@@ -12,6 +12,7 @@ class ZMesonGamma : public edm::EDAnalyzer {
   virtual void endJob() override;
 
   bool runningOnData_;
+  bool verboseIdFlag_;
   const edm::InputTag packedPFCandidates_;
   const edm::InputTag prunedGenParticles_;
   const edm::InputTag slimmedPhotons_;
@@ -19,8 +20,6 @@ class ZMesonGamma : public edm::EDAnalyzer {
   const edm::InputTag slimmedMuons_; 
   const edm::InputTag slimmedJets_;
   const edm::InputTag GenInfo_;
-
-
   edm::LumiReWeighting Lumiweights_;
 
 
@@ -30,8 +29,8 @@ class ZMesonGamma : public edm::EDAnalyzer {
   void create_trees();
 
   // ---------- member data ----------- //
-  TH1F* h_Events;
-  TH1F* h_pileup;
+  TH1F* hEvents;
+  TH1F* hPileup;
 
   //Counters
   int nPV;
@@ -45,12 +44,18 @@ class ZMesonGamma : public edm::EDAnalyzer {
   int nPhotons38WP80;
   int nJets30;
   int nJets25;
-
-  int _Nevents_triggered;
-  int _Nevents_processed;
-  int _Nevents_isPhoton;
-  int _Nevents_isTwoKaons;
-
+  int nEventsTriggered;
+  int nEventsProcessed;
+  int nEventsIsTwoKaons;
+  int nEventsIsPhoton;
+  int nEventsZMatched; 
+  int nEventsZNotMatched; 
+  int nEventsZMassMatched; 
+  int nEventsZMassNotMatched; 
+  int nEventsMesonPtNotMatched;
+  int nEventsBestPairFound;
+  int nEventsTrkPtFilter;
+  int nEventsPairIsolationFilter;
 
   //bools
   bool isTwoProngTrigger;
@@ -62,77 +67,105 @@ class ZMesonGamma : public edm::EDAnalyzer {
   //TTree and TTree variables
   TTree *mytree;
 
-  int run_number;
-  int event_number;
+  int runNumber;
+  int eventNumber;
 
 
-  float ph_eT;
-  float ph_energy;
-  float ph_eta;
-  float ph_etaSC;
-  float ph_phi;
-  float eTphMax;
+  float photonEt;
+  float photonEnergy;
+  float photonEta;
+  float photonEtaSC;
+  float photonPhi;
+  float photonEtMax; //eTphmax
   float photonRegressionError;
-  float ph_iso_ChargedHadron;
-  float ph_iso_NeutralHadron;
-  float ph_iso_Photon;
-  float ph_iso_eArho;
+  float photonIsoChargedHadron;
+  float photonIsoNeutralHadron;
+  float photonIsoPhoton;
+  float photonIsoEArho;
 
-  float firstCandPx;
-  float firstCandPy;
-  float firstCandPz;
-  float secondCandPx;
-  float secondCandPy;
-  float secondCandPz;
-  float firstCandEnergy;
-  float secondCandEnergy;
-  float firstCandEnergy_K;
-  float secondCandEnergy_K;
-  float firstCandEnergy_Pi;
-  float secondCandEnergy_Pi;
-  float _firstCandPt;
-  float _firstCandEta;
-  float _firstCandPhi;
-  float _firstCandCharge;
-  float _secondCandPt;
-  float _secondCandEta;
-  float _secondCandPhi;
-  float _secondCandCharge;
-  float _bestCouplePt;
-  float _bestCoupleEta;
-  float _bestCouplePhi;
+  float firstTrkPx;
+  float firstTrkPy;
+  float firstTrkPz;
+  float bestFirstTrkDxy;
+  float bestFirstTrkDxyErr;
+  float bestFirstTrkDz;
+  float bestFirstTrkDzErr;
+  float secondTrkPx;
+  float secondTrkPy;
+  float secondTrkPz;
+  float bestSecondTrkDxy;
+  float bestSecondTrkDxyErr;
+  float bestSecondTrkDz;
+  float bestSecondTrkDzErr;
+  float firstTrkEnergy;
+  float secondTrkEnergy;
+  float firstTrkEnergyK;
+  float secondTrkEnergyK;
+  float firstTrkEnergyPi;
+  float secondTrkEnergyPi;
+  float firstTrkPt;
+  float firstTrkEta;
+  float firstTrkPhi;
+  float firstTrkCharge;
+  float secondTrkPt;
+  float secondTrkEta;
+  float secondTrkPhi;
+  float secondTrkCharge;
+  float bestPairPt;
+  float bestPairEta;
+  float bestPairPhi;
 
-  float _Jet_Photon_invMass;
-  float _MesonMass;
+  float jetPhotonInvMass;
+  float mesonMass;
+  float ZMassFrom2KPhoton;
 
-  float met_pT;
-  float metpuppi_pT;
+  float K1SumPt05;
+  float K1SumPt05Ch;
+  float K2SumPt05;
+  float K2SumPt05Ch;
+  float pairSumPt05;
+  float pairSumPt05Ch;
+  float isoK1;
+  float isoK1Ch;
+  float isoK2;
+  float isoK2Ch;
+  float isoPair;
+  float isoPairCh;
+
+  float metPt;
+  float metpuppiPt;
 
   //Jet datamember  
-  float _jet_invMass;
-  float _bestJet_pT;
-  float _bestJet_eta;
-  float _bestJet_phi;
-  int _bestJet_nDaughters;
-  float _bestJet_pTMax;
-  float _bestJet_chargedEmEnergy;
-  float _bestJet_neutralEmEnergy;
-  float _bestJet_chargedHadEnergy;
-  float _bestJet_neutralHadEnergy;
-  float _bestJet_chargedEmEnergyFraction;
-  float _bestJet_neutralEmEnergyFraction;
-  float _bestJet_chargedHadEnergyFraction;
-  float _bestJet_neutralHadEnergyFraction;
-  int _bestJet_chargedHadMultiplicity;
-  float _bestJet_invMass;
-  float _bestJet_Photon_invMass;
-  float _bestJet_JECunc;
+  float jetInvMass;
+  float bestJetPt;
+  float bestJetEta;
+  float bestJetPhi;
+  int bestJetnDaughters;
+  float bestJetPtMax;
+  float bestJetChargedEmEnergy;
+  float bestJetNeutralEmEnergy;
+  float bestJetChargedHadEnergy;
+  float bestJetNeutralHadEnergy;
+  float bestJetChargedEmEnergyFraction;
+  float bestJetNeutralEmEnergyFraction;
+  float bestJetChargedHadEnergyFraction;
+  float bestJetNeutralHadEnergyFraction;
+  int bestJetChargedHadMultiplicity;
+  float bestJetInvMass;
+  float bestJetPhotonInvMass;
+  float bestJetJECunc;
 
   //MC truth
-  float PU_Weight;
-  float MC_Weight;
+  float PUWeight;
+  float MCWeight;
 
-  float rho_;
+  bool isPhi;
+  bool isRho;
+
+  float rho;
+
+  //for VBF veto
+  int nJets20;
 
   //Tokens
   edm::EDGetTokenT<std::vector<reco::GenParticle> > prunedGenParticlesToken_; 
@@ -145,13 +178,14 @@ class ZMesonGamma : public edm::EDAnalyzer {
   edm::EDGetTokenT<std::vector<pat::Jet> > slimmedJetsToken_;
   edm::EDGetTokenT<std::vector<pat::MET> > slimmedMETsToken_;
   edm::EDGetTokenT<std::vector<pat::MET> > slimmedMETsPuppiToken_;
+
   //Ele ID decisions objects
   edm::EDGetToken electronsMiniAODToken_;
 
   //Photon ID decisions
   edm::EDGetToken photonsMiniAODToken_;
 
-  bool verboseIdFlag_;
-
+  //rho (PU energy density)
+  edm::EDGetTokenT<double> rhoToken_;
 
 };
