@@ -127,7 +127,7 @@ verboseIdFlag_(iConfig.getParameter<bool>("phoIdVerbose"))//,
 
 
   debug=false;  //DEBUG datamember 
-  verbose=true; 
+  verbose=false; 
 
   hPileup   = fs->make<TH1F>("pileup", "pileup", 75,0,75);
 
@@ -146,6 +146,9 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   edm::Handle<std::vector<reco::GenParticle>  > genParticles;
   iEvent.getByToken(prunedGenParticlesToken_, genParticles);
+
+  edm::Handle<std::vector<reco::GenParticle>  > prunedGenParticles;
+  if(!runningOnData_)iEvent.getByToken(prunedGenParticlesToken_, prunedGenParticles);
 
   edm::Handle<edm::TriggerResults> triggerBits;
   iEvent.getByToken(triggerBitsToken_, triggerBits);  
@@ -484,12 +487,12 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   //int MCtruthIndex = -1;
   //float deltaR = -1;   
   int nDaughters = 0;
-  //bool isBestJetFound = false; 
+   
 
   //daughters forloop variable
   int firstTrkCharge; //carica primo candidato firstTrkCharge
   int secondTrkCharge; //secondTrkCharge
-  float firstCandPt; // firstTrkPt
+  float firstTrkPt; // firstTrkPt
   float secondTrkPt; //secondTrkPt
   LorentzVector firstTrkP4; //quadrimpulso firstTrkP4
   LorentzVector secondTrkP4; //secondTrkP4
@@ -543,22 +546,21 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   bool isBestCoupleOfTheEventFound=false; //isBestCoupleOfTheEventFound
   bool isPhi = false;
   bool isRho = false;
-  //std::vector<float> pt_jets_vector;   //for VBF veto
-  //std::vector<LorentzVector> p4_jets_vector;   //for VBF veto
-  //std::vector<float> m_jets_vector;   //for VBF veto
-
+  bool check = false;
+  
   //JEC uncertainties
   //JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(JetCorPar); 
 
   //JET LOOP
   for (auto jet = slimmedJets->begin(); jet != slimmedJets->end(); ++jet) {//JET LOOP START -------------------------------------------------------- 
 
+    if(check) cout << "Jet loop starts" << endl;
     jetIndex++; 
 
     jetPhotonInvMass=(jet->p4()+photonP4).M(); //calculate inv mass of jet+photon
     nDaughters= jet->numberOfDaughters(); //calculate number of daughters
 
-    //----------------------------- Pre-Filters --------------------------------------------------------//mettere tutto insieme con gli or
+    //----------------------------- Pre-Filters --------------------------------------------------------
     float neutralHadEnergyFrac = jet->neutralHadronEnergyFraction();
     float neutralEmEnergyFrac  = jet->neutralEmEnergyFraction();
     float muonEnergyFrac       = jet->muonEnergyFraction();
@@ -568,89 +570,61 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     float pt                   = jet->pt();
     float eta                  = abs(jet->eta());
 
-    /*if(jet->neutralHadronEnergyFraction() > 0.9) continue; //reject if neutralhadron-energy fraction is > 0.9
-    if(jet->neutralEmEnergyFraction() > 0.9) continue; //reject if neutralEm-energy fraction is > 0.9, alias NO-PHOTON FILTER                              
-    if(nDaughters < 2) continue; //reject if number of constituens is less then 1
-    if(jet->muonEnergyFraction() > 0.8) continue; //reject if muon-energy fraction is > 0.8 
-    if(jet->chargedHadronEnergyFraction() <= 0.) continue; //reject if chargedHadron-energy fraction is 0 
-    if(jet->chargedHadronMultiplicity() == 0) continue; //reject if there are NOT charged hadrons 
-    if(jet->chargedEmEnergyFraction() > 0.8) continue; //reject if chargedEm-energy fraction is > 0.8   
-    if(jet->pt() < 20. || abs(jet->eta()) > 4.7) continue;*/
-
-    if(neutralHadEnergyFrac > 0.9 || neutralEmEnergyFrac > 0.9 || nDaughters < 2. || muonEnergyFrac > 0.8 || chargedHadEnergyFrac < 0. || chargedHadMult == 0. || chargedEmEnergyFrac > 0.8 || pt < 20. || eta > 4.7) continue;
-    //for VBF veto ----------------------
-    //nJets20++;
-    //eta_jets_vector.push_back(jet->eta());
-    //p4_jets_vector.push_back(jet->p4());
-    //pt_jets_vector.push_back(jet->pt());
-    //m_jets_vector.push_back((jet->p4()).M());
-    //-----------------------------------
-
-    /*/JEC and JES uncertainties ----------------------------------------------
-    jecUnc->setJetEta(jet->eta());
-    jecUnc->setJetPt(jet->pt()); // here you must use the CORRECTED jet pt
-    double unc = jecUnc->getUncertainty(true);
-    double jetPtShifted = jet->pt() - unc; //just for JEC syst
-    if (debug) cout <<"jet pT = "<<jet->pt()<<", jet pT shifted = "<<jetPtShifted<<endl;
-    //------------------------------------------------------------------------*/
-
+    if(neutralHadEnergyFrac > 0.9 || neutralEmEnergyFrac > 0.9 || nDaughters < 2. || muonEnergyFrac > 0.8 || chargedHadEnergyFrac <= 0. || chargedHadMult == 0. || chargedEmEnergyFrac > 0.8 || pt < 20. || eta > 4.7) continue;
+    
     if(jet->pt() < 38. || abs(jet->eta()) > 2.5) continue; //taglio in pt, deve comunque essere > del trigger (35)
     if(jetPhotonInvMass < 30.) continue; //reject jets with inv mass lower than 30 GeV (molto loose)
                            
     //-------------------------------------------------------------------------------------------------      
     
-    if(verbose) cout<<"    Jet at index = "<<jetIndex<<" passed the cuts:"<<endl; 
-
+    if(verbose) cout<<"Jet at index = "<<jetIndex<<" passed the cuts:"<<endl; 
     
     //-------------------------------------daughters forloop----------------------------
 
     for(int firstTrkIndex=0; firstTrkIndex < nDaughters; firstTrkIndex++){ //1ST PARTICLE LOOP STARTS
 
+      if(check) cout << "First track loop starts" << endl;
+
       if (verbose) cout<<"Daughter n."<<firstTrkIndex+1<<" pT = "<<slimmedJets->at(jetIndex).daughter(firstTrkIndex)->pt()<<endl; 
 
       firstTrkCharge = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->charge();  //take firstCand charge
-      firstCandPt    = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->pt();  //take firstCand pt
+      firstTrkPt    = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->pt();  //take firstCand pt
       firstCandEta   = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->eta(); //take firstCand eta
       firstCandPhi   = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->phi(); //take firstCand phi
+      if(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack() == NULL) continue;
       firstTrkDxy    = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position()); //take firstCand dxy
       firstTrkDxyErr = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dxyError();        
       firstTrkDz     = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position()); //take firstCand dz
       firstTrkDzErr  = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dzError();
 
-      //loop only over charged daughters, mettere tutto insieme con degli ||
-      if(firstTrkCharge == 0 || slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack() == NULL || abs(firstTrkDxy) >= 0.2 || abs(firstTrkDz) >= 0.5 || !(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->quality(reco::Track::highPurity))) continue;
-      /*if (slimmedJets->at(jetIndex).daughter(firstTrkIndex)->charge() == 0) continue;
-      if(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack() == NULL) continue;//se non trova una buona traccia
-      if (abs(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position())) >= 0.2) continue;
-      if (abs(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position())) >= 0.5)  continue;
-      if (!(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->quality(reco::Track::highPurity))) continue;*/         
-
-      if(firstCandPt < 1.) continue; //firstCand filter if pT < 1 GeV
+      //loop only over charged daughters
+      if(firstTrkCharge == 0 || abs(firstTrkDxy) >= 0.2 || abs(firstTrkDz) >= 0.5 || !(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->quality(reco::Track::highPurity))) continue;
+      
+      if(firstTrkPt < 1.) continue; //firstCand filter if pT < 1 GeV
 
       for(int secondTrkIndex=firstTrkIndex+1; secondTrkIndex < nDaughters; secondTrkIndex++){ //2ND LOOP STARTS
-      
-        //loop only over charged daughters, raggruppare con gli || 
+
+        if(check) cout << "Second track loop starts" << endl;
+        //loop only over charged daughters
         secondTrkCharge = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->charge();
         secondTrkPt     = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->pt();
         secondCandEta   = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->eta();
         secondCandPhi   = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->phi();
+        if(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack() == NULL) continue;
         secondTrkDxy    = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position());
         secondTrkDxyErr = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxyError();          
         secondTrkDz     = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position());
         secondTrkDzErr  = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dzError();
 
-        if(secondTrkCharge == 0 || slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack() == NULL || abs(secondTrkDxy) >= 0.2 || abs(secondTrkDz) >= 0.5 || !(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->quality(reco::Track::highPurity))) continue;
-        /*if (slimmedJets->at(jetIndex).daughter(secondTrkIndex)->charge() == 0) continue;
-        if (slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack() == NULL) continue;
-        if(verbose) cout<<"Track without bestTrack() found!"<<endl;
+        if(secondTrkCharge == 0 || abs(secondTrkDxy) >= 0.2 || abs(secondTrkDz) >= 0.5 || !(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->quality(reco::Track::highPurity))) continue;
+        
+        //if(verbose) cout<<"Track without bestTrack() found!"<<endl;
         //cout<<"dxy = "<<slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position())<<endl;
         //cout<<"dz  = "<<slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position())<<endl;          
-        if ((abs(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position()))) >= 0.2 || abs(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position())) >= 0.5 ) continue;
-        if (!(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->quality(reco::Track::highPurity))) continue;*/
-        
+                
         //TRKs PT CUT --------------------------------------------------------------------------
         if(secondTrkPt < 1.) continue; //firstCand filter if pT < 1 GeV
-        if(firstCandPt < 10. && secondTrkPt < 10.) continue;  //filter if both cand pT are < 10GeV
+        if(firstTrkPt < 10. && secondTrkPt < 10.) continue;  //filter if both cand pT are < 10 GeV
 
         //DITRK DELTA R CUT --------------------------------------------------------------------------         
         float deltaEta= firstCandEta - secondCandEta;
@@ -659,7 +633,7 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         if (deltaPhi > M_PI) deltaPhi = 2*M_PI - deltaPhi;
 
         deltaRK= sqrt(deltaEta*deltaEta + deltaPhi*deltaPhi);
-        if(deltaRK > 0.07) continue; //forse >0.05, controllare
+        if(deltaRK > 0.07) continue; //controllare
 
         //OPPOSITE CHARGE - FILTER ------------------------------------------------------------
         if(firstTrkCharge * secondTrkCharge >= 0) continue; //choose only opposite charges
@@ -740,6 +714,7 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
         // ISOLATION CUT -------------------------------------------------------------------------  
         for(auto cand_iso = PFCandidates->begin(); cand_iso != PFCandidates->end(); ++cand_iso){ //ISOLATION FORLOOP START
+          if(check) cout << "Isolation loop starts" << endl;
           
           if(debug){
             cout <<endl<<"ISO CALC DETAILS ---------------------"<<endl;
@@ -790,6 +765,8 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
             pairSumPt05Ch += cand_iso->pt();
             if (debug) cout<<"Particle in the cone: SumPt = "<<pairSumPt05Ch<<endl;
           }
+          if(check) cout << "isolation loop ended" << endl;
+
         } //ISOLATION FORLOOP END
 
         float isoCoupleCh = pairP4.pt()/(pairSumPt05Ch + pairP4.pt());
@@ -798,7 +775,6 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
           continue; //reject se la coppia di tracce contribuisce per meno del 90% al pt totale del jet
         }
 
-        //if(verbose) cout << "step 1" << endl;
         //PT MAX OF THE JET - FILTER -------------------------------------------------
         if (verbose) cout<<"Current bestCoupleOfTheEvent_Pt = "<<bestCoupleOfTheJetPt<<endl;
         
@@ -806,7 +782,6 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
           if(verbose) cout<<"Not passed: pT lower than the current best pair of the event"<<endl;
           continue; //choose the couple with greatest pt
         }
-        //if(verbose) cout << "step 2" << endl;
 
         //If passed, this is the pair with the largest pT of the event so far
         bestCoupleOfTheJetPt = pairP4.pt();     
@@ -814,7 +789,6 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
         if(verbose) cout<<"This is the best pair so far!"<<endl<<"-------------------------"<<endl;
         isBestCoupleOfTheEventFound = true;
-        //if(verbose) cout << "step 3" << endl;
 
         //Save if best pair has been found
         bestJetIndex         = jetIndex; //note the position of the chosen jet inside the vector   
@@ -839,20 +813,19 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         bestSecondTrkP4      = secondTrkP4;
         bestPairP4           = pairP4;          
 
-        if(verbose) cout << "step 4" << endl;
-
+        if(check) cout << "Second track loop ends" << endl;
     } //2ND LOOP ENDS
-    if(verbose) cout << "second loop ended" << endl;
+    if(check) cout << "First track loop ends" << endl;
   } //1ST LOOP ENDS
-  if(verbose) cout << "first loop ended" << endl;
 
   if(jet->pt() < 25.) continue;
   nJets25++;
   if(jet->pt() < 30.) continue;
   nJets30++;
 
+  if(check) cout << "jet loop ends" << endl;
 } //JET LOOP END
-if(verbose) cout << "jet loop ended" << endl;
+
 //delete jecUnc;
 
 
@@ -918,8 +891,8 @@ if(firstTrkPt < secondTrkCharge)  //swap-values loop, in order to fill the tree 
 }
 
 //CUTS ON CANDIDATES PT
-if(firstTrkPt < 20. || secondTrkCharge < 5.) {
-    cout<<"Final cut on candidates pT not passed, RETURN."<<endl;
+if(firstTrkPt < 15. || secondTrkCharge < 5.) {
+    if(verbose) cout<<"Final cut on candidates pT not passed, RETURN."<<endl;
     return;
 }
   nEventsTrkPtFilter++;
@@ -950,13 +923,236 @@ nEventsPairIsolationFilter++;
 
 
 
+//*************************************************************//
+//                                                             //
+//----------------------- Access MC Truth ---------------------//
+//                                                             //
+//*************************************************************//
+
+//In signal, identify if there's a real mu or ele from W
+is_Kplus_matched   = false;
+is_Kminus_matched  = false;
+is_Piplus_matched  = false;
+is_Piminus_matched = false;
+//is_Phi_matched     = false;
+//is_Rho_matched     = false;
+is_photon_matched  = false;
+is_meson_matched   = false;
+is_Higgs_matched   = false; 
+
+Kminus_phi   = -999.;
+Kplus_phi    = -999.;
+float Piminus_phi  = -999.;
+float Piplus_phi   = -999.;
+Kminus_eta   = -999.;
+Kplus_eta    = -999.;
+float Piminus_eta  = -999.;
+float Piplus_eta   = -999.;
+deltaR_Kplus       = -999;
+deltaR_wrong       = -999;
+deltaR_Kminus      = -999.;
+deltaR_Piplus      = -999.;
+deltaR_Piminus     = -999.;
+genPhoton_eT       = -999.;
+genPhoton_eta      = -999.;
+genPhoton_phi      = -999.;
+genMeson_pT        = -999.;
+genMeson_m         = -999.;
+genMeson_eta       = -999.;
+genMeson_phi       = -999.;
+KplusPt      = -999.;
+KminusPt     = -999.;
+Kplus_dxy    = -999.;
+Kplus_dz     = -999.;
+Kminus_dxy    = -999.;
+Kminus_dz     = -999.;
 
 
+if(!runningOnData_){
+    for(auto gen = prunedGenParticles->begin(); gen != prunedGenParticles->end(); ++gen){
+      if( gen->pdgId() == 321  && gen->mother()->pdgId() == 333 && gen->mother()->mother()->pdgId() == 25)  Kplus_phi   = gen->phi(), Kplus_eta   = gen->eta(), KplusPt  = gen->pt();//, Kplus_dz  = gen->dz();//(&slimmedPV->at(0))->position()
+      if( gen->pdgId() == -321 && gen->mother()->pdgId() == 333 && gen->mother()->mother()->pdgId() == 25)  Kminus_phi  = gen->phi(), Kminus_eta  = gen->eta(), KminusPt = gen->pt();//, Kminus_dxy = gen->dxy(), Kminus_dz = gen->dz();
+      if( gen->pdgId() == 211  && gen->mother()->pdgId() == 113 && gen->mother()->mother()->pdgId() == 25)  Piplus_phi  = gen->phi(), Piplus_eta  = gen->eta();
+      if( gen->pdgId() == -211 && gen->mother()->pdgId() == 113 && gen->mother()->mother()->pdgId() == 25)  Piminus_phi = gen->phi(), Piminus_eta = gen->eta();
+      if( gen->pdgId() == 333  && gen->mother()->pdgId() == 25) genMeson_pT  = gen->pt(), genMeson_phi  = gen->phi(),  genMeson_eta = gen->eta(), genMeson_m = gen->mass();
+      if( gen->pdgId() == 113  && gen->mother()->pdgId() == 25) genMeson_pT  = gen->pt(), genMeson_phi  = gen->phi(),  genMeson_eta = gen->eta(), genMeson_m = gen->mass();
+      if( gen->pdgId() == 22   && gen->mother()->pdgId() == 25) genPhoton_eT = gen->pt(), genPhoton_phi = gen->phi(), genPhoton_eta = gen->eta();
+    }
+  }
 
+//MC TRUTH CHECK
+if(!runningOnData_) //ONLY FOR MC START
+{
+  //photon matching -----------------------------------------
+  float deltaPhiPhoton = fabs(photonPhi - genPhoton_phi);
+  if (deltaPhiPhoton > M_PI) deltaPhiPhoton = 2*M_PI - deltaPhiPhoton;
 
+  float deltaR_photonGenVsReco = sqrt((photonEta - genPhoton_eta) * (photonEta - genPhoton_eta) + deltaPhiPhoton * deltaPhiPhoton);
+  //float photonRelPt = 
+  if (deltaR_photonGenVsReco < 0.2) is_photon_matched = true;
 
+  //meson matching -----------------------------------------
+  float deltaPhiMeson = fabs(bestPairPhi - genMeson_phi);
+  if (deltaPhiMeson > M_PI) deltaPhiMeson = 2*M_PI - deltaPhiMeson;
+
+  float deltaR_mesonGenVsReco = sqrt((bestPairEta - genMeson_eta) * (bestPairEta - genMeson_eta) + deltaPhiMeson * deltaPhiMeson);
+  if (deltaR_mesonGenVsReco < 0.3) is_meson_matched = true;    
+
+  //meson pT matching -----------------------------------------
+  if (bestPairPt < genMeson_pT - 4. || bestPairPt > genMeson_pT + 4.) nEventsMesonPtNotMatched ++; 
+
+  //Higgs matching -----------------------------------------    
+  if(is_photon_matched && is_meson_matched){
+
+    if(verbose) cout<<endl<<"**************** Z FOUND ******************"<<endl;
+    //if(verbose) cout<<"Higgs deltaR = "<<deltaR<<endl;
+    nEventsZMatched++;
+    is_Higgs_matched=true;
+  }
   
-  mytree->Fill();
+  else 
+  {
+    nEventsZNotMatched++;
+    if(verbose) cout<<"THAT'S NOT A Z!"<<endl;    
+  }
+
+  //if is PhiGamma event
+  if (isPhi){
+
+    //First cand positive and second cand negative
+    if (firstTrkCharge > 0){ 
+      float deltaPhi_Kplus = fabs(firstTrkPhi - Kplus_phi);
+      float deltaPhi_wrong = fabs(secondTrkPhi - Kplus_phi);
+
+      //phi angle folding K plus
+      if (deltaPhi_Kplus > M_PI) deltaPhi_Kplus = 2*M_PI - deltaPhi_Kplus;
+      if (deltaPhi_wrong > M_PI) deltaPhi_wrong = 2*M_PI - deltaPhi_wrong;
+
+      //deltaR K plus
+      deltaR_Kplus = sqrt((firstTrkEta - Kplus_eta) * (firstTrkEta - Kplus_eta) + deltaPhi_Kplus * deltaPhi_Kplus);
+      deltaR_wrong = sqrt((secondTrkEta - Kplus_eta) * (secondTrkEta - Kplus_eta) + deltaPhi_wrong * deltaPhi_wrong);
+      
+      //phi angle folding K minus
+      float deltaPhi_Kminus = fabs(secondTrkPhi - Kminus_phi);
+      if (deltaPhi_Kminus > M_PI) deltaPhi_Kminus = 2*M_PI - deltaPhi_Kminus;
+
+      //deltaR K minus
+      deltaR_Kminus = sqrt((secondTrkEta - Kminus_eta) * (secondTrkEta - Kminus_eta) + deltaPhi_Kminus * deltaPhi_Kminus);
+      cout<<endl;
+      //if (_firstTrkPt < 0.95*KplusPt && _firstTrkPt > 1.05*KplusPt) cout<<"firstCand pT not matched"<<endl;
+
+    }
+
+    else{ //Second cand positive and first cand negative
+      
+      //phi angle folding K plus
+      float deltaPhi_Kplus = fabs(secondTrkPhi - Kplus_phi);
+      if (deltaPhi_Kplus > M_PI) deltaPhi_Kplus = 2*M_PI - deltaPhi_Kplus;
+
+      //deltaR K plus
+      deltaR_Kplus = sqrt((secondTrkEta - Kplus_eta) * (secondTrkEta - Kplus_eta) + deltaPhi_Kplus * deltaPhi_Kplus);
+
+      //cout<<endl;
+      //if (_firstTrkPt < 0.95*KminusPt && _firstTrkPt > 1.05*KminusPt) cout<<"firstTrkPt pT not matched"<<endl;
+
+    }
+
+    //phi angle folding K minus
+    float deltaPhi_Kminus = fabs(firstTrkPhi - Kminus_phi);
+    if (deltaPhi_Kminus > M_PI) deltaPhi_Kminus = 2*M_PI - deltaPhi_Kminus;
+
+    //deltaR K minus
+    deltaR_Kminus = sqrt((firstTrkEta - Kminus_eta) * (firstTrkEta - Kminus_eta) + deltaPhi_Kminus * deltaPhi_Kminus);
+
+
+  } //if isPhi END
+
+  else{ //RhoGamma event
+
+    //First cand positive and second cand negative
+    if (firstTrkCharge > 0){ 
+      //phi angle folding Pi plus
+      float deltaPhi_Piplus = fabs(firstTrkPhi - Piplus_phi);
+      if (deltaPhi_Piplus > M_PI) deltaPhi_Piplus = 2*M_PI - deltaPhi_Piplus;
+
+      //deltaR Pi plus
+      deltaR_Piplus = sqrt((firstTrkEta - Piplus_eta) * (firstTrkEta - Piplus_eta) + deltaPhi_Piplus * deltaPhi_Piplus);
+
+      //phi angle folding Pi minus
+      float deltaPhi_Piminus = fabs(secondTrkPhi - Piminus_phi);
+      if (deltaPhi_Piminus > M_PI) deltaPhi_Piminus = 2*M_PI - deltaPhi_Piminus;
+
+      //deltaR Pi minus
+      deltaR_Piminus = sqrt((secondTrkEta - Piminus_eta) * (secondTrkEta - Piminus_eta) + deltaPhi_Piminus * deltaPhi_Piminus);      
+    }
+
+    else{ //Second cand positive and first cand negative
+      
+      //phi angle folding Pi plus
+      float deltaPhi_Piplus = fabs(secondTrkPhi - Piplus_phi);
+      if (deltaPhi_Piplus > M_PI) deltaPhi_Piplus = 2*M_PI - deltaPhi_Piplus;
+
+      //deltaR Pi plus
+      deltaR_Piplus = sqrt((secondTrkEta - Piplus_eta) * (secondTrkEta - Piplus_eta) + deltaPhi_Piplus * deltaPhi_Piplus);
+      
+      
+      //phi angle folding Pi minus
+      float deltaPhi_Piminus = fabs(firstTrkPhi - Piminus_phi);
+      if (deltaPhi_Piminus > M_PI) deltaPhi_Piminus = 2*M_PI - deltaPhi_Piminus;
+
+      //deltaR Pi minus
+      deltaR_Piminus = sqrt((firstTrkEta - Piminus_eta) * (firstTrkEta - Piminus_eta) + deltaPhi_Piminus * deltaPhi_Piminus);
+    }
+
+  } // if isRho END
+
+  //some prints    
+  if(verbose){
+    cout<<"Photon eT = "<<photonEt<<endl;
+    cout<<"n Jets = "<<nJets25<<endl;
+    cout<<"Jet + photon inv. mass = "<<bestJetPhotonInvMass<<endl;
+    cout<<"n. of daughters: "<<bestJetnDaughters<<endl;
+    cout<<"Best couple pT = "<<firstTrkPt + secondTrkPt<<endl;
+    cout<<"firstTrkPt     = "<<firstTrkPt<<endl;
+    cout<<"secondCandPt   = "<<secondTrkPt<<endl;
+    cout<<"genMeson_pT    = "<<genMeson_pT<<endl;
+    cout<<"genKplus pT    = "<<KplusPt<<endl;
+    cout<<"genKminus pT   = "<<KminusPt<<endl;
+    cout<<"trk1 dxy       = "<<bestFirstTrkDxy<<endl;
+    cout<<"trk2 dxy       = "<<bestSecondTrkDxy<<endl;
+    cout<<"trk1 dxyErr    = "<<bestFirstTrkDxyErr<<endl;
+    cout<<"trk2 dxyErr    = "<<bestSecondTrkDxyErr<<endl;
+    cout<<"deltaDxy       = "<<abs(bestFirstTrkDxy - bestSecondTrkDxy)<<endl;
+    cout<<"trk1 dz        = "<<bestFirstTrkDz<<endl;
+    cout<<"trk2 dz        = "<<bestSecondTrkDz<<endl;
+    cout<<"trk1 dzErr     = "<<bestFirstTrkDzErr<<endl;
+    cout<<"trk2 dzErr     = "<<bestSecondTrkDzErr<<endl;
+    cout<<"deltaDz        = "<<abs(bestFirstTrkDz - bestSecondTrkDz)<<endl;
+    cout<<"Kplus  dxy     = "<<Kplus_dxy<<endl;
+    cout<<"Kplus  dz      = "<<Kplus_dz<<endl;
+    cout<<"Kminus dxy     = "<<Kminus_dxy<<endl;
+    cout<<"Kminus dz      = "<<Kminus_dz<<endl;
+    cout<<"Best couple DeltaR = "<<deltaRKChosen<<endl;
+    cout<<"Meson candidate inv. mass  = "<<mesonMass<<endl;
+    cout<<"isPhi = "<<isPhi<<" and isRho = "<<isRho<<endl;
+    cout<<"Z inv. mass = "<<ZMassFrom2KPhoton<<endl;
+    cout<<"--------------------------------------------------"<<endl;
+    cout<<"MC Z found = "<<nEventsZMatched<<",   Z NOT matched = "<<nEventsZNotMatched<<",   mesonPt not matched = "<<nEventsMesonPtNotMatched<<endl;
+    cout<<"--------------------------------------------------"<<endl<<endl;
+  }
+
+} //ONLY FOR MC END
+
+else //ONLY FOR DATA
+{
+  cout<<"CANDIDATE Z FOUND IN DATA: EVENT RECORDED!"<<endl;
+  if(debug){
+    cout<<"Photon eT = "<<photonEt<<endl;
+  }
+}
+  
+mytree->Fill();
+
 }
 
 //*************************************************************//
@@ -1014,17 +1210,17 @@ void ZMesonGamma::create_trees()
   mytree->Branch("bestJet_JECunc",&bestJetJECunc);
 
   mytree->Branch("firstTrkCharge",&firstTrkCharge);
-  mytree->Branch("firstCandPt",&firstTrkPt);
-  mytree->Branch("firstCandEta",&firstTrkEta);
-  mytree->Branch("firstCandPhi",&firstTrkPhi);
+  mytree->Branch("firstTrkPt",&firstTrkPt);
+  mytree->Branch("firstTrkEta",&firstTrkEta);
+  mytree->Branch("firstTrkPhi",&firstTrkPhi);
   mytree->Branch("firstTrkDxy",&bestFirstTrkDxy);
   mytree->Branch("firstTrkDz",&bestFirstTrkDz);
   mytree->Branch("firstTrkDxyErr",&bestFirstTrkDxyErr);
   mytree->Branch("firstTrkDzErr",&bestFirstTrkDzErr);
   mytree->Branch("secondTrkCharge",&secondTrkCharge);
-  mytree->Branch("secondTrkPt",&secondTrkCharge);
-  mytree->Branch("secondCandEta",&secondTrkEta);
-  mytree->Branch("secondCandPhi",&secondTrkPhi);
+  mytree->Branch("secondTrkPt",&secondTrkPt);
+  mytree->Branch("secondTrkEta",&secondTrkEta);
+  mytree->Branch("secondTrkPhi",&secondTrkPhi);
   mytree->Branch("secondTrkDxy",&bestSecondTrkDxy);
   mytree->Branch("secondTrkDz",&bestSecondTrkDz);
   mytree->Branch("secondTrkDxyErr",&bestSecondTrkDxyErr);
@@ -1039,7 +1235,7 @@ void ZMesonGamma::create_trees()
   mytree->Branch("secondTrkEnergy",&secondTrkEnergy);
 
   mytree->Branch("MesonMass",&mesonMass);
-  mytree->Branch("Hmass_From2K_Photon",&ZMassFrom2KPhoton);
+  mytree->Branch("ZMassFrom2KPhoton",&ZMassFrom2KPhoton);
 
   mytree->Branch("pairSumPt05",&pairSumPt05);
   mytree->Branch("pairSumPt05Ch",&pairSumPt05Ch);

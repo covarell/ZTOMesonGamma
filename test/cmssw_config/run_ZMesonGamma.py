@@ -35,15 +35,16 @@ options.parseArguments()
 if options.runningOnData:
     process.GlobalTag = GlobalTag(process.GlobalTag, '106X_dataRun2_v33') # OLD ONE : 102X_dataRun2_Sep2018ABC_v2
     inputFiles = { '/store/data/Run2018B/Tau/MINIAOD/UL2018_MiniAODv2-v2/70000/09FD3540-D36B-6249-9817-D3BAC2F02E74.root'}
-
-   
-    #inputFiles = listOfFiles
-
+    
 else:
    process.GlobalTag = GlobalTag(process.GlobalTag, '106X_upgrade2018_realistic_v15_L1v1')  # OLD ONE : 102X_upgrade2018_realistic_v18
-   inputFiles={'file:/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD/Zrhogamma_2018UL_11.root',
-            'file:/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD/Zrhogamma_2018UL_0.root'} 
-   input_path = '/eos/user/p/pellicci/MesonGamma_root/2023/Zphigamma_miniAOD/'
+   inputFiles={'file:/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD/Zrhogamma_2018UL_12.root','file:/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD/Zrhogamma_2018UL_11.root'} 
+   #inputFiles={'file:/eos/user/p/pellicci/MesonGamma_root/2023/Zphigamma_miniAOD/Zphigamma_2018UL_12.root','file:/eos/user/p/pellicci/MesonGamma_root/2023/Zphigamma_miniAOD/Zphigamma_2018UL_11.root'}
+   input_path = '/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD/'
+   #input_path = '/eos/user/p/pellicci/MesonGamma_root/2023/Zphigamma_miniAOD/'
+
+
+
 #INPUT FILE LIST
 '''                                                                                                                                                                                                   
     For the given path, get the List of all files in the directory tree                                                                                                                               
@@ -66,18 +67,21 @@ def getListOfFiles(dirName):
     return allFiles     
 
 # Get the list of all files in directory tree at given path                                                                                                                                           
-#listOfFiles = getListOfFiles(input_path)                                                                                                                                                              
-#print(listOfFiles)   
+listOfFiles = getListOfFiles(input_path) ######                                                                                                                                                          
+print(listOfFiles)  
+
 process.source = cms.Source ("PoolSource",
-                             fileNames = cms.untracked.vstring (inputFiles),
+                             fileNames = cms.untracked.vstring (listOfFiles), #inputFiles or listOfFiles
                              duplicateCheckMode = cms.untracked.string ('noDuplicateCheck')
-)
+                             )
 
 
 # Output file
-process.TFileService = cms.Service("TFileService",
-   fileName = cms.string("ZMesonGamma_output.root")
-)
+if options.runningOnData:
+    process.TFileService = cms.Service("TFileService", fileName = cms.string("ZMesonGamma_Data.root"))
+else:
+    process.TFileService = cms.Service("TFileService", fileName = cms.string("ZMesonGamma_Signal.root"))
+
 
 
 ###############################################################################################################################
@@ -108,7 +112,7 @@ updateJetCollection(
 
 
 
-process.load("ZAnalysis.ZTOMesonGamma.ZMesonGammaGen_cfi")
+process.load("ZMesonGammaAnalysis.ZTOMesonGamma.ZMesonGammaGen_cfi")
 process.ZMesonGamma.runningOnData = options.runningOnData
 
 # Apply JEC to both MC and data

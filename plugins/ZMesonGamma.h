@@ -115,6 +115,11 @@ class ZMesonGamma : public edm::EDAnalyzer {
   float bestPairEta;
   float bestPairPhi;
 
+  float minPDFWeight;
+  float maxPDFWeight;
+  float minQCDWeight;
+  float maxQCDWeight;
+
   float jetPhotonInvMass;
   float mesonMass;
   float ZMassFrom2KPhoton;
@@ -158,7 +163,40 @@ class ZMesonGamma : public edm::EDAnalyzer {
   //MC truth
   float PUWeight;
   float MCWeight;
+  float deltaR_Kplus;
+  float deltaR_wrong;
+  float deltaR_Kminus;
+  float deltaR_Piplus;
+  float deltaR_Piminus;
+  float genPhoton_eT;
+  float genPhoton_eta;
+  float genPhoton_phi;
+  float genMeson_pT;
+  float genMeson_eta;
+  float genMeson_phi;
+  float genMeson_m;
+  float KplusPt;
+  float KminusPt;
+  float Kplus_dxy;
+  float Kplus_dz;
+  float Kminus_dxy;
+  float Kminus_dz;
+  float Kminus_eta;
+  float Kplus_eta;
+  float Kminus_phi;
+  float Kplus_phi;
 
+  bool is_Kplus_matched;
+  bool is_Kminus_matched;
+  bool is_Piplus_matched;
+  bool is_Piminus_matched;
+  bool is_Phi_fromH;
+  bool is_Rho_fromH;
+  bool is_Photon_fromH;
+  bool is_photon_a_photon;
+  bool is_photon_matched;
+  bool is_meson_matched;
+  bool is_Higgs_matched;
   bool isPhi;
   bool isRho;
 
