@@ -174,9 +174,9 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   edm::Handle<std::vector<pat::MET > > slimmedMETsPuppi;
   iEvent.getByToken(slimmedMETsPuppiToken_, slimmedMETsPuppi);
 
-  edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
+  /*edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
   iSetup.get<JetCorrectionsRecord>().get("AK4PFchs",JetCorParColl); 
-  JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
+JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];*/
 
 
    nEventsProcessed++; //This will be saved in the output tree, giving the number of processed events
