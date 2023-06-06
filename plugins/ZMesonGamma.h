@@ -1,40 +1,51 @@
+
 //---------- class declaration----------
 
 class ZMesonGamma : public edm::EDAnalyzer {
-
- public:
+public:
   explicit ZMesonGamma(const edm::ParameterSet&);
   ~ZMesonGamma();
 
- private:
+private:
   virtual void beginJob() override;
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() override;
-
+ 
+ 
   bool runningOnData_;
   bool verboseIdFlag_;
   const edm::InputTag packedPFCandidates_;
+  const edm::InputTag slimmedMuons_; 
   const edm::InputTag prunedGenParticles_;
+  const edm::InputTag genParticles_;
   const edm::InputTag slimmedPhotons_;
   const edm::InputTag slimmedElectrons_;
-  const edm::InputTag slimmedMuons_; 
   const edm::InputTag slimmedJets_;
+  const edm::InputTag slimmedMETs_;
+  const edm::InputTag slimmedMETsPuppi_;
+  const edm::InputTag pvCollection_;  
+  const edm::InputTag bsCollection_;  
+  const edm::InputTag PileupSrc_;
   const edm::InputTag GenInfo_;
+
   edm::LumiReWeighting Lumiweights_;
-
-
 
   edm::Service<TFileService> fs;
 
   void create_trees();
 
-  // ---------- member data ----------- //
+  // ----------member data ---------------------------
   TH1F* hEvents;
+
   TH1F* hPileup;
+
+  //debug
+
+  bool debug;
+  bool verbose;
 
   //Counters
   int nPV;
-
   int nMuons10;
   int nMuons20;
   int nElectrons10;
@@ -56,32 +67,24 @@ class ZMesonGamma : public edm::EDAnalyzer {
   int nEventsBestPairFound;
   int nEventsTrkPtFilter;
   int nEventsPairIsolationFilter;
-
-  //bools
-  bool isTwoProngTrigger;
-
-  //debug
-  bool debug;
-  bool verbose;
-
+  
   //TTree and TTree variables
   TTree *mytree;
 
   int runNumber;
   int eventNumber;
 
-
   float photonEt;
-  float photonEnergy;
   float photonEta;
   float photonEtaSC;
   float photonPhi;
-  float photonEtMax; //eTphmax
-  float photonRegressionError;
   float photonIsoChargedHadron;
   float photonIsoNeutralHadron;
   float photonIsoPhoton;
   float photonIsoEArho;
+  bool isPhotonWP90;
+  float photonEtMax;
+  float photonRegressionError;
 
   float firstTrkPx;
   float firstTrkPy;
@@ -114,7 +117,6 @@ class ZMesonGamma : public edm::EDAnalyzer {
   float bestPairPt;
   float bestPairEta;
   float bestPairPhi;
-
   float minPDFWeight;
   float maxPDFWeight;
   float minQCDWeight;
@@ -123,7 +125,7 @@ class ZMesonGamma : public edm::EDAnalyzer {
   float jetPhotonInvMass;
   float mesonMass;
   float ZMassFrom2KPhoton;
-
+    
   float K1SumPt05;
   float K1SumPt05Ch;
   float K2SumPt05;
@@ -137,10 +139,14 @@ class ZMesonGamma : public edm::EDAnalyzer {
   float isoPair;
   float isoPairCh;
 
+  
   float metPt;
   float metpuppiPt;
+  
+  bool isTwoProngTrigger;
 
-  //Jet datamember  
+  //Jet datamember
+  
   float jetInvMass;
   float bestJetPt;
   float bestJetEta;
@@ -159,13 +165,13 @@ class ZMesonGamma : public edm::EDAnalyzer {
   float bestJetInvMass;
   float bestJetPhotonInvMass;
   float bestJetJECunc;
-
+  
   //MC truth
-  float PUWeight;
-  float MCWeight;
-  float deltaR_Kplus;
+  float PU_Weight;
+  float MC_Weight;
+  float deltaRKplus;
   float deltaR_wrong;
-  float deltaR_Kminus;
+  float deltaRKminus;
   float deltaR_Piplus;
   float deltaR_Piminus;
   float genPhoton_eT;
@@ -197,25 +203,34 @@ class ZMesonGamma : public edm::EDAnalyzer {
   bool is_photon_matched;
   bool is_meson_matched;
   bool is_Higgs_matched;
-  bool isPhi;
-  bool isRho;
-
-  float rho;
+  bool _isPhi;
+  bool _isRho;
+  //rho for isolation
+  float rho_;
 
   //for VBF veto
   int nJets20;
 
+
   //Tokens
-  edm::EDGetTokenT<std::vector<reco::GenParticle> > prunedGenParticlesToken_; 
   edm::EDGetTokenT<std::vector<pat::PackedCandidate> > packedPFCandidatesToken_; 
-  edm::EDGetTokenT<std::vector<reco::Vertex> > offlineSlimmedPrimaryVerticesToken_;  
+  edm::EDGetTokenT<std::vector<pat::Muon> > slimmedMuonsToken_;   edm::EDGetTokenT<std::vector<pat::Jet> > slimmedJetsToken_;
+  edm::EDGetTokenT<std::vector<pat::MET> > slimmedMETsToken_;
+  edm::EDGetTokenT<std::vector<pat::MET> > slimmedMETsPuppiToken_;
+  edm::EDGetTokenT<std::vector<reco::Vertex> > offlineSlimmedPrimaryVerticesToken_; 
+  edm::EDGetTokenT<reco::BeamSpot> offlineBeamSpotToken_;
   edm::EDGetTokenT<std::vector<PileupSummaryInfo> > pileupSummaryToken_;
   edm::EDGetTokenT<GenEventInfoProduct> GenInfoToken_;
   edm::EDGetTokenT<edm::TriggerResults> triggerBitsToken_;
-  edm::EDGetTokenT<std::vector<pat::Muon> > slimmedMuonsToken_;   
-  edm::EDGetTokenT<std::vector<pat::Jet> > slimmedJetsToken_;
-  edm::EDGetTokenT<std::vector<pat::MET> > slimmedMETsToken_;
-  edm::EDGetTokenT<std::vector<pat::MET> > slimmedMETsPuppiToken_;
+  edm::EDGetTokenT<LHEEventProduct> LHEEventProduct_; //LHE reader
+  //edm::EDGetTokenT<std::vector<pat::PackedGenParticle> > packedGenParticlesToken_; //GENPART
+  edm::EDGetTokenT<std::vector<reco::GenParticle>> prunedGenParticlesToken_;
+  
+  //edm::EDGetTokenT<reco::JetCorrector> jetCorrectorToken_;
+  //edm::EDGetTokenT<JetCorrectionUncertainty> mJetCorrectorUnc;
+
+//  edm::EDGetTokenT<reco::JetCorrector> jetCorrectorToken_;
+
 
   //Ele ID decisions objects
   edm::EDGetToken electronsMiniAODToken_;
@@ -225,5 +240,10 @@ class ZMesonGamma : public edm::EDAnalyzer {
 
   //rho (PU energy density)
   edm::EDGetTokenT<double> rhoToken_;
+
+
+  //Effective areas for isolation
+  //EffectiveAreas   effectiveAreas_el_;
+  //EffectiveAreas   effectiveAreas_ph_;
 
 };

@@ -13,7 +13,9 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 
 from Configuration.AlCa.GlobalTag import GlobalTag
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
+#process.options = cms.untracked.PSet(SkipEvent = cms.untracked.vstring('ProductNotFound'))
+
 inputFiles={'file:/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD/Zrhogamma_2018UL_11.root',
             'file:/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD/Zrhogamma_2018UL_0.root'}
 
@@ -42,21 +44,11 @@ def getListOfFiles(dirName):
 listOfFiles = getListOfFiles(input_path)                                                                                                                                                              
 ##print(listOfFiles) 
 
-process.source = cms.Source("PoolSource",fileNames = cms.untracked.vstring(listOfFiles))
-
-process.source = cms.Source ("PoolSource",
-                             fileNames = cms.untracked.vstring (listOfFiles),
-                             duplicateCheckMode = cms.untracked.string ('noDuplicateCheck')
-)   
+process.source = cms.Source ("PoolSource", fileNames = cms.untracked.vstring (listOfFiles), duplicateCheckMode = cms.untracked.string ('noDuplicateCheck'))   
 
 
 #Output file
-process.TFileService = cms.Service("TFileService",
-   fileName = cms.string("ZMesonGammaGen_output.root")
-)
-
+process.TFileService = cms.Service("TFileService", fileName = cms.string("ZMesonGammaGen_output.root"))
 process.ZMesonGammaGen = cms.EDAnalyzer('ZMesonGammaGen') ##nome
-##process.load("ZAnalysis.ZMesonGamma.ZMesonGammaAnalysis_cfi")
-
 process.p = cms.Path(process.ZMesonGammaGen) ##nome
 

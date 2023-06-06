@@ -43,12 +43,12 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   edm::Handle<std::vector<reco::GenParticle>  > genParticles;
   iEvent.getByToken(prunedGenParticlesToken_, genParticles);
 
-  int genZ_ID    = -999;
-  float genZ_pT  = -999.;
-  float genZ_eta = -999.;
-  float genZ_phi = -999.;
-  float genZ_E   = -999.;
-  float genZ_mass=-999.;
+  int genZ_ID     = -999;
+  float genZ_pT   = -999.;
+  float genZ_eta  = -999.;
+  float genZ_phi  = -999.;
+  float genZ_E    = -999.;
+  float genZ_mass = -999.;
 
   int genGamma_ID    = -999;
   float genGamma_pT  = -999.;
@@ -56,12 +56,12 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   float genGamma_phi = -999.;
   float genGamma_E   = -999.;
 
-  int genMeson_ID    = -999;
-  float genMeson_pT  = -999.;
-  float genMeson_eta = -999.;
-  float genMeson_phi = -999.;
-  float genMeson_E   = -999.;
-  float genMeson_mass =-999.;
+  int genMeson_ID     = -999;
+  float genMeson_pT   = -999.;
+  float genMeson_eta  = -999.;
+  float genMeson_phi  = -999.;
+  float genMeson_E    = -999.;
+  float genMeson_mass = -999.;
 
   int genTrackminus_ID    = -999;
   float genTrackminus_pT  = -999.;
@@ -116,110 +116,117 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 
       //for each daughter
       for(int i = 0; i < 2; i++){
-	
-	//if daughter is Gamma
-	if(gen->daughter(i)->pdgId() == 22){
 
-	//save Z variables
-	genZ_ID  = gen->pdgId();
-	genZ_pT  = gen->pt();
-	genZ_eta = gen->eta();
-	genZ_phi = gen->phi();
-	genZ_E   = gen->energy();
-	
-		 
-	//save Gamma variables
-	genGamma_ID  = gen->daughter(i)->pdgId();
-	genGamma_pT  = gen->daughter(i)->pt();
-	genGamma_eta = gen->daughter(i)->eta();
-	genGamma_phi = gen->daughter(i)->phi();
-	genGamma_E   = gen->daughter(i)->energy();
-	} 
+        //if daughters are not Phi or Rho and gamma, continue
+        if( !(gen->daughter(i)->pdgId() == 22 || (gen->daughter(i)->pdgId() == 333 || gen->daughter(i)->pdgId() == 113)) ) continue;
 
-	//if daughter(i) is a Phi or a Rho
-	if(gen->daughter(i)->pdgId() == 333 || gen->daughter(i)->pdgId() == 113){
+        //save Z variables
+        genZ_ID   = gen->pdgId();
+        genZ_pT   = gen->pt();
+        genZ_eta  = gen->eta();
+        genZ_phi  = gen->phi();
+        genZ_E    = gen->energy();
+        genZ_mass = gen->p4().M();
+              
+        //cout << gen->daughter(i)->pdgId() << endl;
 
-	  //save Phi/Rho variables
-	  genMeson_ID  = gen->daughter(i)->pdgId();
-	  genMeson_pT  = gen->daughter(i)->pt();
-	  genMeson_eta = gen->daughter(i)->eta();
-	  genMeson_phi = gen->daughter(i)->phi();
-	  genMeson_E   = gen->daughter(i)->energy();
+        //if daughter is Gamma
+        if(gen->daughter(i)->pdgId() == 22){ 
+                   
+          //save Gamma variables
+          genGamma_ID  = gen->daughter(i)->pdgId();
+          genGamma_pT  = gen->daughter(i)->pt();
+          genGamma_eta = gen->daughter(i)->eta();
+          genGamma_phi = gen->daughter(i)->phi();
+          genGamma_E   = gen->daughter(i)->energy();
+        } 
 
-    
-	  //if Meson has two daughters
-	  if(gen->daughter(i)->numberOfDaughters() == 2){
-	    
-	    //for each Meson daughter
-	    for(int j = 0; j < 2; j++){
+        //if daughter(i) is a Phi or a Rho
+        if(gen->daughter(i)->pdgId() == 333 || gen->daughter(i)->pdgId() == 113){
 
-	      //if daughter(j) is a K-
-	      if(gen->daughter(i)->daughter(j)->pdgId() == -321){
+          //save Phi/Rho variables
+          genMeson_ID   = gen->daughter(i)->pdgId();
+          genMeson_pT   = gen->daughter(i)->pt();
+          genMeson_eta  = gen->daughter(i)->eta();
+          genMeson_phi  = gen->daughter(i)->phi();
+          genMeson_E    = gen->daughter(i)->energy();
+          genMeson_mass = gen->daughter(i)->p4().M();
+          //cout << genMeson_mass << endl;
 
-		//save K- variables
-		genTrackminus_ID = gen->daughter(i)->daughter(j)->pdgId();
-		genTrackminus_pT = gen->daughter(i)->daughter(j)->pt();
-		genTrackminus_eta = gen->daughter(i)->daughter(j)->eta();
-		genTrackminus_phi = gen->daughter(i)->daughter(j)->phi();
-		genTrackminus_E = gen->daughter(i)->daughter(j)->energy();
-	      }
+  
+          //if Meson has two daughters
+          if(gen->daughter(i)->numberOfDaughters() == 2){
+      
+            //for each Meson daughter
+            for(int j = 0; j < 2; j++){
 
-	      //if daughter(j) is a K+
-	      if(gen->daughter(i)->daughter(j)->pdgId() == 321){
+              //if daughter(j) is a K-
+              if(gen->daughter(i)->daughter(j)->pdgId() == -321){
 
-		//save K+ variables
-		genTrackplus_ID = gen->daughter(i)->daughter(j)->pdgId();
-		genTrackplus_pT = gen->daughter(i)->daughter(j)->pt();
-		genTrackplus_eta = gen->daughter(i)->daughter(j)->eta();
-		genTrackplus_phi = gen->daughter(i)->daughter(j)->phi();
-		genTrackplus_E = gen->daughter(i)->daughter(j)->energy();
-	      }
+                //save K- variables
+                genTrackminus_ID = gen->daughter(i)->daughter(j)->pdgId();
+                genTrackminus_pT = gen->daughter(i)->daughter(j)->pt();
+                genTrackminus_eta = gen->daughter(i)->daughter(j)->eta();
+                genTrackminus_phi = gen->daughter(i)->daughter(j)->phi();
+                genTrackminus_E = gen->daughter(i)->daughter(j)->energy();
+              }
 
-	     
-	      //if daughter(j) is a Pi-
-	      if(gen->daughter(i)->daughter(j)->pdgId() == -211){
+              //if daughter(j) is a K+
+              if(gen->daughter(i)->daughter(j)->pdgId() == 321){
 
-		//save Pi- variables
-		genTrackminus_ID = gen->daughter(i)->daughter(j)->pdgId();
-		genTrackminus_pT = gen->daughter(i)->daughter(j)->pt();
-		genTrackminus_eta = gen->daughter(i)->daughter(j)->eta();
-		genTrackminus_phi = gen->daughter(i)->daughter(j)->phi();
-		genTrackminus_E = gen->daughter(i)->daughter(j)->energy();
-	      }
-	      
-	      //if daughter(j) is a Pi+
-	      if(gen->daughter(i)->daughter(j)->pdgId() == 211){
+                //save K+ variables
+                genTrackplus_ID = gen->daughter(i)->daughter(j)->pdgId();
+                genTrackplus_pT = gen->daughter(i)->daughter(j)->pt();
+                genTrackplus_eta = gen->daughter(i)->daughter(j)->eta();
+                genTrackplus_phi = gen->daughter(i)->daughter(j)->phi();
+                genTrackplus_E = gen->daughter(i)->daughter(j)->energy();
+              }
 
-		//save Pi+ variables
-		genTrackplus_ID = gen->daughter(i)->daughter(j)->pdgId();
-		genTrackplus_pT = gen->daughter(i)->daughter(j)->pt();
-		genTrackplus_eta = gen->daughter(i)->daughter(j)->eta();
-		genTrackplus_phi = gen->daughter(i)->daughter(j)->phi();
-		genTrackplus_E = gen->daughter(i)->daughter(j)->energy();
-	      }
+       
+              //if daughter(j) is a Pi-
+              if(gen->daughter(i)->daughter(j)->pdgId() == -211){
 
-	    
-	    } //j-forloop end
-      //cout<<"pdgIDE"<<endl;
-      //cout<<genTrackplus_ID<<endl;
-	  }//"if Phi/Rho has two daughters" end   //quindi: il mesone è sempre un phi/rho, infatti pdgID è stampato sempre, mentre non sempre il mesone decade in due figlie,
-        //cout<<"pdgID"<<endl;             // infatti pdgIDE non sempre è stampato
-        //cout<<genTrackplus_ID<<endl;
+                //save Pi- variables
+                genTrackminus_ID = gen->daughter(i)->daughter(j)->pdgId();
+                genTrackminus_pT = gen->daughter(i)->daughter(j)->pt();
+                genTrackminus_eta = gen->daughter(i)->daughter(j)->eta();
+                genTrackminus_phi = gen->daughter(i)->daughter(j)->phi();
+                genTrackminus_E = gen->daughter(i)->daughter(j)->energy();
+              }
+        
+              //if daughter(j) is a Pi+
+              if(gen->daughter(i)->daughter(j)->pdgId() == 211){
+
+                //save Pi+ variables
+                genTrackplus_ID = gen->daughter(i)->daughter(j)->pdgId();
+                genTrackplus_pT = gen->daughter(i)->daughter(j)->pt();
+                genTrackplus_eta = gen->daughter(i)->daughter(j)->eta();
+                genTrackplus_phi = gen->daughter(i)->daughter(j)->phi();
+                genTrackplus_E = gen->daughter(i)->daughter(j)->energy();
+              }
+
+      
+            } //j-forloop end
+            //cout<<"pdgIDE"<<endl;
+            //cout<<genTrackplus_ID<<endl;
+          }//"if Phi/Rho has two daughters" end   //quindi: il mesone è sempre un phi/rho, infatti pdgID è stampato sempre, mentre non sempre il mesone decade in due figlie,
+          //cout<<"pdgID"<<endl;             // infatti pdgIDE non sempre è stampato
+          //cout<<genTrackplus_ID<<endl;
         }//"if it is a Phi/Rho" end
       }//i-forloop end
-        //Evaluate Meson invariant mass
-        genMeson_mass = TMath::Sqrt((genTrackplus_E+genTrackminus_E)*(genTrackplus_E+genTrackminus_E)-((genTrackplus_pT*TMath::Cos(genTrackplus_phi)+genTrackminus_pT*TMath::Cos(genTrackminus_phi))*(genTrackplus_pT*TMath::Cos(genTrackplus_phi)+genTrackminus_pT*TMath::Cos(genTrackminus_phi))+(genTrackplus_pT*TMath::Sin(genTrackplus_phi)+genTrackminus_pT*TMath::Sin(genTrackminus_phi))*(genTrackplus_pT*TMath::Sin(genTrackplus_phi)+genTrackminus_pT*TMath::Sin(genTrackminus_phi))+(genTrackplus_pT*TMath::SinH(genTrackplus_eta)+genTrackminus_pT*TMath::SinH(genTrackminus_eta))*(genTrackplus_pT*TMath::SinH(genTrackplus_eta)+genTrackminus_pT*TMath::SinH(genTrackminus_eta))));
         //Evaluate Z invariant mass
-        genZ_mass = TMath::Sqrt((genGamma_E+genMeson_E)*(genGamma_E+genMeson_E)-((genGamma_pT*TMath::Cos(genGamma_phi)+genMeson_pT*TMath::Cos(genMeson_phi))*(genGamma_pT*TMath::Cos(genGamma_phi)+genMeson_pT*TMath::Cos(genMeson_phi))+(genGamma_pT*TMath::Sin(genGamma_phi)+genMeson_pT*TMath::Sin(genMeson_phi))*(genGamma_pT*TMath::Sin(genGamma_phi)+genMeson_pT*TMath::Sin(genMeson_phi))+(genGamma_pT*TMath::SinH(genGamma_eta)+genMeson_pT*TMath::SinH(genMeson_eta))*(genGamma_pT*TMath::SinH(genGamma_eta)+genMeson_pT*TMath::SinH(genMeson_eta))));       
+        //genZ_mass = TMath::Sqrt((genGamma_E+genMeson_E)*(genGamma_E+genMeson_E)-((genGamma_pT*TMath::Cos(genGamma_phi)+genMeson_pT*TMath::Cos(genMeson_phi))*(genGamma_pT*TMath::Cos(genGamma_phi)+genMeson_pT*TMath::Cos(genMeson_phi))+(genGamma_pT*TMath::Sin(genGamma_phi)+genMeson_pT*TMath::Sin(genMeson_phi))*(genGamma_pT*TMath::Sin(genGamma_phi)+genMeson_pT*TMath::Sin(genMeson_phi))+(genGamma_pT*TMath::SinH(genGamma_eta)+genMeson_pT*TMath::SinH(genMeson_eta))*(genGamma_pT*TMath::SinH(genGamma_eta)+genMeson_pT*TMath::SinH(genMeson_eta))));       
+        //Evaluate Meson invariant mass
+        //genMeson_mass = TMath::Sqrt((genTrackplus_E+genTrackminus_E)*(genTrackplus_E+genTrackminus_E)-((genTrackplus_pT*TMath::Cos(genTrackplus_phi)+genTrackminus_pT*TMath::Cos(genTrackminus_phi))*(genTrackplus_pT*TMath::Cos(genTrackplus_phi)+genTrackminus_pT*TMath::Cos(genTrackminus_phi))+(genTrackplus_pT*TMath::Sin(genTrackplus_phi)+genTrackminus_pT*TMath::Sin(genTrackminus_phi))*(genTrackplus_pT*TMath::Sin(genTrackplus_phi)+genTrackminus_pT*TMath::Sin(genTrackminus_phi))+(genTrackplus_pT*TMath::SinH(genTrackplus_eta)+genTrackminus_pT*TMath::SinH(genTrackminus_eta))*(genTrackplus_pT*TMath::SinH(genTrackplus_eta)+genTrackminus_pT*TMath::SinH(genTrackminus_eta))));
     }//"if it is a Z" end
-    	}//gen-forloop end
+  }//gen-forloop end
   
-  genZ_ID_tree  = genZ_ID;
-  genZ_pT_tree  = genZ_pT;
-  genZ_eta_tree = genZ_eta;
-  genZ_phi_tree = genZ_phi;
-  genZ_E_tree   = genZ_E;
-  genZ_mass_tree= genZ_mass;
+  genZ_ID_tree   = genZ_ID;
+  genZ_pT_tree   = genZ_pT;
+  genZ_eta_tree  = genZ_eta;
+  genZ_phi_tree  = genZ_phi;
+  genZ_E_tree    = genZ_E;
+  genZ_mass_tree = genZ_mass;
 
   
   genGamma_ID_tree  = genGamma_ID;
@@ -228,25 +235,25 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   genGamma_phi_tree = genGamma_phi;
   genGamma_E_tree   = genGamma_E;
   
-  genMeson_ID_tree  = genMeson_ID;
-  genMeson_pT_tree  = genMeson_pT;
-  genMeson_eta_tree = genMeson_eta;
-  genMeson_phi_tree = genMeson_phi;
-  genMeson_E_tree   = genMeson_E;
-  genMeson_mass_tree= genMeson_mass;
+  genMeson_ID_tree   = genMeson_ID;
+  genMeson_pT_tree   = genMeson_pT;
+  genMeson_eta_tree  = genMeson_eta;
+  genMeson_phi_tree  = genMeson_phi;
+  genMeson_E_tree    = genMeson_E;
+  genMeson_mass_tree = genMeson_mass;
 
 
-  genTrackminus_ID_tree = genTrackminus_ID;
-  genTrackminus_pT_tree = genTrackminus_pT;
-  genTrackminus_eta_tree= genTrackminus_eta;
-  genTrackminus_phi_tree= genTrackminus_phi;
-  genTrackminus_E_tree  = genTrackminus_E;
+  genTrackminus_ID_tree  = genTrackminus_ID;
+  genTrackminus_pT_tree  = genTrackminus_pT;
+  genTrackminus_eta_tree = genTrackminus_eta;
+  genTrackminus_phi_tree = genTrackminus_phi;
+  genTrackminus_E_tree   = genTrackminus_E;
 
-  genTrackplus_ID_tree = genTrackplus_ID;
-  genTrackplus_pT_tree = genTrackplus_pT;
-  genTrackplus_eta_tree= genTrackplus_eta;
-  genTrackplus_phi_tree= genTrackplus_phi;
-  genTrackplus_E_tree  = genTrackplus_E;
+  genTrackplus_ID_tree  = genTrackplus_ID;
+  genTrackplus_pT_tree  = genTrackplus_pT;
+  genTrackplus_eta_tree = genTrackplus_eta;
+  genTrackplus_phi_tree = genTrackplus_phi;
+  genTrackplus_E_tree   = genTrackplus_E;
   
   mytree->Fill();
 }
