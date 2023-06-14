@@ -272,9 +272,9 @@ for histo_name in list_histos:
     ################################################
 
     if isPhi: 
-        output_dir = "/eos/user/e/eferrand/"
+        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/"
     else:
-        output_dir = "/eos/user/e/eferrand/"
+        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/"
 
     canvas[histo_name].SaveAs(output_dir + histo_name + ".pdf")
     canvas[histo_name].SaveAs(output_dir + histo_name + ".png")

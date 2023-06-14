@@ -24,7 +24,7 @@ args = p.parse_args()
 fInput = ROOT.TFile(args.rootfile_name)
 output_filename = args.outputfile_option
 mytree = fInput.Get("ZMesonGamma/mytree")
-#h_Events = fInput.Get("ZMesonGamma/hEvents")
+h_Events = fInput.Get("ZMesonGamma/hEvents")
 
 #SPLIT: I can split a string of chars before and after a split code (that could be a string or a symbol)
 #then I can take the string standing before or after with [0] or [1], respectively. 
@@ -42,9 +42,25 @@ if CRflag > 0 :
 else :
     print "Processing the signal region"
 
+
+#Normalization for MC dataset ################################################################################
+
+#normalization_weight = 
+
+#Combine luminosity
+#luminosity2018A = 14.00 #fb^-1
+#luminosity2018B = 3.41 #fb^-1   
+#luminosity2018C = 6.94 #fb^-1
+#luminosity2018D = 31.93 #fb^-1
+luminosity = 39.54 #total lumi delivered during the trigger activity: 39.54 #fb^-1
+
+'''if not samplename == "Data":
+    weightSum = 0.
+else: weightSum = 1.'''
+
 #HISTOS ###########################################################################################################
 histo_map = dict()
-list_histos = ["h_ZMass", "h_MesonMass", "h_firstTrkPt", "h_secondTrkPt", "h_firstTrkEta", "h_secondTrkEta", "h_firstTrkPhi", "h_secondTrkPhi", "h_bestPairPt", "h_bestPairEta", "h_bestPairDeltaR", "h_bestJetPt", "h_bestJetEta", "h_firstTrkIso","h_firstTrkIsoCh","h_secondTrkIso","h_secondTrkIsoCh","h_pairIso","h_pairIsoCh", "h_photonEnergy", "h_photonEta", "h_nJets25","h_nMuons","h_nElectrons", "h_pairIsoNeutral"] 
+list_histos = ["h_ZMass", "h_MesonMass", "h_firstTrkPt", "h_secondTrkPt", "h_firstTrkEta", "h_secondTrkEta", "h_firstTrkPhi", "h_secondTrkPhi", "h_bestPairPt", "h_bestPairEta", "h_bestPairDeltaR", "h_bestJetPt", "h_bestJetEta", "h_firstTrkIso","h_firstTrkIsoCh","h_secondTrkIso","h_secondTrkIsoCh","h_pairIso","h_pairIsoCh", "h_photonEnergy", "h_photonEta", "h_nJets25","h_nMuons","h_nElectrons", "h_pairIsoNeutral", "h_efficiency"] 
 
 histo_map[list_histos[0]]  = ROOT.TH1F(list_histos[0],"M_{Z}", 300, 40., 140.) 
 if   isPhiAnalysis: histo_map[list_histos[1]]  = ROOT.TH1F(list_histos[1],"M_{meson}", 100, 1., 1.05) 
@@ -74,6 +90,7 @@ histo_map[list_histos[21]] = ROOT.TH1F(list_histos[21],"n. of jets over pre-filt
 histo_map[list_histos[22]] = ROOT.TH1F(list_histos[22],"n. of muons", 6, -0.5, 5.5)
 histo_map[list_histos[23]] = ROOT.TH1F(list_histos[23],"n. of electrons", 5, -0.5, 5.5)
 histo_map[list_histos[24]] = ROOT.TH1F(list_histos[24],"Iso_neutral of the meson", 100, 0.6,1.)
+histo_map[list_histos[25]] = ROOT.TH1F(list_histos[25],"Efficiency steps", 6, 0.,6.)
 
 
 #CREATE OUTPUT ROOTFILE ############################################################################################
@@ -106,11 +123,6 @@ _secondTrkIsoCh = np.zeros(1, dtype=float)
 _bestPairDeltaR = np.zeros(1, dtype=float) 
 
 
-
-
-
-
-
 tree_output = ROOT.TTree('tree_output','tree_output')
 tree_output.Branch('ZMass',_ZMass,'ZMass/D')
 tree_output.Branch('mesonMass',_mesonMass,'MesonMass/D')
@@ -134,11 +146,9 @@ tree_output.Branch('bestPairDeltaR',_bestPairDeltaR,'_bestPairDeltaR/D')
 ##tree_output.Branch('eventWeight',_eventWeight,'_eventWeight/D')
 tree_output.Branch('nJets',_nJets,'_nJets/D')
 
-
-
-
-
-
+#------------- counters -----------------
+#nEventsMesonAnalysis = 0
+nEventsOverLeptonVeto = 0
 
 
 #EVENTS LOOP ########################################################################################################
@@ -198,6 +208,17 @@ for jentry in xrange(nentries):
 
         if CRflag == 1 and (mesonMass > 0.62 and mesonMass < 0.92) :
             continue
+
+    #NORMALIZATION -------------------------------------------------------------------
+    #normalization for MC
+    PUWeight    = mytree.PU_Weight
+    weight_sign = mytree.MC_Weight/abs(mytree.MC_Weight) #just take the sign of the MC gen weight
+    #eventWeight =  luminosity * normalization_weight * weight_sign * PUWeight
+
+    #Lepton veto
+    if nElectrons > 0: continue
+    if nMuons     > 0: continue
+    nEventsOverLeptonVeto += 1
 
     #FILL HISTOS #####################################################################################################
     #if DATA -> Blind Analysis on Z inv mass plot
@@ -306,10 +327,50 @@ histo_map["h_nMuons"].GetXaxis().SetTitle("nMuons over selection")
 histo_map["h_nMuons"].SetTitle("# of muons")
 histo_map["h_nElectrons"].GetXaxis().SetTitle("nMuons over selection")
 histo_map["h_nElectrons"].SetTitle("# of electrons")
+histo_map["h_efficiency"].GetXaxis().SetTitle("")
+histo_map["h_efficiency"].GetYaxis().SetTitle("#epsilon (%)")
 
 
 #Tree writing ##########################################################################################################
 tree_output.Write()
+
+bin1content  = h_Events.GetBinContent(1)
+bin2content  = h_Events.GetBinContent(2)
+bin3content  = h_Events.GetBinContent(3)
+bin4content  = h_Events.GetBinContent(4)
+bin5content  = h_Events.GetBinContent(5)
+bin6content  = h_Events.GetBinContent(6)
+
+nSignal      = bin1content
+scale_factor = 100/nSignal
+
+histo_map["h_efficiency"].Fill(0.5,bin1content*scale_factor)
+histo_map["h_efficiency"].Fill(1.5,bin2content*scale_factor)
+histo_map["h_efficiency"].Fill(2.5,bin3content*scale_factor)
+histo_map["h_efficiency"].Fill(3.5,bin4content*scale_factor)
+histo_map["h_efficiency"].Fill(4.5,bin5content*scale_factor)
+histo_map["h_efficiency"].Fill(5.5,bin6content*scale_factor)
+histo_map["h_efficiency"].GetXaxis().SetBinLabel(1,"Events processed")
+histo_map["h_efficiency"].GetXaxis().SetBinLabel(2,"Events triggered")
+histo_map["h_efficiency"].GetXaxis().SetBinLabel(3,"Photon requested")
+histo_map["h_efficiency"].GetXaxis().SetBinLabel(4,"Best couple found")
+histo_map["h_efficiency"].GetXaxis().SetBinLabel(5,"trk-cand pT selection")
+histo_map["h_efficiency"].GetXaxis().SetBinLabel(6,"trktrk iso selection")
+
+c11 = ROOT.TCanvas()
+c11.cd()
+histo_map["h_efficiency"].SetFillColor(1) 
+histo_map["h_efficiency"].SetFillStyle(3003)
+ROOT.gStyle.SetPaintTextFormat("4.2f %")
+ROOT.gStyle.SetOptStat(0)
+histo_map["h_efficiency"].SetMarkerSize(1.4)
+histo_map["h_efficiency"].GetXaxis().SetRangeUser(0.,7.1)
+#histo_map["h_efficiency"].GetYaxis().SetRangeUser(0.,30.)
+#histo_map["h_efficiency"].SetMaximum(max(histo_map["h_efficiency"].GetHistogram().GetMaximum(),30.))
+histo_map["h_efficiency"].Draw("HIST TEXT0")
+c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/h_efficiency.pdf")
+c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/h_efficiency.png")    
+
 
 #HISTOS WRITING ########################################################################################################
 fOut.cd()

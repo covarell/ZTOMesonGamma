@@ -109,20 +109,19 @@ verboseIdFlag_(iConfig.getParameter<bool>("phoIdVerbose"))
   GenInfoToken_                       = consumes<GenEventInfoProduct> (edm::InputTag("generator"));
   triggerBitsToken_                   = consumes<edm::TriggerResults> (edm::InputTag("TriggerResults","","HLT"));
   rhoToken_                           = consumes<double> (iConfig.getParameter <edm::InputTag>("rho"));
-  //LHEEventProduct_                    = consumes<LHEEventProduct>(edm::InputTag("externalLHEProducer"));
   //packedGenParticlesToken_            = consumes<std::vector<pat::GenParticle>>(edm::InputTag("packedGenParticles", "", "PAT"));
 
   hEvents = fs->make<TH1F>("hEvents", "Event counting in different steps", 8, 0., 8.);
 
-  nEventsProcessed             = 0;
-  nEventsTriggered             = 0;
-  nEventsIsTwoKaons            = 0;
-  nEventsIsPhoton              = 0;
-  nEventsZMatched          = 0;
-  nEventsZNotMatched       = 0;
-  nEventsMesonPtNotMatched     = 0;
+  nEventsProcessed           = 0;
+  nEventsTriggered           = 0;
+  nEventsIsTwoKaons          = 0;
+  nEventsIsPhoton            = 0;
+  nEventsZMatched            = 0;
+  nEventsZNotMatched         = 0;
+  nEventsMesonPtNotMatched   = 0;
   nEventsBestPairFound       = 0;
-  nEventsTrkPtFilter          = 0;
+  nEventsTrkPtFilter         = 0;
   nEventsPairIsolationFilter = 0;
 
 
@@ -152,9 +151,6 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   edm::Handle<std::vector<reco::GenParticle>  > prunedGenParticles;
   if(!runningOnData_)iEvent.getByToken(prunedGenParticlesToken_, prunedGenParticles);
 
-  //edm::Handle<std::vector<pat::PackedGenParticle>> packedGenParticles;  //GENPART
-  //if(!runningOnData_) iEvent.getByToken(packedGenParticlesToken_, packedGenParticles);
-
   edm::Handle<std::vector<pat::Photon> > slimmedPhotons;
   iEvent.getByToken(photonsMiniAODToken_,slimmedPhotons);
 
@@ -176,12 +172,6 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   edm::Handle<edm::TriggerResults> triggerBits;
   iEvent.getByToken(triggerBitsToken_, triggerBits); 
 
-  //edm::Handle<reco::JetCorrector> jetCorr;
-  //iEvent.getByToken(jetCorrectorToken_, jetCorr);
-
-  /*edm::ESHandle<JetCorrectorParametersCollection> JetCorParColl;
-  iSetup.get<JetCorrectionsRecord>().get("AK4PFchs",JetCorParColl); 
-  JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];*/
 
   nEventsProcessed++; //This will be saved in the output tree, giving the number of processed events
 
@@ -294,121 +284,121 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   if(!isTwoProngTrigger){
    if(verbose) cout<<"Event not triggered, RETURN."<<endl;
    return;
- }
- nEventsTriggered++;
-
+  }
+  nEventsTriggered++;
+  
   //*************************************************************//
   //                                                             //
   //------------------ Variable initialization ------------------//
   //                                                             //
   //*************************************************************//
 
- nMuons10              = 0;
- nElectrons10          = 0;
- nMuons20              = 0;
- nElectrons20          = 0;
- nPhotons38WP80        = 0;
- nPhotons20WP90        = 0;
- nPhotonsChosen        = 0;
- nJets30               = 0;
- nJets25               = 0;
- nJets20               = 0;
+  nMuons10              = 0;
+  nElectrons10          = 0;
+  nMuons20              = 0;
+  nElectrons20          = 0;
+  nPhotons38WP80        = 0;
+  nPhotons20WP90        = 0;
+  nPhotonsChosen        = 0;
+  nJets30               = 0;
+  nJets25               = 0;
+  nJets20               = 0;
  
   //These variables will go in the tree
- photonEt     = 0.;
- photonEta    = 0.;
- photonEtaSC  = 0.;
- photonPhi    = 0.;
- LorentzVector ph_p4;
+  photonEt               = 0.;
+  photonEta              = 0.;
+  photonEtaSC            = 0.;
+  photonPhi              = 0.;
+  LorentzVector ph_p4;
+  photonIsoChargedHadron = 0.;
+  photonIsoNeutralHadron = 0.;
+  photonIsoPhoton        = 0.;
+  photonIsoEArho         = 0.;
+  photonRegressionError  = 0.;
+  photonEtMax        = -1000.;
 
- photonIsoChargedHadron = 0.;
- photonIsoNeutralHadron = 0.;
- photonIsoPhoton        = 0.;
- photonIsoEArho         = 0.;
- photonRegressionError = 0.;
-
-
- photonEtMax = -1000.;
-
- jetPhotonInvMass  = -1.;
- mesonMass           = -1.;
- ZMassFrom2KPhoton = -1.;
+  jetPhotonInvMass  = -1.;
+  mesonMass         = -1.;
+  ZMassFrom2KPhoton = -1.;
  
- metPt      = 0.;
- metpuppiPt = 0.;
+  metPt      = 0.;
+  metpuppiPt = 0.;
 
- bestJetPt                       =-1.;
- bestJetEta                      =-1.;
- bestJetPhi                      =-1.;
- bestJetnDaughters               = 0;
- bestJetPtMax                    =-1.;
- bestJetChargedEmEnergy          = 0.;
- bestJetNeutralEmEnergy          = 0.;
- bestJetChargedHadEnergy         = 0.;
- bestJetNeutralHadEnergy         = 0.;
- bestJetChargedEmEnergyFraction  = 0.;
- bestJetNeutralEmEnergyFraction  = 0.;
- bestJetChargedHadEnergyFraction = 0.;
- bestJetNeutralHadEnergyFraction = 0.;
- bestJetChargedHadMultiplicity   = 0.;
- bestJetInvMass                  = 0.;
- bestJetPhotonInvMass            = 0.;
- bestJetJECunc                   = 0.;
- firstTrkPt                      = 0.;
- firstTrkEta                     = 0.;
- firstTrkPhi                     = 0.;
- firstTrkCharge                  = 0.;
- secondTrkPt                     = 0.;
- secondTrkEta                    = 0.;
- secondTrkPhi                    = 0.;
- secondTrkCharge                 = 0.;
- bestPairPt                     = 0.;
- bestPairEta                    = 0.;
- bestPairPhi                    = 0.;  
+  bestJetPt                       =-1.;
+  bestJetEta                      =-1.;
+  bestJetPhi                      =-1.;
+  bestJetnDaughters               = 0;
+  bestJetPtMax                    =-1.;
+  bestJetChargedEmEnergy          = 0.;
+  bestJetNeutralEmEnergy          = 0.;
+  bestJetChargedHadEnergy         = 0.;
+  bestJetNeutralHadEnergy         = 0.;
+  bestJetChargedEmEnergyFraction  = 0.;
+  bestJetNeutralEmEnergyFraction  = 0.;
+  bestJetChargedHadEnergyFraction = 0.;
+  bestJetNeutralHadEnergyFraction = 0.;
+  bestJetChargedHadMultiplicity   = 0.;
+  bestJetInvMass                  = 0.;
+  bestJetPhotonInvMass            = 0.;
+  bestJetJECunc                   = 0.;
+  firstTrkPt                      = 0.;
+  firstTrkEta                     = 0.;
+  firstTrkPhi                     = 0.;
+  firstTrkCharge                  = 0.;
+  secondTrkPt                     = 0.;
+  secondTrkEta                    = 0.;
+  secondTrkPhi                    = 0.;
+  secondTrkCharge                 = 0.;
+  bestPairPt                      = 0.;
+  bestPairEta                     = 0.;
+  bestPairPhi                     = 0.;  
 
-//K-candidates and PHI ISOLATION
-K1SumPt05        = 0.;
-K1SumPt05Ch     = 0.;
+  //K-candidates and PHI ISOLATION
+  K1SumPt05     = 0.;
+  K1SumPt05Ch   = 0.;
 
-K2SumPt05        = 0.;
-K2SumPt05Ch     = 0.;
+  K2SumPt05     = 0.;
+  K2SumPt05Ch   = 0.;
 
-pairSumPt05    = 0.;
-pairSumPt05Ch = 0.;
+  pairSumPt05   = 0.;
+  pairSumPt05Ch = 0.;
 
-isoK1        = 0.;
-isoK1Ch     = 0.;
-isoK2        = 0.;
-isoK2Ch     = 0.;
-isoPair    = 0.;
-isoPairCh = 0.;
+  isoK1     = 0.;
+  isoK1Ch   = 0.;
+  isoK2     = 0.;
+  isoK2Ch   = 0.;
+  isoPair   = 0.;
+  isoPairCh = 0.;
+
 
   //*************************************************************//
   //                                                             //
   //----------------------------- MET ---------------------------//
   //                                                             //
   //*************************************************************//
- for(auto met = slimmedMETs->begin(); met != slimmedMETs->end(); ++met){
+  for(auto met = slimmedMETs->begin(); met != slimmedMETs->end(); ++met){
   metPt = met->pt();
-}
+  }
 
-for(auto metpuppi = slimmedMETsPuppi->begin(); metpuppi != slimmedMETsPuppi->end(); ++metpuppi){
+  for(auto metpuppi = slimmedMETsPuppi->begin(); metpuppi != slimmedMETsPuppi->end(); ++metpuppi){
   metpuppiPt = metpuppi->pt();
-}
+  }
+
 
   //*************************************************************//
   //                                                             //
   //---------------------------- Muons --------------------------//
   //                                                             //
   //*************************************************************//
- //Count muons for each event
-for(auto mu = slimmedMuons->begin(); mu != slimmedMuons->end(); ++mu){
-  if(mu->pt() < 10. || !mu->CutBasedIdMedium || fabs(mu->eta()) > 2.4 || fabs(mu->muonBestTrack()->dxy((&slimmedPV->at(0))->position())) >= 0.2 || fabs(mu->muonBestTrack()->dz((&slimmedPV->at(0))->position())) >= 0.5) continue;
+  //Count muons for each event
+  for(auto mu = slimmedMuons->begin(); mu != slimmedMuons->end(); ++mu){
+    if(mu->pt() < 10. || !mu->CutBasedIdMedium || fabs(mu->eta()) > 2.4 || fabs(mu->muonBestTrack()->dxy((&slimmedPV->at(0))->position())) >= 0.2 || fabs(mu->muonBestTrack()->dz((&slimmedPV->at(0))->position())) >= 0.5) continue;
   if(!mu->PFIsoLoose) continue;
   nMuons10++;
   if(mu->pt() < 20.) continue;
   nMuons20++;
-}
+  }
+
 
   //*************************************************************//
   //                                                             //
@@ -417,17 +407,14 @@ for(auto mu = slimmedMuons->begin(); mu != slimmedMuons->end(); ++mu){
   //*************************************************************//
   //Count the number of electrons
   // Get rho value
-edm::Handle< double > rhoH;
-iEvent.getByToken(rhoToken_,rhoH);
-rho_ = *rhoH;
+  edm::Handle< double > rhoH;
+  iEvent.getByToken(rhoToken_,rhoH);
+  rho_ = *rhoH;
 
-float corr_pt = 0.;
-/*ph_en_sigmaUP = 0.;
-ph_en_sigmaDW = 0.;
-ph_en_scaleUP = 0.;
-ph_en_scaleDW = 0.;*/
+  float corr_pt = 0.;
 
-for(auto el = slimmedElectrons->begin(); el != slimmedElectrons->end(); ++el){
+
+  for(auto el = slimmedElectrons->begin(); el != slimmedElectrons->end(); ++el){
     //Calculate electron p4, correct it with the Scale&Smearing correction and extract the pT
     LorentzVector el_p4 = el->p4();// * el->userFloat("ecalTrkEnergyPostCorr")/el->energy();
     corr_pt = el_p4.pt();
@@ -494,10 +481,6 @@ for(auto el = slimmedElectrons->begin(); el != slimmedElectrons->end(); ++el){
     //photonIsoEArho         = eA * rho_;
     photonEt     = corr_et;
     //ph_energy = photon->energy();
-    //ph_en_sigmaUP = photon->userFloat("energySigmaUp")/cosh(photon->eta()); //dividing for cosh(eta) means passing from energy to eT
-    //ph_en_sigmaDW = photon->userFloat("energySigmaDown")/cosh(photon->eta());  //dividing for cosh(eta) means passing from energy to eT
-    //ph_en_scaleUP = photon->userFloat("energyScaleUp")/cosh(photon->eta()); //dividing for cosh(eta) means passing from energy to eT
-    //ph_en_scaleDW = photon->userFloat("energyScaleDown")/cosh(photon->eta()); //dividing for cosh(eta) means passing from energy to eT
     photonEta    = photon->eta();
     photonEtaSC  = photon->superCluster()->eta();
     photonPhi    = photon->phi();
@@ -510,15 +493,15 @@ for(auto el = slimmedElectrons->begin(); el != slimmedElectrons->end(); ++el){
 
 
     
-}//PHOTON FORLOOP END -------------------------------------------------------------------------------------------------------------------------
+  }//PHOTON FORLOOP END -------------------------------------------------------------------------------------------------------------------------
 
-//Return if there are no photons chosen
-if(!cand_photon_found) {
-  cout<<"No best photon found, RETURN."<<endl;
-  return;
-}
+  //Return if there are no photons chosen
+  if(!cand_photon_found) {
+    cout<<"No best photon found, RETURN."<<endl;
+    return;
+  }
 
-nEventsIsPhoton++;
+  nEventsIsPhoton++;
 
   //*************************************************************//
   //                                                             //
@@ -527,79 +510,73 @@ nEventsIsPhoton++;
   //*************************************************************//
 
   //int nJet=1;
-int jetIndex=-1;
-int bestJet_Index=-1;
-//int MCtruthIndex = -1;
-float deltaR = -1;   
-int nDaughters = 0;
+  int jetIndex=-1;
+  int bestJet_Index=-1;
+  //int MCtruthIndex = -1;
+  float deltaR = -1;   
+  int nDaughters = 0;
   //bool isBestJetFound = false; 
 
   //daughters forloop variable
-int firstTrkCharge;
-int secondTrkCharge;
-//float firstTrkPt;
-//float secondTrkPt;
-LorentzVector firstTrkP4;
-LorentzVector secondTrkP4;
-LorentzVector firstTrkP4K;
-LorentzVector secondTrkP4K;
-LorentzVector firstTrkP4Pi;
-LorentzVector secondTrkP4Pi;
-LorentzVector pairP4;
-LorentzVector pairP4K;
-LorentzVector PairP4Pi;
-LorentzVector bestFirstTrkP4;
-LorentzVector bestSecondTrkP4;
-LorentzVector bestPairP4;
-float bestCoupleOfTheJetPt = 0.;
-float deltaRKChosen = 0.;
-float deltaRK = 0.;
-firstTrkEnergyK = 0.;
-secondTrkEnergyK = 0.;
-firstTrkEnergyPi = 0.;
-secondTrkEnergyPi = 0.;
-firstTrkPx=0.;
-firstTrkPy=0.;
-firstTrkPz=0.;
-float firstTrkDxy=-999.;
-float firstTrkDxyErr=-999.;
-float firstTrkDz=-999.;
-float firstTrkDzErr=-999.;
-bestFirstTrkDxy=-999.;
-bestFirstTrkDz=-999.;
-bestFirstTrkDxyErr=-999.;
-bestFirstTrkDzErr=-999.;
-secondTrkPx=0.;
-secondTrkPy=0.;
-secondTrkPz=0.;
-float secondTrkDxy=-999.;
-float secondTrkDxyErr=-999.;
-float secondTrkDz=-999.;
-float secondTrkDzErr=-999.;
-bestSecondTrkDxy=-999.;
-bestSecondTrkDz=-999.;
-bestSecondTrkDxyErr=-999.;
-bestSecondTrkDzErr=-999.;
-firstTrkEta=0.;
-firstTrkPhi=0.;
-secondTrkEta=0.;
-secondTrkPhi=0.;
-float PhiMass = 0.;
-float RhoMass = 0.;
-float kMass = 0.4937;
-float PiMass = 0.13957;
-bool isBestCoupleOfTheEventFound=false;
-bool isPhi = false;
-bool isRho = false;
-//std::vector<float> pt_jets_vector;   //for VBF veto
-//std::vector<LorentzVector> p4_jets_vector;   //for VBF veto
-//std::vector<float> m_jets_vector;   //for VBF veto
+  int firstTrkCharge;
+  int secondTrkCharge;
+  //float firstTrkPt;
+  //float secondTrkPt;
+  LorentzVector firstTrkP4;
+  LorentzVector secondTrkP4;
+  LorentzVector firstTrkP4K;
+  LorentzVector secondTrkP4K;
+  LorentzVector firstTrkP4Pi;
+  LorentzVector secondTrkP4Pi;
+  LorentzVector pairP4;
+  LorentzVector pairP4K;
+  LorentzVector PairP4Pi;
+  LorentzVector bestFirstTrkP4;
+  LorentzVector bestSecondTrkP4;
+  LorentzVector bestPairP4;
+  float bestCoupleOfTheJetPt = 0.;
+  float deltaRKChosen = 0.;
+  float deltaRK = 0.;
+  firstTrkEnergyK = 0.;
+  secondTrkEnergyK = 0.;
+  firstTrkEnergyPi = 0.;
+  secondTrkEnergyPi = 0.;
+  firstTrkPx=0.;
+  firstTrkPy=0.;
+  firstTrkPz=0.;
+  float firstTrkDxy=-999.;
+  float firstTrkDxyErr=-999.;
+  float firstTrkDz=-999.;
+  float firstTrkDzErr=-999.;
+  bestFirstTrkDxy=-999.;
+  bestFirstTrkDz=-999.;
+  bestFirstTrkDxyErr=-999.;
+  bestFirstTrkDzErr=-999.;
+  secondTrkPx=0.;
+  secondTrkPy=0.;
+  secondTrkPz=0.;
+  float secondTrkDxy=-999.;
+  float secondTrkDxyErr=-999.;
+  float secondTrkDz=-999.;
+  float secondTrkDzErr=-999.;
+  bestSecondTrkDxy=-999.;
+  bestSecondTrkDz=-999.;
+  bestSecondTrkDxyErr=-999.;
+  bestSecondTrkDzErr=-999.;
+  firstTrkEta=0.;
+  firstTrkPhi=0.;
+  secondTrkEta=0.;
+  secondTrkPhi=0.;
+  float PhiMass = 0.;
+  float RhoMass = 0.;
+  float kMass = 0.4937;
+  float PiMass = 0.13957;
+  bool isBestCoupleOfTheEventFound=false;
+  bool isPhi = false;
+  bool isRho = false;
+  
 
-//JEC uncertainties
-//JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(JetCorPar); 
-
-
-//JET LOOP
+  //JET LOOP
   for (auto jet = slimmedJets->begin(); jet != slimmedJets->end(); ++jet) { //JET LOOP START -------------------------------------------------------- 
 
     jetIndex++;
@@ -624,14 +601,14 @@ bool isRho = false;
                            
      //-------------------------------------------------------------------------------------------------      
     
-    if (verbose) cout<<"    Jet at index = "<<jetIndex<<" passed the cuts:"<<endl; 
+    if (verbose) cout<<" Jet at index = "<<jetIndex<<" passed the cuts:"<<endl; 
        
 
-      //-------------------------------------daughters forloop----------------------------
+    //-------------------------------------daughters forloop----------------------------
 
-      for(int firstTrkIndex=0; firstTrkIndex < nDaughters; firstTrkIndex++){ //1ST LOOP STARTS
+    for(int firstTrkIndex=0; firstTrkIndex < nDaughters; firstTrkIndex++){ //1ST LOOP STARTS
 
-        if (verbose) cout<<"Daughter n."<<firstTrkIndex+1<<" pT = "<<slimmedJets->at(jetIndex).daughter(firstTrkIndex)->pt()<<endl;
+      if (verbose) cout<<"Daughter n."<<firstTrkIndex+1<<" pT = "<<slimmedJets->at(jetIndex).daughter(firstTrkIndex)->pt()<<endl;
 
       firstTrkCharge = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->charge();  //take firstCand charge
       firstTrkPt    = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->pt();  //take firstCand pt
@@ -644,314 +621,312 @@ bool isRho = false;
       firstTrkDzErr  = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dzError();
 
         
-        if(firstTrkCharge == 0 || abs(firstTrkDxy) >= 0.2 || abs(firstTrkDz) >= 0.5 || !(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->quality(reco::Track::highPurity))) continue;
+      if(firstTrkCharge == 0 || abs(firstTrkDxy) >= 0.2 || abs(firstTrkDz) >= 0.5 || !(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->quality(reco::Track::highPurity))) continue;
 
-        /*if (slimmedJets->at(jetIndex).daughter(firstTrkIndex)->charge() == 0) continue;
+      /*if (slimmedJets->at(jetIndex).daughter(firstTrkIndex)->charge() == 0) continue;
+      
+      if(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack() == NULL) continue;
+
+      if (abs(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position())) >= 0.2) continue;
+      if (abs(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position())) >= 0.5)  continue;
+      if (!(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->quality(reco::Track::highPurity))) continue;
+      
+      firstTrkPt  = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->pt();  //take firstCand pt
+      firstTrkEta = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->eta(); //take firstCand eta
+      firstTrkPhi = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->phi(); //take firstCand phi
+
+      firstTrkDxy    = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position());
+      firstTrkDxyErr = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dxyError();
+      
+      firstTrkDz    = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position());
+      firstTrkDzErr = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dzError();*/
+
+      if(firstTrkPt < 1.) continue; //firstCand filter if pT < 1 GeV
+
+      for(int secondTrkIndex=firstTrkIndex+1; secondTrkIndex < nDaughters; secondTrkIndex++){ //2ND LOOP STARTS
+
+        secondTrkCharge = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->charge();
+        secondTrkPt     = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->pt();
+        secondTrkEta   = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->eta();
+        secondTrkPhi   = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->phi();
+        if(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack() == NULL) continue;
+        secondTrkDxy    = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position());
+        secondTrkDxyErr = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxyError();          
+        secondTrkDz     = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position());
+        secondTrkDzErr  = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dzError();
+
+        //if (slimmedJets->at(jetIndex).daughter(secondTrkIndex)->charge() == 0) continue;
+        if(secondTrkCharge == 0 || abs(secondTrkDxy) >= 0.2 || abs(secondTrkDz) >= 0.5 || !(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->quality(reco::Track::highPurity))) continue;
+
+
+        //minimum apporach distance
+        //if (slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack() == NULL) continue;
+        if(verbose) cout<<"Track without bestTrack() found!"<<endl;
+
+        //cout<<"dxy = "<<slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position())<<endl;
+        //cout<<"dz  = "<<slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position())<<endl;
         
-        if(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack() == NULL) continue;
-
-        if (abs(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position())) >= 0.2) continue;
-        if (abs(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position())) >= 0.5)  continue;
-        if (!(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->quality(reco::Track::highPurity))) continue;
+        //if ((abs(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position()))) >= 0.2 || abs(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position())) >= 0.5 ) continue;
+        //if (!(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->quality(reco::Track::highPurity))) continue;
         
-        firstTrkPt  = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->pt();  //take firstCand pt
-        firstTrkEta = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->eta(); //take firstCand eta
-        firstTrkPhi = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->phi(); //take firstCand phi
-
-        firstTrkDxy    = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position());
-        firstTrkDxyErr = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dxyError();
+        //secondTrkDxy    = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position());
+        //secondTrkDxyErr = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxyError();
         
-        firstTrkDz    = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position());
-        firstTrkDzErr = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dzError();*/
+        //secondTrkDz    = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position());
+        //secondTrkDzErr = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dzError();
 
-        if(firstTrkPt < 1.) continue; //firstCand filter if pT < 1 GeV
+        //TRKs PT CUT --------------------------------------------------------------------------
+        //secondTrkPt  = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->pt();
+        if(secondTrkPt < 1.) continue; //firstCand filter if pT < 1 GeV
+        if(firstTrkPt < 10. && secondTrkPt < 10.) continue;  //filter if both cand pT are < 10GeV
 
-        for(int secondTrkIndex=firstTrkIndex+1; secondTrkIndex < nDaughters; secondTrkIndex++){ //2ND LOOP STARTS
+        //DITRK DELTA R CUT --------------------------------------------------------------------------
+        //secondTrkEta = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->eta();
+        //secondTrkPhi = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->phi();
+        
+        float deltaEta= firstTrkEta - secondTrkEta;
 
-          secondTrkCharge = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->charge();
-          secondTrkPt     = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->pt();
-          secondTrkEta   = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->eta();
-          secondTrkPhi   = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->phi();
-          if(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack() == NULL) continue;
-          secondTrkDxy    = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position());
-          secondTrkDxyErr = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxyError();          
-          secondTrkDz     = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position());
-          secondTrkDzErr  = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dzError();
+        float deltaPhi = fabs(firstTrkPhi - secondTrkPhi);  //phi folding 
+        if (deltaPhi > M_PI) deltaPhi = 2*M_PI - deltaPhi;
 
-          //if (slimmedJets->at(jetIndex).daughter(secondTrkIndex)->charge() == 0) continue;
-          if(secondTrkCharge == 0 || abs(secondTrkDxy) >= 0.2 || abs(secondTrkDz) >= 0.5 || !(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->quality(reco::Track::highPurity))) continue;
+        deltaRK= sqrt(deltaEta*deltaEta + deltaPhi*deltaPhi);
+        if(deltaRK > 0.07) continue;
 
+        //OPPOSITE CHARGE - FILTER ------------------------------------------------------------
+        //firstTrkCharge  = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->charge(); //take firstCand charge
+        //secondTrkCharge = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->charge(); //take secondCand charge
+        if(firstTrkCharge * secondTrkCharge >= 0) continue; //choose only opposite charges
 
-          //minimum apporach distance
-          //if (slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack() == NULL) continue;
-          if(verbose) cout<<"Track without bestTrack() found!"<<endl;
+        //QUADRIMOMENTUM CALCULATION ------------------------------------------------------------
+        firstTrkP4  = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->p4(); //take quadrimomentum
+        secondTrkP4 = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->p4();
 
-          //cout<<"dxy = "<<slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position())<<endl;
-          //cout<<"dz  = "<<slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position())<<endl;
-          
-          //if ((abs(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position()))) >= 0.2 || abs(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position())) >= 0.5 ) continue;
-          //if (!(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->quality(reco::Track::highPurity))) continue;
-          
-          //secondTrkDxy    = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position());
-          //secondTrkDxyErr = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxyError();
-          
-          //secondTrkDz    = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position());
-          //secondTrkDzErr = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dzError();
+        firstTrkPx  = firstTrkP4.px(); //take px, py, pz of the first candidate
+        firstTrkPy  = firstTrkP4.py();
+        firstTrkPz  = firstTrkP4.pz();
+        secondTrkPx = secondTrkP4.px(); //take px, py, pz of the second candidate
+        secondTrkPy = secondTrkP4.py();
+        secondTrkPz = secondTrkP4.pz();
 
-          //TRKs PT CUT --------------------------------------------------------------------------
-          //secondTrkPt  = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->pt();
-          if(secondTrkPt < 1.) continue; //firstCand filter if pT < 1 GeV
-          if(firstTrkPt < 10. && secondTrkPt < 10.) continue;  //filter if both cand pT are < 10GeV
+        //PIONS OR KAONS HYPOTHESIS -----------------------------------------------------------------------------------------------------------------------------------------------            
+        firstTrkEnergyK   = sqrt(firstTrkPx  * firstTrkPx  + firstTrkPy  * firstTrkPy  + firstTrkPz  * firstTrkPz  + kMass  * kMass ); //Kaon hypothesis energy recalculation
+        secondTrkEnergyK  = sqrt(secondTrkPx * secondTrkPx + secondTrkPy * secondTrkPy + secondTrkPz * secondTrkPz + kMass  * kMass ); //Kaon hypothesis energy recalculation
+        firstTrkEnergyPi  = sqrt(firstTrkPx  * firstTrkPx  + firstTrkPy  * firstTrkPy  + firstTrkPz  * firstTrkPz  + PiMass * PiMass); //Pion hypothesis energy recalculation
+        secondTrkEnergyPi = sqrt(secondTrkPx * secondTrkPx + secondTrkPy * secondTrkPy + secondTrkPz * secondTrkPz + PiMass * PiMass); //Pion hypothesis energy recalculation
+        
+        /*
+        if (verbose) {
+          cout<<"firstTrkEnergyK   = "<<firstTrkEnergyK<<endl;
+          cout<<"firstTrkEnergyPi  = "<<firstTrkEnergyPi<<endl;
+          cout<<"secondTrkEnergyK  = "<<secondTrkEnergyK<<endl;
+          cout<<"secondTrkEnergyPi = "<<secondTrkEnergyPi<<endl;
+        }
+        */
 
-          //DITRK DELTA R CUT --------------------------------------------------------------------------
-          //secondTrkEta = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->eta();
-          //secondTrkPhi = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->phi();
-          
-          float deltaEta= firstTrkEta - secondTrkEta;
+        firstTrkP4K   = firstTrkP4.SetE(firstTrkEnergyK); //Kaon hypothesis quadrimomentum correction
+        secondTrkP4K  = secondTrkP4.SetE(secondTrkEnergyK); //Kaon hypothesis quadrimomentum correction
+        firstTrkP4Pi  = firstTrkP4.SetE(firstTrkEnergyPi); //Kaon hypothesis quadrimomentum correction
+        secondTrkP4Pi = secondTrkP4.SetE(secondTrkEnergyPi); //Kaon hypothesis quadrimomentum correction
 
-          float deltaPhi = fabs(firstTrkPhi - secondTrkPhi);  //phi folding 
-          if (deltaPhi > M_PI) deltaPhi = 2*M_PI - deltaPhi;
+        pairP4K  = firstTrkP4K  + secondTrkP4K; //calculation of the couple-quadrimomentum after the correction
+        PairP4Pi = firstTrkP4Pi + secondTrkP4Pi; //calculation of the couple-quadrimomentum after the correction
+        
+        if (verbose) {
+          cout<<"KK pT = "<<pairP4K.pt()<<endl;
+          cout<<"PiPi pT = "<<PairP4Pi.pt()<<endl;
+        }
 
-          deltaRK= sqrt(deltaEta*deltaEta + deltaPhi*deltaPhi);
-          if(deltaRK > 0.07) continue;
+        //DITRK PT CUT -------------------------------------------------------------------------
+        if(pairP4K.pt() < 38.) {
+          if(verbose) cout<<"couplePt cut NOT passed"<<endl;
+          continue;
+        }  
+        
+        //MESON INV MASS CUT -------------------------------------------------------------------------
+        isPhi = false;
+        isRho = false;
 
-          //OPPOSITE CHARGE - FILTER ------------------------------------------------------------
-          //firstTrkCharge  = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->charge(); //take firstCand charge
-          //secondTrkCharge = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->charge(); //take secondCand charge
-          if(firstTrkCharge * secondTrkCharge >= 0) continue; //choose only opposite charges
+        PhiMass = (pairP4K).M(); //calculate inv mass of the Phi candidate  
+        if (verbose) cout<<"mKK (before the meson mass selection) =  "<<PhiMass<<endl;
+        if(PhiMass > 1. && PhiMass < 1.05) isPhi = true; //filter on Phi invariant mass  
 
-          //QUADRIMOMENTUM CALCULATION ------------------------------------------------------------
-          firstTrkP4  = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->p4(); //take quadrimomentum
-          secondTrkP4 = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->p4();
+        RhoMass = (PairP4Pi).M(); //calculate inv mass of the Rho candidate  
+        if (verbose) cout<<"mPiPi (before the meson mass selection) =  "<<RhoMass<<endl;
+        if(RhoMass > 0.5 && RhoMass < 1.) isRho = true; //filter on Rho invariant mass   
 
-          firstTrkPx  = firstTrkP4.px(); //take px, py, pz of the first candidate
-          firstTrkPy  = firstTrkP4.py();
-          firstTrkPz  = firstTrkP4.pz();
-          secondTrkPx = secondTrkP4.px(); //take px, py, pz of the second candidate
-          secondTrkPy = secondTrkP4.py();
-          secondTrkPz = secondTrkP4.pz();
+        if (!isPhi && !isRho) continue; //continue if the pair mass doesn't match any of the two mass hypothesis
 
-          //PIONS OR KAONS HYPOTHESIS -----------------------------------------------------------------------------------------------------------------------------------------------            
-          firstTrkEnergyK   = sqrt(firstTrkPx  * firstTrkPx  + firstTrkPy  * firstTrkPy  + firstTrkPz  * firstTrkPz  + kMass  * kMass ); //Kaon hypothesis energy recalculation
-          secondTrkEnergyK  = sqrt(secondTrkPx * secondTrkPx + secondTrkPy * secondTrkPy + secondTrkPz * secondTrkPz + kMass  * kMass ); //Kaon hypothesis energy recalculation
-          firstTrkEnergyPi  = sqrt(firstTrkPx  * firstTrkPx  + firstTrkPy  * firstTrkPy  + firstTrkPz  * firstTrkPz  + PiMass * PiMass); //Pion hypothesis energy recalculation
-          secondTrkEnergyPi = sqrt(secondTrkPx * secondTrkPx + secondTrkPy * secondTrkPy + secondTrkPz * secondTrkPz + PiMass * PiMass); //Pion hypothesis energy recalculation
-          
-          /*
-          if (verbose) {
-            cout<<"firstTrkEnergyK   = "<<firstTrkEnergyK<<endl;
-            cout<<"firstTrkEnergyPi  = "<<firstTrkEnergyPi<<endl;
-            cout<<"secondTrkEnergyK  = "<<secondTrkEnergyK<<endl;
-            cout<<"secondTrkEnergyPi = "<<secondTrkEnergyPi<<endl;
-          }
-          */
-
-          firstTrkP4K   = firstTrkP4.SetE(firstTrkEnergyK); //Kaon hypothesis quadrimomentum correction
-          secondTrkP4K  = secondTrkP4.SetE(secondTrkEnergyK); //Kaon hypothesis quadrimomentum correction
-          firstTrkP4Pi  = firstTrkP4.SetE(firstTrkEnergyPi); //Kaon hypothesis quadrimomentum correction
-          secondTrkP4Pi = secondTrkP4.SetE(secondTrkEnergyPi); //Kaon hypothesis quadrimomentum correction
-
-          pairP4K  = firstTrkP4K  + secondTrkP4K; //calculation of the couple-quadrimomentum after the correction
-          PairP4Pi = firstTrkP4Pi + secondTrkP4Pi; //calculation of the couple-quadrimomentum after the correction
-          
-          if (verbose) {
-            cout<<"KK pT = "<<pairP4K.pt()<<endl;
-            cout<<"PiPi pT = "<<PairP4Pi.pt()<<endl;
-          }
-
-          //DITRK PT CUT -------------------------------------------------------------------------
-          if(pairP4K.pt() < 38.) {
-            if(verbose) cout<<"couplePt cut NOT passed"<<endl;
-            continue;
-          }  
-          
-          //MESON INV MASS CUT -------------------------------------------------------------------------
-          isPhi = false;
+        if (isPhi && isRho){ //if both hypothesis are true, mark it as a Phi candidate (this is done because the Phi mass window is tighter)
+          isPhi = true;
           isRho = false;
+        }
 
-          PhiMass = (pairP4K).M(); //calculate inv mass of the Phi candidate  
-          if (verbose) cout<<"mKK (before the meson mass selection) =  "<<PhiMass<<endl;
-          if(PhiMass > 1. && PhiMass < 1.05) isPhi = true; //filter on Phi invariant mass  
+        //update values of quadrimomenta
+        if(isPhi){
+          firstTrkP4  = firstTrkP4K; 
+          secondTrkP4 = secondTrkP4K;
+          pairP4     = pairP4K;
+        }  
+        if(isRho){
+          firstTrkP4  = firstTrkP4Pi;
+          secondTrkP4 = secondTrkP4Pi;
+          pairP4     = PairP4Pi;
+        }
 
-          RhoMass = (PairP4Pi).M(); //calculate inv mass of the Rho candidate  
-          if (verbose) cout<<"mPiPi (before the meson mass selection) =  "<<RhoMass<<endl;
-          if(RhoMass > 0.5 && RhoMass < 1.) isRho = true; //filter on Rho invariant mass   
-
-          if (!isPhi && !isRho) continue; //continue if the pair mass doesn't match any of the two mass hypothesis
-
-          if (isPhi && isRho){ //if both hypothesis are true, mark it as a Phi candidate (this is done because the Phi mass window is tighter)
-            isPhi = true;
-            isRho = false;
-          }
-
-          //update values of quadrimomenta
-          if(isPhi){
-            firstTrkP4  = firstTrkP4K; 
-            secondTrkP4 = secondTrkP4K;
-            pairP4     = pairP4K;
-          }  
-          if(isRho){
-            firstTrkP4  = firstTrkP4Pi;
-            secondTrkP4 = secondTrkP4Pi;
-            pairP4     = PairP4Pi;
-          }
-
-          // ISOLATION CUT -------------------------------------------------------------------------  
-          for(auto cand_iso = PFCandidates->begin(); cand_iso != PFCandidates->end(); ++cand_iso){ //ISOLATION FORLOOP START
-            
-            if(debug){
-              cout <<endl<<"ISO CALC DETAILS ---------------------"<<endl;
-              cout << "pt cand_iso = "<<cand_iso->pt()<<endl;
-            }
-            if(cand_iso->pt() < 0.5) continue; //do not consider tracks with pT < 500MeV
-
-            //calculate the deltaR between the track and the first candidate ---------------------------------------
-            float deltaPhi_K1 = fabs(firstTrkP4.phi()-cand_iso->phi());  //phi folding 
-            if (deltaPhi_K1 > M_PI) deltaPhi_K1 = 2*M_PI - deltaPhi_K1;
-
-            float deltaRK1 = sqrt((firstTrkP4.eta()-cand_iso->eta())*(firstTrkP4.eta()-cand_iso->eta()) + deltaPhi_K1*deltaPhi_K1);
-            if (debug) cout << "deltaRK1 = "<<deltaRK1<<endl;
-            if(deltaRK1 < 0.0005) continue; //remove first candidate from the sum
-
-            //calculate the deltaR between the track and the second candidate ---------------------------------------
-            float deltaPhi_K2 = fabs(secondTrkP4.phi()-cand_iso->phi());  //phi folding  
-            if (deltaPhi_K2 > M_PI) deltaPhi_K2 = 2*M_PI - deltaPhi_K2;
-
-            float deltaRK2 = sqrt((secondTrkP4.eta()-cand_iso->eta())*(secondTrkP4.eta()-cand_iso->eta()) + deltaPhi_K2*deltaPhi_K2);
-            if (debug) cout << "deltaRK2 = "<<deltaRK2<<endl;
-            if(deltaRK2 < 0.0005) continue; //remove second candidate from the sum
-
-            //calculate the deltaR between the track and the best pair ---------------------------------------
-            float deltaPhi_Couple = fabs(pairP4.phi()-cand_iso->phi());  //phi folding  
-            if (deltaPhi_Couple > M_PI) deltaPhi_Couple = 2*M_PI - deltaPhi_Couple;
-
-            float deltaR_Couple = sqrt((pairP4.eta()-cand_iso->eta())*(pairP4.eta()-cand_iso->eta()) + deltaPhi_Couple*deltaPhi_Couple);
-
-            //sum pT of the tracks inside a cone of deltaR = 0.3 ---------------------------------------
-            if(deltaRK1 <= 0.3) K1SumPt05 += cand_iso->pt();
-            if(deltaRK2 <= 0.3) K2SumPt05 += cand_iso->pt();
-            if(deltaR_Couple <= 0.3) pairSumPt05 += cand_iso->pt();
-            //cout<< "charge before = "<<cand_iso->charge()<<endl;
-
-            //sum pT of the charged tracks inside a cone of deltaR = 0.3 ---------------------------------------
-            if (debug) cout << "Charge = "<< cand_iso->charge()<<endl;
-            if(cand_iso->charge() == 0) continue;
-          // cout << "particle charge = "<<cand_iso->charge()<<endl;
-            if (debug) cout << "dxy = "<<fabs(cand_iso->dxy())<<" and dz = "<< fabs(cand_iso->dz())<<endl;
-            if(fabs(cand_iso->dxy()) >= 0.2 || fabs(cand_iso->dz()) >= 0.5) continue; // Requesting charged particles to come from PV
-            //cout<< "charge after = "<<cand_iso->charge()<<endl;
-            if(deltaRK1 <= 0.3) K1SumPt05Ch += cand_iso->pt();
-            if(deltaRK2 <= 0.3) K2SumPt05Ch += cand_iso->pt();
-            if (debug) cout <<"deltaR_Couple = "<<deltaR_Couple<<endl;
-            if(deltaR_Couple <= 0.3){
-              pairSumPt05Ch += cand_iso->pt();
-              if (debug) cout<<"Particle in the cone: SumPt = "<<pairSumPt05Ch<<endl;
-            }
-          } //ISOLATION FORLOOP END
-
-          float isoCoupleCh = pairP4.pt()/(pairSumPt05Ch + pairP4.pt());
-          if(isoCoupleCh < 0.9) {
-            cout<<"No isolation cut passed."<<endl;
-            continue; 
-          }
-
-
-          //PT MAX OF THE JET - FILTER -------------------------------------------------
-          if (verbose) cout<<"Current bestCoupleOfTheEvent_Pt = "<<bestCoupleOfTheJetPt<<endl;
+        // ISOLATION CUT -------------------------------------------------------------------------  
+        for(auto cand_iso = PFCandidates->begin(); cand_iso != PFCandidates->end(); ++cand_iso){ //ISOLATION FORLOOP START
           
-          if(pairP4.pt() <= bestCoupleOfTheJetPt) {
-            if(verbose) cout<<"Not passed: pT lower than the current best pair of the event"<<endl;
-            continue; //choose the couple with greatest pt
+          if(debug){
+            cout <<endl<<"ISO CALC DETAILS ---------------------"<<endl;
+            cout << "pt cand_iso = "<<cand_iso->pt()<<endl;
           }
+          if(cand_iso->pt() < 0.5) continue; //do not consider tracks with pT < 500MeV
 
-          //If passed, this is the pair with the largest pT of the event so far
-          bestCoupleOfTheJetPt = pairP4.pt();     
-          if (verbose) cout<<"pairP4.pt() = "<<bestCoupleOfTheJetPt<<endl;
+          //calculate the deltaR between the track and the first candidate ---------------------------------------
+          float deltaPhi_K1 = fabs(firstTrkP4.phi()-cand_iso->phi());  //phi folding 
+          if (deltaPhi_K1 > M_PI) deltaPhi_K1 = 2*M_PI - deltaPhi_K1;
 
-          if(verbose) cout<<"This is the best pair so far!"<<endl<<"-------------------------"<<endl;
-          isBestCoupleOfTheEventFound = true;
+          float deltaRK1 = sqrt((firstTrkP4.eta()-cand_iso->eta())*(firstTrkP4.eta()-cand_iso->eta()) + deltaPhi_K1*deltaPhi_K1);
+          if (debug) cout << "deltaRK1 = "<<deltaRK1<<endl;
+          if(deltaRK1 < 0.0005) continue; //remove first candidate from the sum
 
-          //Save if best pair has been found
-          bestJet_Index           = jetIndex; //note the position of the chosen jet inside the vector   
-          deltaRKChosen          = deltaRK;
-          bestJetPhotonInvMass = jetPhotonInvMass;
-          _isPhi                  = isPhi;
-          _isRho                  = isRho;
-          //bestJetJECunc         = unc;
-          firstTrkCharge        = firstTrkCharge;
-          secondTrkCharge       = secondTrkCharge;
-          bestFirstTrkDxy       = firstTrkDxy;
-          bestFirstTrkDz        = firstTrkDz;
-          bestSecondTrkDxy      = secondTrkDxy;
-          bestSecondTrkDz       = secondTrkDz;
-          bestFirstTrkDxyErr    = firstTrkDxyErr;
-          bestFirstTrkDzErr     = firstTrkDzErr;
-          bestSecondTrkDxyErr   = secondTrkDxyErr;
-          bestSecondTrkDzErr    = secondTrkDzErr;
+          //calculate the deltaR between the track and the second candidate ---------------------------------------
+          float deltaPhi_K2 = fabs(secondTrkP4.phi()-cand_iso->phi());  //phi folding  
+          if (deltaPhi_K2 > M_PI) deltaPhi_K2 = 2*M_PI - deltaPhi_K2;
+
+          float deltaRK2 = sqrt((secondTrkP4.eta()-cand_iso->eta())*(secondTrkP4.eta()-cand_iso->eta()) + deltaPhi_K2*deltaPhi_K2);
+          if (debug) cout << "deltaRK2 = "<<deltaRK2<<endl;
+          if(deltaRK2 < 0.0005) continue; //remove second candidate from the sum
+
+          //calculate the deltaR between the track and the best pair ---------------------------------------
+          float deltaPhi_Couple = fabs(pairP4.phi()-cand_iso->phi());  //phi folding  
+          if (deltaPhi_Couple > M_PI) deltaPhi_Couple = 2*M_PI - deltaPhi_Couple;
+
+          float deltaR_Couple = sqrt((pairP4.eta()-cand_iso->eta())*(pairP4.eta()-cand_iso->eta()) + deltaPhi_Couple*deltaPhi_Couple);
+
+          //sum pT of the tracks inside a cone of deltaR = 0.3 ---------------------------------------
+          if(deltaRK1 <= 0.3) K1SumPt05 += cand_iso->pt();
+          if(deltaRK2 <= 0.3) K2SumPt05 += cand_iso->pt();
+          if(deltaR_Couple <= 0.3) pairSumPt05 += cand_iso->pt();
+          //cout<< "charge before = "<<cand_iso->charge()<<endl;
+
+          //sum pT of the charged tracks inside a cone of deltaR = 0.3 ---------------------------------------
+          if (debug) cout << "Charge = "<< cand_iso->charge()<<endl;
+          if(cand_iso->charge() == 0) continue;
+        // cout << "particle charge = "<<cand_iso->charge()<<endl;
+          if (debug) cout << "dxy = "<<fabs(cand_iso->dxy())<<" and dz = "<< fabs(cand_iso->dz())<<endl;
+          if(fabs(cand_iso->dxy()) >= 0.2 || fabs(cand_iso->dz()) >= 0.5) continue; // Requesting charged particles to come from PV
+          //cout<< "charge after = "<<cand_iso->charge()<<endl;
+          if(deltaRK1 <= 0.3) K1SumPt05Ch += cand_iso->pt();
+          if(deltaRK2 <= 0.3) K2SumPt05Ch += cand_iso->pt();
+          if (debug) cout <<"deltaR_Couple = "<<deltaR_Couple<<endl;
+          if(deltaR_Couple <= 0.3){
+            pairSumPt05Ch += cand_iso->pt();
+            if (debug) cout<<"Particle in the cone: SumPt = "<<pairSumPt05Ch<<endl;
+          }
+        } //ISOLATION FORLOOP END
+
+        float isoCoupleCh = pairP4.pt()/(pairSumPt05Ch + pairP4.pt());
+        if(isoCoupleCh < 0.9) {
+          cout<<"No isolation cut passed."<<endl;
+          continue; 
+        }
+
+
+        //PT MAX OF THE JET - FILTER -------------------------------------------------
+        if (verbose) cout<<"Current bestCoupleOfTheEvent_Pt = "<<bestCoupleOfTheJetPt<<endl;
+        
+        if(pairP4.pt() <= bestCoupleOfTheJetPt) {
+          if(verbose) cout<<"Not passed: pT lower than the current best pair of the event"<<endl;
+          continue; //choose the couple with greatest pt
+        }
+
+        //If passed, this is the pair with the largest pT of the event so far
+        bestCoupleOfTheJetPt = pairP4.pt();     
+        if (verbose) cout<<"pairP4.pt() = "<<bestCoupleOfTheJetPt<<endl;
+
+        if(verbose) cout<<"This is the best pair so far!"<<endl<<"-------------------------"<<endl;
+        isBestCoupleOfTheEventFound = true;
+
+        //Save if best pair has been found
+        bestJet_Index           = jetIndex; //note the position of the chosen jet inside the vector   
+        deltaRKChosen          = deltaRK;
+        bestJetPhotonInvMass = jetPhotonInvMass;
+        _isPhi                  = isPhi;
+        _isRho                  = isRho;
+        //bestJetJECunc         = unc;
+        firstTrkCharge        = firstTrkCharge;
+        secondTrkCharge       = secondTrkCharge;
+        bestFirstTrkDxy       = firstTrkDxy;
+        bestFirstTrkDz        = firstTrkDz;
+        bestSecondTrkDxy      = secondTrkDxy;
+        bestSecondTrkDz       = secondTrkDz;
+        bestFirstTrkDxyErr    = firstTrkDxyErr;
+        bestFirstTrkDzErr     = firstTrkDzErr;
+        bestSecondTrkDxyErr   = secondTrkDxyErr;
+        bestSecondTrkDzErr    = secondTrkDzErr;
+        
+
+        bestFirstTrkP4  = firstTrkP4; 
+        bestSecondTrkP4 = secondTrkP4;
+        bestPairP4     = pairP4;
           
-
-          bestFirstTrkP4  = firstTrkP4; 
-          bestSecondTrkP4 = secondTrkP4;
-          bestPairP4     = pairP4;
-            
 
       } //2ND LOOP ENDS
-  } //1ST LOOP ENDS
+    } //1ST LOOP ENDS
 
-  if(jet->pt() < 25.) continue;
-  nJets25++;
-  if(jet->pt() < 30.) continue;
-  nJets30++;
+    if(jet->pt() < 25.) continue;
+    nJets25++;
+    if(jet->pt() < 30.) continue;
+    nJets30++;
 
-} //JET LOOP END
-
-//delete jecUnc;
+  } //JET LOOP END
 
 
-if(!isBestCoupleOfTheEventFound) 
-{
-  cout<<"No best couple detected for current event, RETURN."<<endl;
-  return;
-}
-nEventsBestPairFound++;      
-if(verbose) cout<<"Bool: nEventsBestPairFound: "<<nEventsBestPairFound<<endl;        
+
+
+  if(!isBestCoupleOfTheEventFound) {
+    cout<<"No best couple detected for current event, RETURN."<<endl;
+    return;
+  }
+  nEventsBestPairFound++;      
+  if(verbose) cout<<"Bool: nEventsBestPairFound: "<<nEventsBestPairFound<<endl;        
 
   //DATAMEMBER SAVING
-firstTrkPt   = bestFirstTrkP4.pt();
-firstTrkEta  = bestFirstTrkP4.eta();
-firstTrkPhi  = bestFirstTrkP4.phi();
-secondTrkPt  = bestSecondTrkP4.pt();       
-secondTrkEta = bestSecondTrkP4.eta();
-secondTrkPhi = bestSecondTrkP4.phi();
-bestPairPt  = bestPairP4.pt();
-bestPairEta = bestPairP4.eta();
-bestPairPhi = bestPairP4.phi();
+  firstTrkPt   = bestFirstTrkP4.pt();
+  firstTrkEta  = bestFirstTrkP4.eta();
+  firstTrkPhi  = bestFirstTrkP4.phi();
+  secondTrkPt  = bestSecondTrkP4.pt();       
+  secondTrkEta = bestSecondTrkP4.eta();
+  secondTrkPhi = bestSecondTrkP4.phi();
+  bestPairPt  = bestPairP4.pt();
+  bestPairEta = bestPairP4.eta();
+  bestPairPhi = bestPairP4.phi();
 
-bestJetInvMass                  = slimmedJets->at(bestJet_Index).mass();
-bestJetPt                       = slimmedJets->at(bestJet_Index).pt();
-bestJetEta                      = slimmedJets->at(bestJet_Index).eta();
-bestJetPhi                      = slimmedJets->at(bestJet_Index).phi();
-bestJetnDaughters               = slimmedJets->at(bestJet_Index).numberOfDaughters();
-bestJetChargedEmEnergy          = slimmedJets->at(bestJet_Index).chargedEmEnergy();
-bestJetNeutralEmEnergy          = slimmedJets->at(bestJet_Index).neutralEmEnergy();
-bestJetChargedHadEnergy         = slimmedJets->at(bestJet_Index).chargedHadronEnergy();
-bestJetNeutralHadEnergy         = slimmedJets->at(bestJet_Index).neutralHadronEnergy();
-bestJetChargedEmEnergyFraction  = slimmedJets->at(bestJet_Index).chargedEmEnergyFraction();
-bestJetNeutralEmEnergyFraction  = slimmedJets->at(bestJet_Index).neutralEmEnergyFraction();
-bestJetChargedHadEnergyFraction = slimmedJets->at(bestJet_Index).chargedHadronEnergyFraction();
-bestJetNeutralHadEnergyFraction = slimmedJets->at(bestJet_Index).neutralHadronEnergyFraction();
-bestJetChargedHadMultiplicity   = slimmedJets->at(bestJet_Index).chargedHadronMultiplicity();
+  bestJetInvMass                  = slimmedJets->at(bestJet_Index).mass();
+  bestJetPt                       = slimmedJets->at(bestJet_Index).pt();
+  bestJetEta                      = slimmedJets->at(bestJet_Index).eta();
+  bestJetPhi                      = slimmedJets->at(bestJet_Index).phi();
+  bestJetnDaughters               = slimmedJets->at(bestJet_Index).numberOfDaughters();
+  bestJetChargedEmEnergy          = slimmedJets->at(bestJet_Index).chargedEmEnergy();
+  bestJetNeutralEmEnergy          = slimmedJets->at(bestJet_Index).neutralEmEnergy();
+  bestJetChargedHadEnergy         = slimmedJets->at(bestJet_Index).chargedHadronEnergy();
+  bestJetNeutralHadEnergy         = slimmedJets->at(bestJet_Index).neutralHadronEnergy();
+  bestJetChargedEmEnergyFraction  = slimmedJets->at(bestJet_Index).chargedEmEnergyFraction();
+  bestJetNeutralEmEnergyFraction  = slimmedJets->at(bestJet_Index).neutralEmEnergyFraction();
+  bestJetChargedHadEnergyFraction = slimmedJets->at(bestJet_Index).chargedHadronEnergyFraction();
+  bestJetNeutralHadEnergyFraction = slimmedJets->at(bestJet_Index).neutralHadronEnergyFraction();
+  bestJetChargedHadMultiplicity   = slimmedJets->at(bestJet_Index).chargedHadronMultiplicity();
 
-//MESON MASS CALCULATION
-mesonMass = (bestFirstTrkP4 + bestSecondTrkP4).M();
+  //MESON MASS CALCULATION
+  mesonMass = (bestFirstTrkP4 + bestSecondTrkP4).M();
 
-//H INV MASS CALCULATION
-ZMassFrom2KPhoton = (bestFirstTrkP4 + bestSecondTrkP4 + ph_p4).M(); //calculate inv mass of the Higgs candidate
-  
+  //Z INV MASS CALCULATION
+  ZMassFrom2KPhoton = (bestFirstTrkP4 + bestSecondTrkP4 + ph_p4).M(); //calculate inv mass of the Higgs candidate
+    
 
-//CANDIDATES SORTING
-if(firstTrkPt < secondTrkPt)  //swap-values loop, in order to fill the tree with the candidate with max pt of the couple in firstCand branches  
-  {                               //and one with min pt in secondCand branches
+  //CANDIDATES SORTING
+  if(firstTrkPt < secondTrkPt){  //swap-values loop, in order to fill the tree with the candidate with max pt of the couple in firstCand branches                                 //and one with min pt in secondCand branches
     float a,b,c,d,e;
     a = firstTrkPt;
     b = firstTrkEta;
@@ -968,38 +943,38 @@ if(firstTrkPt < secondTrkPt)  //swap-values loop, in order to fill the tree with
     secondTrkPhi    = c;
     secondTrkEnergy  = d;
     secondTrkCharge = e;
-}
+  }
 
-//CUTS ON CANDIDATES PT
-if(firstTrkPt < 20. || secondTrkPt < 5.) {
+  //CUTS ON CANDIDATES PT
+  if(firstTrkPt < 20. || secondTrkPt < 5.) {
     cout<<"Final cut on candidates pT not passed, RETURN."<<endl;
     return;
-}
+  }
   nEventsTrkPtFilter++;
 
-//ISOLATION DATAMEMBER FOR TREE FILLING 
-isoK1        = firstTrkPt/(K1SumPt05 + firstTrkPt);
-isoK2        = secondTrkPt/(K2SumPt05 + secondTrkPt);
-isoPair    = bestPairPt/(pairSumPt05 + bestPairPt);
-isoK1Ch     = firstTrkPt/(K1SumPt05Ch + firstTrkPt);
-isoK2Ch     = secondTrkPt/(K2SumPt05Ch + secondTrkPt);
-isoPairCh = bestPairPt/(pairSumPt05Ch + bestPairPt);
+  //ISOLATION DATAMEMBER FOR TREE FILLING 
+  isoK1        = firstTrkPt/(K1SumPt05 + firstTrkPt);
+  isoK2        = secondTrkPt/(K2SumPt05 + secondTrkPt);
+  isoPair    = bestPairPt/(pairSumPt05 + bestPairPt);
+  isoK1Ch     = firstTrkPt/(K1SumPt05Ch + firstTrkPt);
+  isoK2Ch     = secondTrkPt/(K2SumPt05Ch + secondTrkPt);
+  isoPairCh = bestPairPt/(pairSumPt05Ch + bestPairPt);
 
-//CUT ON PHI ISOLATION
-if(verbose){
-  cout<<endl;
-  cout<<"###### ISO           = "<<isoPairCh<<endl;
-  cout<<"###### isRho         = "<<isRho<<endl;
-  cout<<"###### SUM pT        = "<<pairSumPt05Ch<<endl;
-  cout<<"###### pT leading    = "<<firstTrkPt<<endl;
-  cout<<"###### pT subleading = "<<secondTrkPt<<endl;
-  cout<<"###### MesonMass     = "<<mesonMass<<endl;
-  cout<<"###### ZMass         = "<<ZMassFrom2KPhoton<<endl;
-}
+  //CUT ON PHI ISOLATION
+  if(verbose){
+    cout<<endl;
+    cout<<"###### ISO           = "<<isoPairCh<<endl;
+    cout<<"###### isRho         = "<<isRho<<endl;
+    cout<<"###### SUM pT        = "<<pairSumPt05Ch<<endl;
+    cout<<"###### pT leading    = "<<firstTrkPt<<endl;
+    cout<<"###### pT subleading = "<<secondTrkPt<<endl;
+    cout<<"###### MesonMass     = "<<mesonMass<<endl;
+    cout<<"###### ZMass         = "<<ZMassFrom2KPhoton<<endl;
+  }
 
 
 
-nEventsPairIsolationFilter++;
+  nEventsPairIsolationFilter++;
 
 
 
@@ -1059,9 +1034,9 @@ nEventsPairIsolationFilter++;
     }
   } 
 
-//MC TRUTH CHECK
-if(!runningOnData_) //ONLY FOR MC START
-{
+  //MC TRUTH CHECK
+  if(!runningOnData_){ //ONLY FOR MC START
+   
     //photon matching -----------------------------------------
     float deltaPhiPhoton = fabs(photonPhi - genPhoton_phi);
     if (deltaPhiPhoton > M_PI) deltaPhiPhoton = 2*M_PI - deltaPhiPhoton;
@@ -1083,7 +1058,7 @@ if(!runningOnData_) //ONLY FOR MC START
     //Higgs matching -----------------------------------------    
     if(is_photon_matched && is_meson_matched){
 
-      if(verbose) cout<<endl<<"**************** HIGGS FOUND ******************"<<endl;
+      if(verbose) cout<<endl<<"**************** Z FOUND ******************"<<endl;
       if(verbose) cout<<"Z deltaR = "<<deltaR<<endl;
       nEventsZMatched++;
       is_Higgs_matched=true;
@@ -1096,8 +1071,8 @@ if(!runningOnData_) //ONLY FOR MC START
     
     }
 
-//if is PhiGamma event
-  if (_isPhi){
+    //if is PhiGamma event
+    if (_isPhi){
 
     //First cand positive and second cand negative
     if (firstTrkCharge > 0){ 
@@ -1132,41 +1107,41 @@ if(!runningOnData_) //ONLY FOR MC START
       deltaRKplus = sqrt((secondTrkEta - Kplus_eta) * (secondTrkEta - Kplus_eta) + deltaPhi_Kplus * deltaPhi_Kplus);
 
       cout<<endl;
-//      if (firstTrkPt < 0.95*KminusPt && firstTrkPt > 1.05*KminusPt) cout<<"firstTrkPt pT not matched"<<endl;
+      //if (firstTrkPt < 0.95*KminusPt && firstTrkPt > 1.05*KminusPt) cout<<"firstTrkPt pT not matched"<<endl;
 
-      }
-
-      //phi angle folding K minus
-      float deltaPhi_Kminus = fabs(firstTrkPhi - Kminus_phi);
-      if (deltaPhi_Kminus > M_PI) deltaPhi_Kminus = 2*M_PI - deltaPhi_Kminus;
-
-      //deltaR K minus
-      deltaRKminus = sqrt((firstTrkEta - Kminus_eta) * (firstTrkEta - Kminus_eta) + deltaPhi_Kminus * deltaPhi_Kminus);
-
-
-  } //if isPhi END
-  
-  else{ //RhoGamma event
-
-    //First cand positive and second cand negative
-    if (firstTrkCharge > 0){ 
-      //phi angle folding Pi plus
-      float deltaPhi_Piplus = fabs(firstTrkPhi - Piplus_phi);
-      if (deltaPhi_Piplus > M_PI) deltaPhi_Piplus = 2*M_PI - deltaPhi_Piplus;
-
-      //deltaR Pi plus
-      deltaR_Piplus = sqrt((firstTrkEta - Piplus_eta) * (firstTrkEta - Piplus_eta) + deltaPhi_Piplus * deltaPhi_Piplus);
-
-      //phi angle folding Pi minus
-      float deltaPhi_Piminus = fabs(secondTrkPhi - Piminus_phi);
-      if (deltaPhi_Piminus > M_PI) deltaPhi_Piminus = 2*M_PI - deltaPhi_Piminus;
-
-      //deltaR Pi minus
-      deltaR_Piminus = sqrt((secondTrkEta - Piminus_eta) * (secondTrkEta - Piminus_eta) + deltaPhi_Piminus * deltaPhi_Piminus);
-      
     }
 
-    else{ //Second cand positive and first cand negative
+    //phi angle folding K minus
+    float deltaPhi_Kminus = fabs(firstTrkPhi - Kminus_phi);
+    if (deltaPhi_Kminus > M_PI) deltaPhi_Kminus = 2*M_PI - deltaPhi_Kminus;
+
+    //deltaR K minus
+    deltaRKminus = sqrt((firstTrkEta - Kminus_eta) * (firstTrkEta - Kminus_eta) + deltaPhi_Kminus * deltaPhi_Kminus);
+
+
+    } //if isPhi END
+  
+    else{ //RhoGamma event
+
+      //First cand positive and second cand negative
+      if (firstTrkCharge > 0){ 
+        //phi angle folding Pi plus
+        float deltaPhi_Piplus = fabs(firstTrkPhi - Piplus_phi);
+        if (deltaPhi_Piplus > M_PI) deltaPhi_Piplus = 2*M_PI - deltaPhi_Piplus;
+
+        //deltaR Pi plus
+        deltaR_Piplus = sqrt((firstTrkEta - Piplus_eta) * (firstTrkEta - Piplus_eta) + deltaPhi_Piplus * deltaPhi_Piplus);
+
+        //phi angle folding Pi minus
+        float deltaPhi_Piminus = fabs(secondTrkPhi - Piminus_phi);
+        if (deltaPhi_Piminus > M_PI) deltaPhi_Piminus = 2*M_PI - deltaPhi_Piminus;
+
+        //deltaR Pi minus
+        deltaR_Piminus = sqrt((secondTrkEta - Piminus_eta) * (secondTrkEta - Piminus_eta) + deltaPhi_Piminus * deltaPhi_Piminus);
+        
+      }
+
+      else{ //Second cand positive and first cand negative
       
       //phi angle folding Pi plus
       float deltaPhi_Piplus = fabs(secondTrkPhi - Piplus_phi);
@@ -1183,8 +1158,8 @@ if(!runningOnData_) //ONLY FOR MC START
       //deltaR Pi minus
       deltaR_Piminus = sqrt((firstTrkEta - Piminus_eta) * (firstTrkEta - Piminus_eta) + deltaPhi_Piminus * deltaPhi_Piminus);
 
-    }
-  } // if isRho END
+      }
+    } // if isRho END
 
 
 
@@ -1232,24 +1207,20 @@ if(!runningOnData_) //ONLY FOR MC START
       cout<<"Best couple DeltaR = "<<deltaRKChosen<<endl;
       cout<<"Meson candidate inv. mass  = "<<mesonMass<<endl;
       cout<<"isPhi = "<<isPhi<<" and isRho = "<<isRho<<endl;
-      cout<<"H inv. mass = "<<ZMassFrom2KPhoton<<endl;
+      cout<<"Z inv. mass = "<<ZMassFrom2KPhoton<<endl;
       cout<<"--------------------------------------------------"<<endl;
       cout<<"MC Z found = "<<nEventsZMatched<<",   Z NOT matched = "<<nEventsZNotMatched<<",   mesonPt not matched = "<<nEventsMesonPtNotMatched<<endl;
       cout<<"--------------------------------------------------"<<endl<<endl;
-      }
+    }
      
   }  //ONLY FOR MC END 
  
- else //ONLY FOR DATA
- {
-  cout<<"CANDIDATE Z FOUND IN DATA: EVENT RECORDED!"<<endl;
-  if(debug){
-cout<<"Photon eT = "<<photonEt<<endl;
-//cout<<"ph_en_sigmaUP = "<< ph_en_sigmaUP<<endl;
-//cout<<"ph_en_sigmaDW = "<< ph_en_sigmaDW<<endl;
-//cout<<"ph_en_scaleUP = "<<ph_en_scaleUP<<endl;
-//cout<<"ph_en_scaleDW = "<<ph_en_scaleDW<<endl;
-  }
+  else {//ONLY FOR DATA
+ 
+    cout<<"CANDIDATE Z FOUND IN DATA: EVENT RECORDED!"<<endl;
+    if(debug){
+      cout<<"Photon eT = "<<photonEt<<endl;
+    }
  }
 
   //cout<<endl<<"Event n = "<<eventNumber<<endl;
@@ -1396,16 +1367,15 @@ void ZMesonGamma::create_trees()
     mytree->Branch("deltaR_Piplus",&deltaR_Piplus);
     mytree->Branch("deltaR_Piminus",&deltaR_Piminus);
 
-}
+  }
 
 }
 
-void ZMesonGamma::beginJob()
-{
-//Flag for PileUp reweighting
-if (!runningOnData_){ // PU reweighting for 2017
- Lumiweights_ = edm::LumiReWeighting("MCpileUp_2018_25ns_UltraLegacy_PoissonOOTPU.root", "MyDataPileupHistogram.root", "pileup", "pileup");
-}
+void ZMesonGamma::beginJob(){
+  //Flag for PileUp reweighting
+  if (!runningOnData_){ // PU reweighting for 2017
+   Lumiweights_ = edm::LumiReWeighting("MCpileUp_2018_25ns_UltraLegacy_PoissonOOTPU.root", "MyDataPileupHistogram.root", "pileup", "pileup");
+  }
 }
 
 
@@ -1415,22 +1385,20 @@ if (!runningOnData_){ // PU reweighting for 2017
 //                                                             //
 //*************************************************************//
 
-void ZMesonGamma::endJob() 
-{
-hEvents->Fill(0.5,nEventsProcessed);
-hEvents->Fill(1.5,nEventsTriggered);
-hEvents->Fill(2.5,nEventsIsPhoton);
-hEvents->Fill(3.5,nEventsBestPairFound);  
-hEvents->Fill(4.5,nEventsTrkPtFilter);  
-hEvents->Fill(5.5,nEventsPairIsolationFilter);
-//hEvents->Fill(6.5,_Nevents_VBFVeto);  
-hEvents->GetXaxis()->SetBinLabel(1,"processed");
-hEvents->GetXaxis()->SetBinLabel(2,"triggered");
-hEvents->GetXaxis()->SetBinLabel(3,"best photon");
-hEvents->GetXaxis()->SetBinLabel(4,"best pair");
-hEvents->GetXaxis()->SetBinLabel(5,"trks pT");
-hEvents->GetXaxis()->SetBinLabel(6,"trks iso");
-//hEvents->GetXaxis()->SetBinLabel(7,"VBF veto");
+void ZMesonGamma::endJob() {
+  hEvents->Fill(0.5,nEventsProcessed);
+  hEvents->Fill(1.5,nEventsTriggered);
+  hEvents->Fill(2.5,nEventsIsPhoton);
+  hEvents->Fill(3.5,nEventsBestPairFound);  
+  hEvents->Fill(4.5,nEventsTrkPtFilter);  
+  hEvents->Fill(5.5,nEventsPairIsolationFilter);
+  //hEvents->Fill(6.5,_Nevents_VBFVeto);  
+  hEvents->GetXaxis()->SetBinLabel(1,"processed");
+  hEvents->GetXaxis()->SetBinLabel(2,"triggered");
+  hEvents->GetXaxis()->SetBinLabel(3,"best photon");
+  hEvents->GetXaxis()->SetBinLabel(4,"best pair");
+  hEvents->GetXaxis()->SetBinLabel(5,"trks pT");
+  hEvents->GetXaxis()->SetBinLabel(6,"trks iso");
 }
 
 //define this as a plug-in
