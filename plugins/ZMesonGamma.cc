@@ -111,7 +111,7 @@ verboseIdFlag_(iConfig.getParameter<bool>("phoIdVerbose"))
   rhoToken_                           = consumes<double> (iConfig.getParameter <edm::InputTag>("rho"));
   //packedGenParticlesToken_            = consumes<std::vector<pat::GenParticle>>(edm::InputTag("packedGenParticles", "", "PAT"));
 
-  hEvents = fs->make<TH1F>("hEvents", "Event counting in different steps", 8, 0., 8.);
+  hEvents = fs->make<TH1F>("hEvents", "Event counting in different steps", 5, 0., 5.);
 
   nEventsProcessed           = 0;
   nEventsTriggered           = 0;
@@ -128,7 +128,7 @@ verboseIdFlag_(iConfig.getParameter<bool>("phoIdVerbose"))
   debug=false;  //DEBUG datamember 
   verbose=false; 
 
-  hPileup   = fs->make<TH1F>("pileup", "pileup", 75,0,75);
+  hPileup   = fs->make<TH1F>("pileup", "pileup", 75, 0, 75);
 
   create_trees();
 }
@@ -142,13 +142,13 @@ ZMesonGamma::~ZMesonGamma()
 // ------------ method called for each event  ------------
 void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-  edm::Handle<std::vector<pat::PackedCandidate>  > PFCandidates;
+  edm::Handle<std::vector<pat::PackedCandidate> > PFCandidates;
   iEvent.getByToken(packedPFCandidatesToken_, PFCandidates);
 
-  edm::Handle<std::vector<pat::Muon>  > slimmedMuons;
+  edm::Handle<std::vector<pat::Muon> > slimmedMuons;
   iEvent.getByToken(slimmedMuonsToken_, slimmedMuons);
 
-  edm::Handle<std::vector<reco::GenParticle>  > prunedGenParticles;
+  edm::Handle<std::vector<reco::GenParticle> > prunedGenParticles;
   if(!runningOnData_)iEvent.getByToken(prunedGenParticlesToken_, prunedGenParticles);
 
   edm::Handle<std::vector<pat::Photon> > slimmedPhotons;
@@ -157,16 +157,16 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   edm::Handle<std::vector<pat::Electron> > slimmedElectrons;
   iEvent.getByToken(electronsMiniAODToken_,slimmedElectrons);
 
-  edm::Handle<std::vector<pat::Jet > > slimmedJets;
+  edm::Handle<std::vector<pat::Jet> > slimmedJets;
   iEvent.getByToken(slimmedJetsToken_, slimmedJets);
 
-  edm::Handle<std::vector<pat::MET > > slimmedMETs;
+  edm::Handle<std::vector<pat::MET> > slimmedMETs;
   iEvent.getByToken(slimmedMETsToken_, slimmedMETs);
 
-  edm::Handle<std::vector<pat::MET > > slimmedMETsPuppi;
+  edm::Handle<std::vector<pat::MET> > slimmedMETsPuppi;
   iEvent.getByToken(slimmedMETsPuppiToken_, slimmedMETsPuppi);
 
-  edm::Handle<std::vector<reco::Vertex > > slimmedPV;
+  edm::Handle<std::vector<reco::Vertex> > slimmedPV;
   iEvent.getByToken(offlineSlimmedPrimaryVerticesToken_, slimmedPV);
 
   edm::Handle<edm::TriggerResults> triggerBits;
@@ -181,6 +181,7 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   }
 
   eventNumber = iEvent.id().event();
+
 
   //*************************************************************//
   //                                                             //
@@ -239,7 +240,6 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
 
 
-
   //*************************************************************//
   //                                                             //
   //-------------------------- MC Weight ------------------------//
@@ -260,6 +260,7 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       abort();
     }
   }
+
 
 
   //*************************************************************//
@@ -286,6 +287,8 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
    return;
   }
   nEventsTriggered++;
+
+
   
   //*************************************************************//
   //                                                             //
@@ -371,6 +374,7 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   isoPairCh = 0.;
 
 
+
   //*************************************************************//
   //                                                             //
   //----------------------------- MET ---------------------------//
@@ -383,6 +387,7 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   for(auto metpuppi = slimmedMETsPuppi->begin(); metpuppi != slimmedMETsPuppi->end(); ++metpuppi){
   metpuppiPt = metpuppi->pt();
   }
+
 
 
   //*************************************************************//
@@ -398,6 +403,7 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   if(mu->pt() < 20.) continue;
   nMuons20++;
   }
+
 
 
   //*************************************************************//
@@ -434,6 +440,7 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   }
 
   //std::cout << "Nelectrons " << nElectrons << " Nmuons " << nMuons << std::endl;
+
 
 
   //*************************************************************//
@@ -503,6 +510,8 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   nEventsIsPhoton++;
 
+
+
   //*************************************************************//
   //                                                             //
   //--------------------------- N-jets --------------------------//
@@ -510,11 +519,11 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   //*************************************************************//
 
   //int nJet=1;
-  int jetIndex=-1;
-  int bestJet_Index=-1;
+  int jetIndex      = -1;
+  int bestJet_Index = -1;
   //int MCtruthIndex = -1;
-  float deltaR = -1;   
-  int nDaughters = 0;
+  float deltaR      = -1;   
+  int nDaughters    = 0;
   //bool isBestJetFound = false; 
 
   //daughters forloop variable
@@ -535,45 +544,45 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   LorentzVector bestSecondTrkP4;
   LorentzVector bestPairP4;
   float bestCoupleOfTheJetPt = 0.;
-  float deltaRKChosen = 0.;
-  float deltaRK = 0.;
-  firstTrkEnergyK = 0.;
-  secondTrkEnergyK = 0.;
-  firstTrkEnergyPi = 0.;
-  secondTrkEnergyPi = 0.;
-  firstTrkPx=0.;
-  firstTrkPy=0.;
-  firstTrkPz=0.;
-  float firstTrkDxy=-999.;
-  float firstTrkDxyErr=-999.;
-  float firstTrkDz=-999.;
-  float firstTrkDzErr=-999.;
-  bestFirstTrkDxy=-999.;
-  bestFirstTrkDz=-999.;
-  bestFirstTrkDxyErr=-999.;
-  bestFirstTrkDzErr=-999.;
-  secondTrkPx=0.;
-  secondTrkPy=0.;
-  secondTrkPz=0.;
-  float secondTrkDxy=-999.;
-  float secondTrkDxyErr=-999.;
-  float secondTrkDz=-999.;
-  float secondTrkDzErr=-999.;
-  bestSecondTrkDxy=-999.;
-  bestSecondTrkDz=-999.;
-  bestSecondTrkDxyErr=-999.;
-  bestSecondTrkDzErr=-999.;
-  firstTrkEta=0.;
-  firstTrkPhi=0.;
-  secondTrkEta=0.;
-  secondTrkPhi=0.;
-  float PhiMass = 0.;
-  float RhoMass = 0.;
-  float kMass = 0.4937;
-  float PiMass = 0.13957;
-  bool isBestCoupleOfTheEventFound=false;
-  bool isPhi = false;
-  bool isRho = false;
+  float deltaRKChosen        = 0.;
+  float deltaRK              = 0.;
+  firstTrkEnergyK            = 0.;
+  secondTrkEnergyK           = 0.;
+  firstTrkEnergyPi           = 0.;
+  secondTrkEnergyPi          = 0.;
+  firstTrkPx                 = 0.;
+  firstTrkPy                 = 0.;
+  firstTrkPz                 = 0.;
+  float firstTrkDxy          = -999.;
+  float firstTrkDxyErr       = -999.;
+  float firstTrkDz           = -999.;
+  float firstTrkDzErr        = -999.;
+  bestFirstTrkDxy            = -999.;
+  bestFirstTrkDz             = -999.;
+  bestFirstTrkDxyErr         = -999.;
+  bestFirstTrkDzErr          = -999.;
+  secondTrkPx                = 0.;
+  secondTrkPy                = 0.;
+  secondTrkPz                = 0.;
+  float secondTrkDxy         = -999.;
+  float secondTrkDxyErr      = -999.;
+  float secondTrkDz          = -999.;
+  float secondTrkDzErr       = -999.;
+  bestSecondTrkDxy           = -999.;
+  bestSecondTrkDz            = -999.;
+  bestSecondTrkDxyErr        = -999.;
+  bestSecondTrkDzErr         = -999.;
+  firstTrkEta                = 0.;
+  firstTrkPhi                = 0.;
+  secondTrkEta               = 0.;
+  secondTrkPhi               = 0.;
+  float PhiMass              = 0.;
+  float RhoMass              = 0.;
+  float kMass                = 0.4937;
+  float PiMass               = 0.13957;
+  bool isBestCoupleOfTheEventFound = false;
+  bool isPhi                       = false;
+  bool isRho                       = false;
   
 
   //JET LOOP
@@ -597,7 +606,7 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     if(neutralHadEnergyFrac > 0.9 || neutralEmEnergyFrac > 0.9 || nDaughters < 2. || muonEnergyFrac > 0.8 || chargedHadEnergyFrac <= 0. || chargedHadMult == 0. || chargedEmEnergyFrac > 0.8 || pt < 20. || eta > 4.7) continue;
     
     if(jet->pt() < 38. || abs(jet->eta()) > 2.5) continue;
-    if(jetPhotonInvMass < 30.) continue; //reject jets with inv mass lower then 100 GeV
+    if(jetPhotonInvMass < 30.) continue; //reject jets with inv mass lower then 30 GeV
                            
      //-------------------------------------------------------------------------------------------------      
     
@@ -647,8 +656,8 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
         secondTrkCharge = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->charge();
         secondTrkPt     = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->pt();
-        secondTrkEta   = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->eta();
-        secondTrkPhi   = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->phi();
+        secondTrkEta    = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->eta();
+        secondTrkPhi    = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->phi();
         if(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack() == NULL) continue;
         secondTrkDxy    = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position());
         secondTrkDxyErr = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxyError();          
@@ -765,12 +774,12 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         if(isPhi){
           firstTrkP4  = firstTrkP4K; 
           secondTrkP4 = secondTrkP4K;
-          pairP4     = pairP4K;
+          pairP4      = pairP4K;
         }  
         if(isRho){
           firstTrkP4  = firstTrkP4Pi;
           secondTrkP4 = secondTrkP4Pi;
-          pairP4     = PairP4Pi;
+          pairP4      = PairP4Pi;
         }
 
         // ISOLATION CUT -------------------------------------------------------------------------  
@@ -813,7 +822,7 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
           //sum pT of the charged tracks inside a cone of deltaR = 0.3 ---------------------------------------
           if (debug) cout << "Charge = "<< cand_iso->charge()<<endl;
           if(cand_iso->charge() == 0) continue;
-        // cout << "particle charge = "<<cand_iso->charge()<<endl;
+          // cout << "particle charge = "<<cand_iso->charge()<<endl;
           if (debug) cout << "dxy = "<<fabs(cand_iso->dxy())<<" and dz = "<< fabs(cand_iso->dz())<<endl;
           if(fabs(cand_iso->dxy()) >= 0.2 || fabs(cand_iso->dz()) >= 0.5) continue; // Requesting charged particles to come from PV
           //cout<< "charge after = "<<cand_iso->charge()<<endl;
@@ -849,27 +858,27 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         isBestCoupleOfTheEventFound = true;
 
         //Save if best pair has been found
-        bestJet_Index           = jetIndex; //note the position of the chosen jet inside the vector   
-        deltaRKChosen          = deltaRK;
+        bestJet_Index        = jetIndex; //note the position of the chosen jet inside the vector   
+        deltaRKChosen        = deltaRK;
         bestJetPhotonInvMass = jetPhotonInvMass;
-        _isPhi                  = isPhi;
-        _isRho                  = isRho;
-        //bestJetJECunc         = unc;
-        firstTrkCharge        = firstTrkCharge;
-        secondTrkCharge       = secondTrkCharge;
-        bestFirstTrkDxy       = firstTrkDxy;
-        bestFirstTrkDz        = firstTrkDz;
-        bestSecondTrkDxy      = secondTrkDxy;
-        bestSecondTrkDz       = secondTrkDz;
-        bestFirstTrkDxyErr    = firstTrkDxyErr;
-        bestFirstTrkDzErr     = firstTrkDzErr;
-        bestSecondTrkDxyErr   = secondTrkDxyErr;
-        bestSecondTrkDzErr    = secondTrkDzErr;
+        _isPhi               = isPhi;
+        _isRho               = isRho;
+        //bestJetJECunc       = unc;
+        firstTrkCharge       = firstTrkCharge;
+        secondTrkCharge      = secondTrkCharge;
+        bestFirstTrkDxy      = firstTrkDxy;
+        bestFirstTrkDz       = firstTrkDz;
+        bestSecondTrkDxy     = secondTrkDxy;
+        bestSecondTrkDz      = secondTrkDz;
+        bestFirstTrkDxyErr   = firstTrkDxyErr;
+        bestFirstTrkDzErr    = firstTrkDzErr;
+        bestSecondTrkDxyErr  = secondTrkDxyErr;
+        bestSecondTrkDzErr   = secondTrkDzErr;
         
 
-        bestFirstTrkP4  = firstTrkP4; 
-        bestSecondTrkP4 = secondTrkP4;
-        bestPairP4     = pairP4;
+        bestFirstTrkP4       = firstTrkP4; 
+        bestSecondTrkP4      = secondTrkP4;
+        bestPairP4           = pairP4;
           
 
       } //2ND LOOP ENDS
@@ -899,9 +908,9 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   secondTrkPt  = bestSecondTrkP4.pt();       
   secondTrkEta = bestSecondTrkP4.eta();
   secondTrkPhi = bestSecondTrkP4.phi();
-  bestPairPt  = bestPairP4.pt();
-  bestPairEta = bestPairP4.eta();
-  bestPairPhi = bestPairP4.phi();
+  bestPairPt   = bestPairP4.pt();
+  bestPairEta  = bestPairP4.eta();
+  bestPairPhi  = bestPairP4.phi();
 
   bestJetInvMass                  = slimmedJets->at(bestJet_Index).mass();
   bestJetPt                       = slimmedJets->at(bestJet_Index).pt();
@@ -933,15 +942,15 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     c = firstTrkPhi;
     d = firstTrkEnergy;
     e = firstTrkCharge;
-    firstTrkPt    = secondTrkPt;
-    firstTrkEta   = secondTrkEta;
-    firstTrkPhi   = secondTrkPhi;
+    firstTrkPt     = secondTrkPt;
+    firstTrkEta    = secondTrkEta;
+    firstTrkPhi    = secondTrkPhi;
     firstTrkEnergy = secondTrkEnergy;
     firstTrkCharge = secondTrkCharge;
     secondTrkPt     = a;
     secondTrkEta    = b;
     secondTrkPhi    = c;
-    secondTrkEnergy  = d;
+    secondTrkEnergy = d;
     secondTrkCharge = e;
   }
 
@@ -953,11 +962,11 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   nEventsTrkPtFilter++;
 
   //ISOLATION DATAMEMBER FOR TREE FILLING 
-  isoK1        = firstTrkPt/(K1SumPt05 + firstTrkPt);
-  isoK2        = secondTrkPt/(K2SumPt05 + secondTrkPt);
-  isoPair    = bestPairPt/(pairSumPt05 + bestPairPt);
-  isoK1Ch     = firstTrkPt/(K1SumPt05Ch + firstTrkPt);
-  isoK2Ch     = secondTrkPt/(K2SumPt05Ch + secondTrkPt);
+  isoK1     = firstTrkPt/(K1SumPt05 + firstTrkPt);
+  isoK2     = secondTrkPt/(K2SumPt05 + secondTrkPt);
+  isoPair   = bestPairPt/(pairSumPt05 + bestPairPt);
+  isoK1Ch   = firstTrkPt/(K1SumPt05Ch + firstTrkPt);
+  isoK2Ch   = secondTrkPt/(K2SumPt05Ch + secondTrkPt);
   isoPairCh = bestPairPt/(pairSumPt05Ch + bestPairPt);
 
   //CUT ON PHI ISOLATION
@@ -995,17 +1004,17 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   is_meson_matched   = false;
   is_Higgs_matched   = false; 
 
-  Kminus_phi   = -999.;
-  Kplus_phi    = -999.;
+  Kminus_phi         = -999.;
+  Kplus_phi          = -999.;
   float Piminus_phi  = -999.;
   float Piplus_phi   = -999.;
-  Kminus_eta   = -999.;
-  Kplus_eta    = -999.;
+  Kminus_eta         = -999.;
+  Kplus_eta          = -999.;
   float Piminus_eta  = -999.;
   float Piplus_eta   = -999.;
-  deltaRKplus       = -999;
+  deltaRKplus        = -999;
   deltaR_wrong       = -999;
-  deltaRKminus      = -999.;
+  deltaRKminus       = -999.;
   deltaR_Piplus      = -999.;
   deltaR_Piminus     = -999.;
   genPhoton_eT       = -999.;
@@ -1015,12 +1024,12 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   genMeson_m         = -999.;
   genMeson_eta       = -999.;
   genMeson_phi       = -999.;
-  KplusPt      = -999.;
-  KminusPt     = -999.;
-  Kplus_dxy    = -999.;
-  Kplus_dz     = -999.;
-  Kminus_dxy    = -999.;
-  Kminus_dz     = -999.;
+  KplusPt            = -999.;
+  KminusPt           = -999.;
+  Kplus_dxy          = -999.;
+  Kplus_dz           = -999.;
+  Kminus_dxy         = -999.;
+  Kminus_dz          = -999.;
 
   if(!runningOnData_){
     for(auto gen = prunedGenParticles->begin(); gen != prunedGenParticles->end(); ++gen){
@@ -1229,6 +1238,7 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 }
 
 
+
 //*************************************************************//
 //                                                             //
 //---------------------- Create the tree ----------------------//
@@ -1379,6 +1389,7 @@ void ZMesonGamma::beginJob(){
 }
 
 
+
 //*************************************************************//
 //                                                             //
 //------------------- Fill event loss histos ------------------//
@@ -1391,14 +1402,13 @@ void ZMesonGamma::endJob() {
   hEvents->Fill(2.5,nEventsIsPhoton);
   hEvents->Fill(3.5,nEventsBestPairFound);  
   hEvents->Fill(4.5,nEventsTrkPtFilter);  
-  hEvents->Fill(5.5,nEventsPairIsolationFilter);
-  //hEvents->Fill(6.5,_Nevents_VBFVeto);  
+  //hEvents->Fill(5.5,nEventsPairIsolationFilter);
   hEvents->GetXaxis()->SetBinLabel(1,"processed");
   hEvents->GetXaxis()->SetBinLabel(2,"triggered");
   hEvents->GetXaxis()->SetBinLabel(3,"best photon");
   hEvents->GetXaxis()->SetBinLabel(4,"best pair");
   hEvents->GetXaxis()->SetBinLabel(5,"trks pT");
-  hEvents->GetXaxis()->SetBinLabel(6,"trks iso");
+  //hEvents->GetXaxis()->SetBinLabel(6,"trks iso");
 }
 
 //define this as a plug-in

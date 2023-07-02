@@ -33,9 +33,9 @@ options.parseArguments()
 
 #Input source
 if options.runningOnData:
-    process.GlobalTag = GlobalTag(process.GlobalTag, '106X_dataRun2_v33') # OLD ONE : 102X_dataRun2_Sep2018ABC_v2
-    inputFiles = { '/store/data/Run2018B/Tau/MINIAOD/UL2018_MiniAODv2-v2/70000/09FD3540-D36B-6249-9817-D3BAC2F02E74.root'}
-    
+   process.GlobalTag = GlobalTag(process.GlobalTag, '106X_dataRun2_v33') # OLD ONE : 102X_dataRun2_Sep2018ABC_v2
+   inputFiles = {'/store/data/Run2018B/Tau/MINIAOD/UL2018_MiniAODv2-v2/70000/09FD3540-D36B-6249-9817-D3BAC2F02E74.root'}
+
 else:
    process.GlobalTag = GlobalTag(process.GlobalTag, '106X_upgrade2018_realistic_v15_L1v1')  # OLD ONE : 102X_upgrade2018_realistic_v18
    #inputFiles={'file:/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD/Zrhogamma_2018UL_12.root','file:/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD/Zrhogamma_2018UL_11.root'} 
@@ -43,32 +43,30 @@ else:
    #input_path = '/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD/'
    input_path = '/eos/user/p/pellicci/MesonGamma_root/2023/Zphigamma_miniAOD/'
 
+   #INPUT FILE LIST
+   '''                                                                                                                                                                                                   
+   For the given path, get the List of all files in the directory tree                                                                                                                               
+   '''                                                                                                                                                                                                   
+   def getListOfFiles(dirName):                                                                                                                                                                          
+       # create a list of file and sub directories                                                                                                                                                       
+       # names in the given directory                                                                                                                                                                    
+       listOfFile = os.listdir(dirName)                                                                                                                                                                  
+       allFiles = list()                                                                                                                                                                                 
+       # Iterate over all the entries                                                                                                                                                                    
+       for entry in listOfFile:                                                                                                                                                                          
+           # Create full path                                                                                                                                                                            
+           fullPath = os.path.join(dirName, entry)                                                                                                                                                       
+           # If entry is a directory then get the list of files in this directory                                                                                                                        
+           if os.path.isdir(fullPath):                                                                                                                                                                   
+              allFiles = allFiles + getListOfFiles(fullPath)                                                                                                                                            
+           else:                                                                                                                                                                                         
+              allFiles.append("file:" + fullPath)                                                                                                                                                                 
+                                                                                                                                                                                                          
+       return allFiles     
 
-
-#INPUT FILE LIST
-'''                                                                                                                                                                                                   
-    For the given path, get the List of all files in the directory tree                                                                                                                               
-'''                                                                                                                                                                                                   
-def getListOfFiles(dirName):                                                                                                                                                                          
-    # create a list of file and sub directories                                                                                                                                                       
-    # names in the given directory                                                                                                                                                                    
-    listOfFile = os.listdir(dirName)                                                                                                                                                                  
-    allFiles = list()                                                                                                                                                                                 
-    # Iterate over all the entries                                                                                                                                                                    
-    for entry in listOfFile:                                                                                                                                                                          
-        # Create full path                                                                                                                                                                            
-        fullPath = os.path.join(dirName, entry)                                                                                                                                                       
-        # If entry is a directory then get the list of files in this directory                                                                                                                        
-        if os.path.isdir(fullPath):                                                                                                                                                                   
-            allFiles = allFiles + getListOfFiles(fullPath)                                                                                                                                            
-        else:                                                                                                                                                                                         
-            allFiles.append("file:" + fullPath)                                                                                                                                                                 
-                                                                                                                                                                                                      
-    return allFiles     
-
-# Get the list of all files in directory tree at given path                                                                                                                                           
-listOfFiles = getListOfFiles(input_path) ######                                                                                                                                                          
-#print(listOfFiles)  
+   # Get the list of all files in directory tree at given path                                                                                                                                           
+   listOfFiles = getListOfFiles(input_path) ######                                                                                                                                                          
+   #print(listOfFiles)  
 
 process.source = cms.Source ("PoolSource",
                              fileNames = cms.untracked.vstring (listOfFiles), #inputFiles or listOfFiles
@@ -78,14 +76,17 @@ process.source = cms.Source ("PoolSource",
 
 # Output file
 if options.runningOnData:
-    process.TFileService = cms.Service("TFileService", fileName = cms.string("ZMesonGamma_Data.root"))
+    process.TFileService = cms.Service("TFileService", fileName = cms.string("ZMesonGamma_output.root"))
 else:
     process.TFileService = cms.Service("TFileService", fileName = cms.string("ZMesonGamma_Signal.root"))
+
+#process.TFileService = cms.Service("TFileService", fileName = cms.string("ZMesonGamma_output.root"))
+
 
 
 
 ###############################################################################################################################
-#                                                                                                                               #
+#                                                                                                                             #
 #-------------------------------------------------------- Jet corrections ----------------------------------------------------#
 #                                                                                                                             #
 #                                      https://twiki.cern.ch/twiki/bin/view/CMS/JECDataMC                                     #

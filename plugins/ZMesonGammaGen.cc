@@ -29,7 +29,7 @@ using namespace std;
 ZMesonGammaGen::ZMesonGammaGen(const edm::ParameterSet& iConfig) 
 {
   prunedGenParticlesToken_ = consumes<std::vector<reco::GenParticle> >(edm::InputTag("prunedGenParticles"));
-
+  //genParticlesToken_       = consumes<std::vector<reco::GenParticle> >(edm::InputTag("genParticles"));
   create_trees();
 }
 
@@ -42,6 +42,8 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 {
   edm::Handle<std::vector<reco::GenParticle>  > genParticles;
   iEvent.getByToken(prunedGenParticlesToken_, genParticles);
+  //iEvent.getByToken(genParticlesToken_, genParticles);
+
 
   int genZ_ID     = -999;
   float genZ_pT   = -999.;
@@ -75,12 +77,12 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   float genTrackplus_phi = -999.;
   float genTrackplus_E   = -999.;
 
-  genZ_ID_tree  = 0;
-  genZ_pT_tree  = 0.;
-  genZ_eta_tree = 0.;
-  genZ_phi_tree = 0.;
-  genZ_E_tree   = 0.;
-  genZ_mass_tree =0.;
+  genZ_ID_tree   = 0;
+  genZ_pT_tree   = 0.;
+  genZ_eta_tree  = 0.;
+  genZ_phi_tree  = 0.;
+  genZ_E_tree    = 0.;
+  genZ_mass_tree = 0.;
 
 
   genGamma_ID_tree  = 0;
@@ -89,12 +91,12 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   genGamma_phi_tree = 0.;
   genGamma_E_tree   = 0.;
 
-  genMeson_ID_tree  = 0;
-  genMeson_pT_tree  = 0.;
-  genMeson_eta_tree = 0.;
-  genMeson_phi_tree = 0.;
-  genMeson_E_tree   = 0.;
-  genMeson_mass_tree =0.;
+  genMeson_ID_tree   = 0;
+  genMeson_pT_tree   = 0.;
+  genMeson_eta_tree  = 0.;
+  genMeson_phi_tree  = 0.;
+  genMeson_E_tree    = 0.;
+  genMeson_mass_tree = 0.;
 
   genTrackminus_ID_tree  = 0;
   genTrackminus_pT_tree  = 0.;
@@ -151,8 +153,6 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           genMeson_phi  = gen->daughter(i)->phi();
           genMeson_E    = gen->daughter(i)->energy();
           genMeson_mass = gen->daughter(i)->p4().M();
-          //cout << genMeson_mass << endl;
-
   
           //if Meson has two daughters
           if(gen->daughter(i)->numberOfDaughters() == 2){
@@ -164,22 +164,22 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
               if(gen->daughter(i)->daughter(j)->pdgId() == -321){
 
                 //save K- variables
-                genTrackminus_ID = gen->daughter(i)->daughter(j)->pdgId();
-                genTrackminus_pT = gen->daughter(i)->daughter(j)->pt();
+                genTrackminus_ID  = gen->daughter(i)->daughter(j)->pdgId();
+                genTrackminus_pT  = gen->daughter(i)->daughter(j)->pt();
                 genTrackminus_eta = gen->daughter(i)->daughter(j)->eta();
                 genTrackminus_phi = gen->daughter(i)->daughter(j)->phi();
-                genTrackminus_E = gen->daughter(i)->daughter(j)->energy();
+                genTrackminus_E   = gen->daughter(i)->daughter(j)->energy();
               }
 
               //if daughter(j) is a K+
               if(gen->daughter(i)->daughter(j)->pdgId() == 321){
 
                 //save K+ variables
-                genTrackplus_ID = gen->daughter(i)->daughter(j)->pdgId();
-                genTrackplus_pT = gen->daughter(i)->daughter(j)->pt();
+                genTrackplus_ID  = gen->daughter(i)->daughter(j)->pdgId();
+                genTrackplus_pT  = gen->daughter(i)->daughter(j)->pt();
                 genTrackplus_eta = gen->daughter(i)->daughter(j)->eta();
                 genTrackplus_phi = gen->daughter(i)->daughter(j)->phi();
-                genTrackplus_E = gen->daughter(i)->daughter(j)->energy();
+                genTrackplus_E   = gen->daughter(i)->daughter(j)->energy();
               }
 
        
@@ -187,22 +187,22 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
               if(gen->daughter(i)->daughter(j)->pdgId() == -211){
 
                 //save Pi- variables
-                genTrackminus_ID = gen->daughter(i)->daughter(j)->pdgId();
-                genTrackminus_pT = gen->daughter(i)->daughter(j)->pt();
+                genTrackminus_ID  = gen->daughter(i)->daughter(j)->pdgId();
+                genTrackminus_pT  = gen->daughter(i)->daughter(j)->pt();
                 genTrackminus_eta = gen->daughter(i)->daughter(j)->eta();
                 genTrackminus_phi = gen->daughter(i)->daughter(j)->phi();
-                genTrackminus_E = gen->daughter(i)->daughter(j)->energy();
+                genTrackminus_E   = gen->daughter(i)->daughter(j)->energy();
               }
         
               //if daughter(j) is a Pi+
               if(gen->daughter(i)->daughter(j)->pdgId() == 211){
 
                 //save Pi+ variables
-                genTrackplus_ID = gen->daughter(i)->daughter(j)->pdgId();
-                genTrackplus_pT = gen->daughter(i)->daughter(j)->pt();
+                genTrackplus_ID  = gen->daughter(i)->daughter(j)->pdgId();
+                genTrackplus_pT  = gen->daughter(i)->daughter(j)->pt();
                 genTrackplus_eta = gen->daughter(i)->daughter(j)->eta();
                 genTrackplus_phi = gen->daughter(i)->daughter(j)->phi();
-                genTrackplus_E = gen->daughter(i)->daughter(j)->energy();
+                genTrackplus_E   = gen->daughter(i)->daughter(j)->energy();
               }
 
       
@@ -212,6 +212,7 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           }//"if Phi/Rho has two daughters" end   //quindi: il mesone è sempre un phi/rho, infatti pdgID è stampato sempre, mentre non sempre il mesone decade in due figlie,
           //cout<<"pdgID"<<endl;             // infatti pdgIDE non sempre è stampato
           //cout<<genTrackplus_ID<<endl;
+          //cout<<genTrackminus_ID<<endl;
         }//"if it is a Phi/Rho" end
       }//i-forloop end
         //Evaluate Z invariant mass
@@ -227,7 +228,6 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   genZ_phi_tree  = genZ_phi;
   genZ_E_tree    = genZ_E;
   genZ_mass_tree = genZ_mass;
-
   
   genGamma_ID_tree  = genGamma_ID;
   genGamma_pT_tree  = genGamma_pT;
@@ -241,7 +241,6 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   genMeson_phi_tree  = genMeson_phi;
   genMeson_E_tree    = genMeson_E;
   genMeson_mass_tree = genMeson_mass;
-
 
   genTrackminus_ID_tree  = genTrackminus_ID;
   genTrackminus_pT_tree  = genTrackminus_pT;

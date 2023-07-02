@@ -88,7 +88,7 @@ for filename in list_inputfiles:
             histo_container[-1].SetLineColor(46)   #blue, 2 for red
 
         histo_container[-1].SetLineWidth(4)   #kind of thick
-        ##histo_container[-1].Scale(1./histo_container[-1].GetEntries()) #normalize to 1
+        histo_container[-1].Scale(1./histo_container[-1].GetEntries()) #normalize to 1
         hsignal[histo_name] = histo_container[-1]
         hstack[histo_name].Add(histo_container[-1])
 
@@ -131,7 +131,7 @@ for histo_name in list_histos:
         if histo_name == "h_ZMass":
             #hstack[histo_name].Rebin(2)            
             hstack[histo_name].GetXaxis().SetTitle("m_{ditrk,#gamma} [GeV]")
-            #hstack[histo_name].GetXaxis().SetLimits(115.,135.)
+            hstack[histo_name].GetXaxis().SetLimits(40.,140.)
 
         if histo_name == "h_nJets25":
             hstack[histo_name].GetXaxis().SetTitle("nJets")
@@ -197,7 +197,7 @@ for histo_name in list_histos:
         if histo_name == "h_bestJetPt" :
             hstack[histo_name].GetXaxis().SetTitle("p_{T}^{jet} [GeV]")
             if isTightSelection:
-                hstack[histo_name].GetXaxis().SetLimits(45.,220.)
+                hstack[histo_name].GetXaxis().SetLimits(45.,190.)
 
         if histo_name == "h_bestJetEta" :
             hstack[histo_name].GetXaxis().SetTitle("#eta_{jet}")
@@ -233,7 +233,7 @@ for histo_name in list_histos:
 
         if histo_name == "h_photonEnergy" :
             hstack[histo_name].GetXaxis().SetTitle("E_{T}^{#gamma}[GeV]")
-            hstack[histo_name].GetXaxis().SetLimits(38.,160.)
+            #hstack[histo_name].GetXaxis().SetLimits(38.,160.)
 
         if histo_name == "h_photonEta" :
             hstack[histo_name].GetXaxis().SetTitle("#eta_{#gamma}")
@@ -272,9 +272,9 @@ for histo_name in list_histos:
     ################################################
 
     if isPhi: 
-        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/"
+        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/"
     else:
-        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/"
+        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/"
 
     canvas[histo_name].SaveAs(output_dir + histo_name + ".pdf")
     canvas[histo_name].SaveAs(output_dir + histo_name + ".png")

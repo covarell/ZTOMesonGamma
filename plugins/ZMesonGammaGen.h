@@ -12,6 +12,7 @@ class ZMesonGammaGen : public edm::EDAnalyzer {
   virtual void endJob() override;
 
   const edm::InputTag prunedGenParticles_;
+  //const edm::InputTag genParticles_;
 
   edm::Service<TFileService> fs;
 
@@ -54,5 +55,7 @@ class ZMesonGammaGen : public edm::EDAnalyzer {
   float genTrackplus_E_tree;
 
   edm::EDGetTokenT<std::vector<reco::GenParticle> > prunedGenParticlesToken_; 
+  //edm::EDGetTokenT<std::vector<reco::GenParticle> > genParticlesToken_; 
+
   //edm::EDGetTokenT<GenEventInfoProduct> GenInfoToken_;
 };
