@@ -6,7 +6,7 @@ process.load('Configuration.Geometry.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 process.load('Configuration.StandardSequences.Services_cff') 
 process.load('Geometry.CaloEventSetup.CaloTowerConstituents_cfi')
-process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff') #Could be not the coprrect one, but should contain the one without "condDBv2"
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff') #Could be not the correct one, but should contain the one without "condDBv2"
 from Configuration.AlCa.GlobalTag import GlobalTag
 
 process.maxEvents = cms.untracked.PSet(
@@ -39,7 +39,7 @@ if options.runningOnData:
 else:
    process.GlobalTag = GlobalTag(process.GlobalTag, '106X_upgrade2018_realistic_v15_L1v1')  # OLD ONE : 102X_upgrade2018_realistic_v18
    #inputFiles={'file:/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD/Zrhogamma_2018UL_12.root','file:/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD/Zrhogamma_2018UL_11.root'} 
-   inputFiles={'file:/eos/user/p/pellicci/MesonGamma_root/2023/Zphigamma_miniAOD/Zphigamma_2018UL_12.root','file:/eos/user/p/pellicci/MesonGamma_root/2023/Zphigamma_miniAOD/Zphigamma_2018UL_11.root'}
+   inputFiles={'file:/eos/user/p/pellicci/MesonGamma_root/2023/Zphigamma_miniAOD/Zphigamma_2018UL_7.root'}#,'file:/eos/user/p/pellicci/MesonGamma_root/2023/Zphigamma_miniAOD/Zphigamma_2018UL_67.root'}
    #input_path = '/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD/'
    input_path = '/eos/user/p/pellicci/MesonGamma_root/2023/Zphigamma_miniAOD/'
 

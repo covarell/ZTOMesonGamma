@@ -1,4 +1,4 @@
-  #define _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
 #include <cmath> 
 #include <iostream>
 
@@ -356,15 +356,9 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   bestPairEta                     = 0.;
   bestPairPhi                     = 0.;  
 
+
   //K-candidates and PHI ISOLATION
-  K1SumPt05     = 0.;
-  K1SumPt05Ch   = 0.;
-
-  K2SumPt05     = 0.;
-  K2SumPt05Ch   = 0.;
-
-  pairSumPt05   = 0.;
-  pairSumPt05Ch = 0.;
+  
 
   isoK1     = 0.;
   isoK1Ch   = 0.;
@@ -372,7 +366,7 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   isoK2Ch   = 0.;
   isoPair   = 0.;
   isoPairCh = 0.;
-
+  
 
 
   //*************************************************************//
@@ -587,7 +581,7 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
   //JET LOOP
   for (auto jet = slimmedJets->begin(); jet != slimmedJets->end(); ++jet) { //JET LOOP START -------------------------------------------------------- 
-
+    if(verbose) cout << "jet loop starts" << endl;
     jetIndex++;
 
     jetPhotonInvMass=(jet->p4()+ph_p4).M(); //calculate inv mass
@@ -603,10 +597,20 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     float pt                   = jet->pt();
     float eta                  = abs(jet->eta());
 
-    if(neutralHadEnergyFrac > 0.9 || neutralEmEnergyFrac > 0.9 || nDaughters < 2. || muonEnergyFrac > 0.8 || chargedHadEnergyFrac <= 0. || chargedHadMult == 0. || chargedEmEnergyFrac > 0.8 || pt < 20. || eta > 4.7) continue;
+    if(neutralHadEnergyFrac > 0.9 || neutralEmEnergyFrac > 0.9 || nDaughters < 2. || muonEnergyFrac > 0.8 || chargedHadEnergyFrac <= 0. || chargedHadMult == 0. || chargedEmEnergyFrac > 0.8 || pt < 20. || eta > 4.7) {
+      if(verbose) cout << "if .... continue" << endl;
+      continue;
+      }
     
-    if(jet->pt() < 38. || abs(jet->eta()) > 2.5) continue;
-    if(jetPhotonInvMass < 30.) continue; //reject jets with inv mass lower then 30 GeV
+    if(jet->pt() < 38. || abs(jet->eta()) > 2.5) {
+      if(verbose) cout << "if jet pt<38 continue" << endl;
+      continue;
+      }
+    if(jetPhotonInvMass < 30.) {
+      if(verbose) cout << "if jet mass<30 continue" << endl;
+      continue; //reject jets with inv mass lower then 30 GeV
+      }
+
                            
      //-------------------------------------------------------------------------------------------------      
     
@@ -616,6 +620,7 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
     //-------------------------------------daughters forloop----------------------------
 
     for(int firstTrkIndex=0; firstTrkIndex < nDaughters; firstTrkIndex++){ //1ST LOOP STARTS
+      if(verbose) cout << "1st particle loop starts" << endl;
 
       if (verbose) cout<<"Daughter n."<<firstTrkIndex+1<<" pT = "<<slimmedJets->at(jetIndex).daughter(firstTrkIndex)->pt()<<endl;
 
@@ -623,14 +628,20 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       firstTrkPt    = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->pt();  //take firstCand pt
       firstTrkEta   = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->eta(); //take firstCand eta
       firstTrkPhi   = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->phi(); //take firstCand phi
-      if(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack() == NULL) continue;//loop only over charged daughters
+      if(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack() == NULL) {
+        if(verbose) cout << "if bestTrack null continue" << endl;
+        continue;//loop only over charged daughters
+        }
       firstTrkDxy    = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position()); //take firstCand dxy
       firstTrkDxyErr = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dxyError();        
       firstTrkDz     = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position()); //take firstCand dz
       firstTrkDzErr  = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dzError();
 
         
-      if(firstTrkCharge == 0 || abs(firstTrkDxy) >= 0.2 || abs(firstTrkDz) >= 0.5 || !(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->quality(reco::Track::highPurity))) continue;
+      if(firstTrkCharge == 0 || abs(firstTrkDxy) >= 0.2 || abs(firstTrkDz) >= 0.5 || !(slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->quality(reco::Track::highPurity))) {
+          if(verbose) cout << "if 1st trk...... continue" << endl;
+          continue;
+          }
 
       /*if (slimmedJets->at(jetIndex).daughter(firstTrkIndex)->charge() == 0) continue;
       
@@ -650,27 +661,37 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       firstTrkDz    = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position());
       firstTrkDzErr = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->bestTrack()->dzError();*/
 
-      if(firstTrkPt < 1.) continue; //firstCand filter if pT < 1 GeV
+      if(firstTrkPt < 1.){
+        if(verbose) cout << "if 1st trk pt <1 continue" << endl;
+        continue; //firstCand filter if pT < 1 GeV
+        }
+
 
       for(int secondTrkIndex=firstTrkIndex+1; secondTrkIndex < nDaughters; secondTrkIndex++){ //2ND LOOP STARTS
+        if(verbose) cout << "2nd particle loop starts" << endl;
 
         secondTrkCharge = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->charge();
         secondTrkPt     = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->pt();
         secondTrkEta    = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->eta();
         secondTrkPhi    = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->phi();
-        if(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack() == NULL) continue;
+        if(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack() == NULL) {
+          if(verbose) cout << "if bestTrack null continue" << endl;
+          continue;
+          }
         secondTrkDxy    = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position());
         secondTrkDxyErr = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxyError();          
         secondTrkDz     = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position());
         secondTrkDzErr  = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dzError();
 
         //if (slimmedJets->at(jetIndex).daughter(secondTrkIndex)->charge() == 0) continue;
-        if(secondTrkCharge == 0 || abs(secondTrkDxy) >= 0.2 || abs(secondTrkDz) >= 0.5 || !(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->quality(reco::Track::highPurity))) continue;
-
+        if(secondTrkCharge == 0 || abs(secondTrkDxy) >= 0.2 || abs(secondTrkDz) >= 0.5 || !(slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->quality(reco::Track::highPurity))) {
+          if(verbose) cout << "if 2nd trk...... continue" << endl;
+          continue;
+          }
 
         //minimum apporach distance
         //if (slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack() == NULL) continue;
-        if(verbose) cout<<"Track without bestTrack() found!"<<endl;
+        //if(verbose) cout<<"Track without bestTrack() found!"<<endl;
 
         //cout<<"dxy = "<<slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dxy((&slimmedPV->at(0))->position())<<endl;
         //cout<<"dz  = "<<slimmedJets->at(jetIndex).daughter(secondTrkIndex)->bestTrack()->dz((&slimmedPV->at(0))->position())<<endl;
@@ -686,8 +707,15 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
         //TRKs PT CUT --------------------------------------------------------------------------
         //secondTrkPt  = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->pt();
-        if(secondTrkPt < 1.) continue; //firstCand filter if pT < 1 GeV
-        if(firstTrkPt < 10. && secondTrkPt < 10.) continue;  //filter if both cand pT are < 10GeV
+        if(secondTrkPt < 1.) {
+          if(verbose) cout << "if second trk pt<1 continue" << endl;
+          continue; //firstCand filter if pT < 1 GeV
+          }
+
+        if(firstTrkPt < 10. && secondTrkPt < 10.) {
+          if(verbose) cout << "if firstTrkPt < 10. && secondTrkPt < 10 continue" << endl;
+          continue;  //filter if both cand pT are < 10GeV
+          }
 
         //DITRK DELTA R CUT --------------------------------------------------------------------------
         //secondTrkEta = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->eta();
@@ -699,12 +727,19 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         if (deltaPhi > M_PI) deltaPhi = 2*M_PI - deltaPhi;
 
         deltaRK= sqrt(deltaEta*deltaEta + deltaPhi*deltaPhi);
-        if(deltaRK > 0.07) continue;
+        if(deltaRK > 0.07) {
+          if(verbose) cout << "deltaRK<0.07 continue" << endl;
+          continue;
+          }
 
         //OPPOSITE CHARGE - FILTER ------------------------------------------------------------
         //firstTrkCharge  = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->charge(); //take firstCand charge
         //secondTrkCharge = slimmedJets->at(jetIndex).daughter(secondTrkIndex)->charge(); //take secondCand charge
-        if(firstTrkCharge * secondTrkCharge >= 0) continue; //choose only opposite charges
+        if(firstTrkCharge * secondTrkCharge >= 0) {
+          if(verbose) cout << "firstTrkCharge * secondTrkCharge >= 0" << endl;
+          continue; //choose only opposite charges
+          }
+
 
         //QUADRIMOMENTUM CALCULATION ------------------------------------------------------------
         firstTrkP4  = slimmedJets->at(jetIndex).daughter(firstTrkIndex)->p4(); //take quadrimomentum
@@ -747,7 +782,7 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
         //DITRK PT CUT -------------------------------------------------------------------------
         if(pairP4K.pt() < 38.) {
-          if(verbose) cout<<"couplePt cut NOT passed"<<endl;
+          if(verbose) cout<<"couplePt cut NOT passed, continue"<<endl;
           continue;
         }  
         
@@ -763,7 +798,10 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         if (verbose) cout<<"mPiPi (before the meson mass selection) =  "<<RhoMass<<endl;
         if(RhoMass > 0.5 && RhoMass < 1.) isRho = true; //filter on Rho invariant mass   
 
-        if (!isPhi && !isRho) continue; //continue if the pair mass doesn't match any of the two mass hypothesis
+        if (!isPhi && !isRho) {
+          if (verbose) cout<<"the pair mass doesn't match any of the two mass hypothesis, continue "<<endl;
+          continue; //continue if the pair mass doesn't match any of the two mass hypothesis
+          }
 
         if (isPhi && isRho){ //if both hypothesis are true, mark it as a Phi candidate (this is done because the Phi mass window is tighter)
           isPhi = true;
@@ -782,14 +820,27 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
           pairP4      = PairP4Pi;
         }
 
+
+        K1SumPt05     = 0.;
+        K1SumPt05Ch   = 0.;
+
+        K2SumPt05     = 0.;
+        K2SumPt05Ch   = 0.;
+
+        pairSumPt05   = 0.;
+        pairSumPt05Ch = 0.;
+
         // ISOLATION CUT -------------------------------------------------------------------------  
         for(auto cand_iso = PFCandidates->begin(); cand_iso != PFCandidates->end(); ++cand_iso){ //ISOLATION FORLOOP START
-          
+          if(verbose) cout << "isolation loop starts" << endl;
           if(debug){
             cout <<endl<<"ISO CALC DETAILS ---------------------"<<endl;
             cout << "pt cand_iso = "<<cand_iso->pt()<<endl;
           }
-          if(cand_iso->pt() < 0.5) continue; //do not consider tracks with pT < 500MeV
+          if(cand_iso->pt() < 0.5) {
+            if(verbose) cout << "cand_iso->pt() < 0.5, continue" << endl;
+            continue; //do not consider tracks with pT < 500MeV
+            }
 
           //calculate the deltaR between the track and the first candidate ---------------------------------------
           float deltaPhi_K1 = fabs(firstTrkP4.phi()-cand_iso->phi());  //phi folding 
@@ -797,7 +848,10 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
           float deltaRK1 = sqrt((firstTrkP4.eta()-cand_iso->eta())*(firstTrkP4.eta()-cand_iso->eta()) + deltaPhi_K1*deltaPhi_K1);
           if (debug) cout << "deltaRK1 = "<<deltaRK1<<endl;
-          if(deltaRK1 < 0.0005) continue; //remove first candidate from the sum
+          if(deltaRK1 < 0.0005) {
+            if(verbose) cout<<"deltaRK1 < 0.0005, continue" << endl;
+            continue; //remove first candidate from the sum
+            }
 
           //calculate the deltaR between the track and the second candidate ---------------------------------------
           float deltaPhi_K2 = fabs(secondTrkP4.phi()-cand_iso->phi());  //phi folding  
@@ -805,7 +859,10 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
           float deltaRK2 = sqrt((secondTrkP4.eta()-cand_iso->eta())*(secondTrkP4.eta()-cand_iso->eta()) + deltaPhi_K2*deltaPhi_K2);
           if (debug) cout << "deltaRK2 = "<<deltaRK2<<endl;
-          if(deltaRK2 < 0.0005) continue; //remove second candidate from the sum
+          if(deltaRK2 < 0.0005) {
+            if(verbose) cout << "deltaRK2 < 0.0005, continue" << endl;
+            continue; //remove second candidate from the sum
+            }
 
           //calculate the deltaR between the track and the best pair ---------------------------------------
           float deltaPhi_Couple = fabs(pairP4.phi()-cand_iso->phi());  //phi folding  
@@ -821,23 +878,31 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
           //sum pT of the charged tracks inside a cone of deltaR = 0.3 ---------------------------------------
           if (debug) cout << "Charge = "<< cand_iso->charge()<<endl;
-          if(cand_iso->charge() == 0) continue;
+          if(cand_iso->charge() == 0) {
+            if(verbose) cout << "cand_iso->charge() == 0, continue" << endl;
+            continue;
+            }
           // cout << "particle charge = "<<cand_iso->charge()<<endl;
           if (debug) cout << "dxy = "<<fabs(cand_iso->dxy())<<" and dz = "<< fabs(cand_iso->dz())<<endl;
-          if(fabs(cand_iso->dxy()) >= 0.2 || fabs(cand_iso->dz()) >= 0.5) continue; // Requesting charged particles to come from PV
+          if(fabs(cand_iso->dxy()) >= 0.2 || fabs(cand_iso->dz()) >= 0.5) {
+            if(verbose) cout << "cand_iso->dxy()) >= 0.2 || cand_iso->dz() >= 0.5, continue" << endl;
+            continue; // Requesting charged particles to come from PV
+            }
           //cout<< "charge after = "<<cand_iso->charge()<<endl;
           if(deltaRK1 <= 0.3) K1SumPt05Ch += cand_iso->pt();
           if(deltaRK2 <= 0.3) K2SumPt05Ch += cand_iso->pt();
           if (debug) cout <<"deltaR_Couple = "<<deltaR_Couple<<endl;
           if(deltaR_Couple <= 0.3){
             pairSumPt05Ch += cand_iso->pt();
-            if (debug) cout<<"Particle in the cone: SumPt = "<<pairSumPt05Ch<<endl;
+            if (verbose) cout<<"Particle in the cone: SumPt = "<<pairSumPt05Ch<<endl;
           }
+          if(verbose) cout << "isolations loop ends" << endl;
         } //ISOLATION FORLOOP END
 
         float isoCoupleCh = pairP4.pt()/(pairSumPt05Ch + pairP4.pt());
+        if(verbose) cout << "pairP4.pt() = " << pairP4.pt() << " pairSumPt05Ch = " << pairSumPt05Ch << " isoCoupleCh = " << isoCoupleCh << endl;
         if(isoCoupleCh < 0.9) {
-          cout<<"No isolation cut passed."<<endl;
+          cout<<"No isolation cut passed, continue."<<endl;
           continue; 
         }
 
@@ -846,13 +911,13 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         if (verbose) cout<<"Current bestCoupleOfTheEvent_Pt = "<<bestCoupleOfTheJetPt<<endl;
         
         if(pairP4.pt() <= bestCoupleOfTheJetPt) {
-          if(verbose) cout<<"Not passed: pT lower than the current best pair of the event"<<endl;
+          if(verbose) cout<<"Not passed: pT lower than the current best pair of the event. Continue"<<endl;
           continue; //choose the couple with greatest pt
         }
 
         //If passed, this is the pair with the largest pT of the event so far
         bestCoupleOfTheJetPt = pairP4.pt();     
-        if (verbose) cout<<"pairP4.pt() = "<<bestCoupleOfTheJetPt<<endl;
+        if (verbose) cout<<"pairP4.pt() = "<<bestCoupleOfTheJetPt << endl; //", isoCoupleCh = " << isoCoupleCh << endl;
 
         if(verbose) cout<<"This is the best pair so far!"<<endl<<"-------------------------"<<endl;
         isBestCoupleOfTheEventFound = true;
@@ -879,16 +944,25 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
         bestFirstTrkP4       = firstTrkP4; 
         bestSecondTrkP4      = secondTrkP4;
         bestPairP4           = pairP4;
+        bestPairIsoCh        = isoCoupleCh;
+        bestPairSumPt05Ch    = pairSumPt05Ch;
           
-
+        if(verbose) cout << "2nd loop ends" << endl;
       } //2ND LOOP ENDS
+      if(verbose) cout << "1st loop ends" << endl;
     } //1ST LOOP ENDS
 
-    if(jet->pt() < 25.) continue;
+    if(jet->pt() < 25.) {
+      if(verbose) cout << "jet->pt() < 25., continue" << endl;
+      continue;
+      }
     nJets25++;
-    if(jet->pt() < 30.) continue;
+    if(jet->pt() < 30.) {
+      if(verbose) cout << "jet->pt() < 30., continue" << endl;
+      continue;
+      }  
     nJets30++;
-
+    if(verbose) cout << "jet loop ends" << endl;
   } //JET LOOP END
 
 
@@ -968,13 +1042,14 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   isoK1Ch   = firstTrkPt/(K1SumPt05Ch + firstTrkPt);
   isoK2Ch   = secondTrkPt/(K2SumPt05Ch + secondTrkPt);
   isoPairCh = bestPairPt/(pairSumPt05Ch + bestPairPt);
+  if(verbose) cout << "bestPairPt = " << bestPairPt << " bestPairSumPt05Ch = " << bestPairSumPt05Ch << " bestPairIsoCh = " << bestPairIsoCh << endl; 
 
   //CUT ON PHI ISOLATION
   if(verbose){
     cout<<endl;
-    cout<<"###### ISO           = "<<isoPairCh<<endl;
+    cout<<"###### ISO           = "<<bestPairIsoCh<<endl;
     cout<<"###### isRho         = "<<isRho<<endl;
-    cout<<"###### SUM pT        = "<<pairSumPt05Ch<<endl;
+    cout<<"###### SUM pT        = "<<bestPairSumPt05Ch<<endl;
     cout<<"###### pT leading    = "<<firstTrkPt<<endl;
     cout<<"###### pT subleading = "<<secondTrkPt<<endl;
     cout<<"###### MesonMass     = "<<mesonMass<<endl;
@@ -1339,7 +1414,7 @@ void ZMesonGamma::create_trees()
   mytree->Branch("iso_K2",&isoK2);
   mytree->Branch("iso_K2_ch",&isoK2Ch);
   mytree->Branch("iso_couple",&isoPair);
-  mytree->Branch("iso_couple_ch",&isoPairCh);
+  mytree->Branch("bestIso_couple_ch",&bestPairIsoCh);
 
 
   //Save MC info

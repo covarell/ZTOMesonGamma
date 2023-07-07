@@ -138,8 +138,9 @@ private:
   float isoK2Ch;
   float isoPair;
   float isoPairCh;
-
-  
+  float bestPairSumPt05Ch;
+  float bestPairIsoCh;
+    
   float metPt;
   float metpuppiPt;
   
