@@ -35,6 +35,8 @@ options.parseArguments()
 if options.runningOnData:
    process.GlobalTag = GlobalTag(process.GlobalTag, '106X_dataRun2_v33') # OLD ONE : 102X_dataRun2_Sep2018ABC_v2
    inputFiles = {'/store/data/Run2018B/Tau/MINIAOD/UL2018_MiniAODv2-v2/70000/09FD3540-D36B-6249-9817-D3BAC2F02E74.root'}
+   input_path = '/store/data/Run2018B/Tau/MINIAOD/UL2018_MiniAODv2-v2/'
+
 
 else:
    process.GlobalTag = GlobalTag(process.GlobalTag, '106X_upgrade2018_realistic_v15_L1v1')  # OLD ONE : 102X_upgrade2018_realistic_v18

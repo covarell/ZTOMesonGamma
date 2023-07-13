@@ -179,7 +179,7 @@ for jentry in xrange(nentries):
     jetPt          = mytree.bestJet_pT   
     jetEta         = mytree.bestJet_eta
     MesonIso       = mytree.iso_couple
-    MesonIsoCh     = mytree.iso_couple_ch
+    MesonIsoCh     = mytree.iso_couple_ch #bestIso_couple_ch
     MesonIso0      = mesonPt/(mesonPt + (mytree.pairSumPt05 - mytree.pairSumPt05Ch))
     firstTrkiso    = mytree.iso_K1
     firstTrkisoCh  = mytree.iso_K1_ch
@@ -386,9 +386,18 @@ if not samplename == "Data" :
     c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/h_efficiency.pdf")
     c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/h_efficiency.png")
 else:
-    c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/h_efficiency.pdf")
-    c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/h_efficiency.png")
-
+    if isPhiAnalysis and CRflag == 0:
+        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/SR/h_efficiency.pdf")
+        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/SR/h_efficiency.png")
+    elif isPhiAnalysis and CRflag == 1:
+        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/CR/h_efficiency.pdf")
+        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/CR/h_efficiency.png")
+    elif isRhoAnalysis and CRflag == 0:
+        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/SR/h_efficiency.pdf")
+        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/SR/h_efficiency.png")
+    elif isRhoAnalysis and CRflag == 1: 
+        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/CR/h_efficiency.pdf")
+        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/CR/h_efficiency.png")
 
 
 #HISTOS WRITING ########################################################################################################
