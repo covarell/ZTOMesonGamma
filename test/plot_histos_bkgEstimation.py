@@ -27,7 +27,7 @@ for filename in sys.argv[4:]:
     list_inputfiles.append(filename)
 
 fileIn = ROOT.TFile(list_inputfiles[0])
-CAT = (filename.split("_")[3]) 
+CAT = (filename.split("_")[2]) 
 
 print "#############################"
 print "is Phi = ",isPhi
@@ -70,10 +70,10 @@ colors_mask = dict()
 #colors_mask["bkgEstimationCR"]   = ROOT.kRed-7
 #colors_mask["Sidebands"]          = ROOT.kRed-7
 if isPhi:
-    colors_mask["SidebandsNorm"]      = ROOT.kCyan-7
+    colors_mask["Sidebands"]      = ROOT.kCyan-7
     decayChannel = "#phi#gamma "
 else:
-    colors_mask["SidebandsNorm"]      = ROOT.kRed-4
+    colors_mask["Sidebands"]      = ROOT.kRed-4
     decayChannel = "#rho#gamma "
 
 colors_mask["GammaJets"]           = ROOT.kOrange
@@ -111,7 +111,7 @@ histo_blacklist = {"h_genPhotonEt","h_genMesonPt","h_RecoVsGenPhotonPtRel","h_Re
 
 for filename in list_inputfiles:
     fileIn = ROOT.TFile(filename)
-    sample_name = (filename.split("_")[4])[:-5] 
+    sample_name = (filename.split("_")[3])[:-5] 
     print "=============== ", sample_name
     for histo_name in list_histos:
         if histo_name in histo_blacklist: continue
@@ -139,7 +139,7 @@ for filename in list_inputfiles:
 
         if sample_name == "Signal":
             histo_container[-1].SetLineStyle(1)   
-            histo_container[-1].SetLineColor(1)   #4 for blue, 2 for red
+            histo_container[-1].SetLineColor(4)   #4 for blue, 2 for red
             histo_container[-1].SetLineWidth(4)   #kind of thick
             hsignal[histo_name] = histo_container[-1]
             '''
@@ -170,16 +170,12 @@ for filename in list_inputfiles:
 
         if histo_name == "h_ZMass" : #Add the legend only once (InvMass_TwoTrk_Photon is just a random variable)
             
-            if not sample_name == "Data" and not sample_name == "Signal" '''and not sample_name == "SignalVBF" and not sample_name == "SignalggH"''':
+            if not sample_name == "Data" and not sample_name == "Signal" :
                 leg1.AddEntry(histo_container[-1],"bkg estimation","f")
-                '''
+                
             elif sample_name == "Data":
                 leg1.AddEntry(histo_container[-1],sample_name,"ep")
-            elif sample_name == "SignalggH":
-                leg1.AddEntry(histo_container[-1],decayChannel + "ggH" ,"f")
-            elif sample_name == "SignalVBF":
-                leg1.AddEntry(histo_container[-1],decayChannel + "VBF" ,"f")
-                '''
+            
             elif sample_name == "Signal":
                 leg1.AddEntry(histo_container[-1],decayChannel, "f")
    
@@ -215,9 +211,9 @@ for histo_name in list_histos:
 
     hstack[histo_name].SetTitle("")
     hdata[histo_name].SetTitle("")
-    #hsignal[histo_name].SetTitle("")
-    hsignalggH[histo_name].SetTitle("")
-    hsignalVBF[histo_name].SetTitle("")
+    hsignal[histo_name].SetTitle("")
+    #hsignalggH[histo_name].SetTitle("")
+    #hsignalVBF[histo_name].SetTitle("")
 
 
     if not plotOnlyData :
@@ -240,7 +236,7 @@ for histo_name in list_histos:
         if histo_name == "h_ZMass":
             #hstack[histo_name].Rebin(2)            
             hstack[histo_name].GetXaxis().SetTitle("m_{ditrk#gamma} [GeV]")
-            hstack[histo_name].GetXaxis().SetLimits(100.,170.)
+            hstack[histo_name].GetXaxis().SetLimits(0.,700.)##############
 
 
         if histo_name == "h_nJets25":
@@ -332,7 +328,7 @@ for histo_name in list_histos:
 
         if histo_name == "h_photonEnergy" :
             hstack[histo_name].GetXaxis().SetTitle("E_{T}^{#gamma}[GeV]")
-            hstack[histo_name].GetXaxis().SetLimits(38.,160.)
+            hstack[histo_name].GetXaxis().SetLimits(38.,160.)################SetRangeUser
             if isTightSelection: hstack[histo_name].GetXaxis().SetLimits(38.,120.)
 
         if histo_name == "h_photonEta" :
@@ -379,17 +375,17 @@ for histo_name in list_histos:
                 hstack[histo_name].GetXaxis().SetTitle("m_{#pi#pi} [GeV]")
 
     if signal_magnify != 1:
-        #hsignal[histo_name].Scale(signal_magnify)   
-        hsignalggH[histo_name].Scale(signal_magnify)   
-        hsignalVBF[histo_name].Scale(signal_magnify)   
-        if histo_name == "h_ZMass":
-            hsignalVBF[histo_name].Rebin(1/5) #do this to have more granularity in the signal curve
-            hsignalggH[histo_name].Rebin(1/5)
+        hsignal[histo_name].Scale(signal_magnify)   
+        #hsignalggH[histo_name].Scale(signal_magnify)   
+        #hsignalVBF[histo_name].Scale(signal_magnify)   
+        #if histo_name == "h_ZMass":
+            #hsignalVBF[histo_name].Rebin(1/5) #do this to have more granularity in the signal curve
+            #hsignalggH[histo_name].Rebin(1/5)
 
     hdata[histo_name].Draw("SAME,E1,X0")
-    #hsignal[histo_name].Draw("SAME,hist")
-    hsignalggH[histo_name].Draw("SAME,hist")
-    hsignalVBF[histo_name].Draw("SAME,hist")
+    hsignal[histo_name].Draw("SAME,hist")
+    #hsignalggH[histo_name].Draw("SAME,hist")
+    #hsignalVBF[histo_name].Draw("SAME,hist")
 
 
     hMCErr = copy.deepcopy(hstack[histo_name].GetStack().Last())
@@ -468,7 +464,7 @@ for histo_name in list_histos:
         totalMC.Draw("sameE2")
         line_on_one.Draw("SAME")
     ################################################
-    output_dir = "~/cernbox/www/latest_production/"+CAT+"_latest_production/"
+    output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/"
     #/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/
 
 
