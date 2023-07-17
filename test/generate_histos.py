@@ -7,8 +7,8 @@ from array import array
 
 #Following bools are given as input
 isDataBlind   = False #Bool for blind analysis
-isPhiAnalysis = True # for Z -> Phi Gamma
-isRhoAnalysis = False # for Z -> Rho Gamma
+isPhiAnalysis = False # for Z -> Phi Gamma
+isRhoAnalysis = True # for Z -> Rho Gamma
 
 #Supress the opening of many Canvas's
 ROOT.gROOT.SetBatch(True)
@@ -238,7 +238,7 @@ for jentry in xrange(nentries):
     #if DATA -> Blind Analysis on Z inv mass plot
     if samplename == "Data":
         if isDataBlind:
-            if ZMass < 85. or ZMass > 97.:
+            if ZMass < 80. or ZMass > 110.:
                 histo_map["h_ZMass"].Fill(ZMass)#, eventWeight)
         else:
             histo_map["h_ZMass"].Fill(ZMass)#, eventWeight)

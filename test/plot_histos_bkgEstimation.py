@@ -18,7 +18,7 @@ isPhi = int(sys.argv[3]) #note that in python true = 1 and false = 0
 
 
 if not isTightSelection:
-    inputnames = ["Data","Signal","Sidebands"]
+    inputnames = ["Data","Signal","SidebandsNorm"]
 else:
     inputnames = ["Data","Signal"]
 
@@ -70,10 +70,10 @@ colors_mask = dict()
 #colors_mask["bkgEstimationCR"]   = ROOT.kRed-7
 #colors_mask["Sidebands"]          = ROOT.kRed-7
 if isPhi:
-    colors_mask["Sidebands"]      = ROOT.kCyan-7
+    colors_mask["SidebandsNorm"]      = ROOT.kCyan-7
     decayChannel = "#phi#gamma "
 else:
-    colors_mask["Sidebands"]      = ROOT.kRed-4
+    colors_mask["SidebandsNorm"]      = ROOT.kRed-4
     decayChannel = "#rho#gamma "
 
 colors_mask["GammaJets"]           = ROOT.kOrange
@@ -464,8 +464,10 @@ for histo_name in list_histos:
         totalMC.Draw("sameE2")
         line_on_one.Draw("SAME")
     ################################################
-    output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/"
-    #/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/
+    if isPhi :
+        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/Bkg/"
+    else :
+        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/Bkg/"
 
 
     canvas[histo_name].SaveAs(output_dir + histo_name + ".pdf")
