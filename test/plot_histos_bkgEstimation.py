@@ -142,22 +142,24 @@ for filename in list_inputfiles:
             histo_container[-1].SetLineColor(4)   #4 for blue, 2 for red
             histo_container[-1].SetLineWidth(4)   #kind of thick
             hsignal[histo_name] = histo_container[-1]
-            '''
-        if sample_name == "SignalggH":
+            
+        elif sample_name == "SignalggH":
             histo_container[-1].SetLineStyle(1)   
             histo_container[-1].SetLineColor(4)   #4 for blue, 2 for red
             histo_container[-1].SetLineWidth(4)   #kind of thick
             hsignalggH[histo_name] = histo_container[-1]
+
         elif sample_name == "SignalVBF":
             histo_container[-1].SetLineStyle(1)   
             histo_container[-1].SetLineColor(8)   #4 for blue, 2 for red
             histo_container[-1].SetLineWidth(4)   #kind of thick
             hsignalVBF[histo_name] = histo_container[-1]
-            '''
+            
         elif "Data" in sample_name :
             histo_container[-1].SetMarkerStyle(20)   #point
             histo_container[-1].SetBinErrorOption(ROOT.TH1.kPoisson)
             hdata[histo_name] = histo_container[-1]
+
         else:
             histo_container[-1].SetFillColor(colors_mask[sample_name])
             histo_container[-1].SetLineColor(colors_mask[sample_name])

@@ -1,30 +1,30 @@
-DEBUG 2023-07-12 10:00:12.681 UTC: 	 CRAB Client version: v3.230417
-DEBUG 2023-07-12 10:00:12.682 UTC: 	 Running on: Linux lxplus787.cern.ch 3.10.0-1160.92.1.el7.x86_64 #1 SMP Tue Jun 20 11:48:01 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux - CentOS Linux 7 (Core)
-DEBUG 2023-07-12 10:00:12.682 UTC: 	 Executing command: 'submit'
-DEBUG 2023-07-12 10:00:12.687 UTC: 	 Found CRAB cache file /afs/cern.ch/user/e/eferrand/.crab3
-DEBUG 2023-07-12 10:00:12.688 UTC: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
-DEBUG 2023-07-12 10:00:12.994 UTC: 	 Checking credentials
-DEBUG 2023-07-12 10:00:12.996 UTC: 	 Found proxy file /tmp/x509up_u160400
-DEBUG 2023-07-12 10:00:12.996 UTC: 	 Making sure it has proper VOMS extension
-DEBUG 2023-07-12 10:00:12.996 UTC: 	 Executing command :
+DEBUG 2023-09-28 08:47:45.829 UTC: 	 CRAB Client version: v3.230612
+DEBUG 2023-09-28 08:47:45.830 UTC: 	 Running on: Linux lxplus761.cern.ch 3.10.0-1160.95.1.el7.x86_64 #1 SMP Mon Jul 24 13:59:37 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux - CentOS Linux 7 (Core)
+DEBUG 2023-09-28 08:47:45.830 UTC: 	 Executing command: 'submit'
+DEBUG 2023-09-28 08:47:45.831 UTC: 	 Found CRAB cache file /afs/cern.ch/user/e/eferrand/.crab3
+DEBUG 2023-09-28 08:47:45.832 UTC: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+DEBUG 2023-09-28 08:47:45.865 UTC: 	 Checking credentials
+DEBUG 2023-09-28 08:47:45.865 UTC: 	 Found proxy file /tmp/x509up_u160400
+DEBUG 2023-09-28 08:47:45.865 UTC: 	 Making sure it has proper VOMS extension
+DEBUG 2023-09-28 08:47:45.865 UTC: 	 Executing command :
  voms-proxy-info --vo --file /tmp/x509up_u160400
-DEBUG 2023-07-12 10:00:13.995 UTC: 	 output : cms
+DEBUG 2023-09-28 08:47:46.764 UTC: 	 output : cms
 
  error: 
  retcode : 0
-DEBUG 2023-07-12 10:00:13.995 UTC: 	 Getting proxy life time left
-DEBUG 2023-07-12 10:00:13.995 UTC: 	 Executing command :
+DEBUG 2023-09-28 08:47:46.765 UTC: 	 Getting proxy life time left
+DEBUG 2023-09-28 08:47:46.765 UTC: 	 Executing command :
  voms-proxy-info --actimeleft --timeleft --file /tmp/x509up_u160400
-DEBUG 2023-07-12 10:00:14.703 UTC: 	 output : 686154
-686153
+DEBUG 2023-09-28 08:47:47.650 UTC: 	 output : 691088
+691088
 
  error: 
  retcode : 0
-DEBUG 2023-07-12 10:00:14.703 UTC: 	 Proxy valid for 190:35:53 hours
-DEBUG 2023-07-12 10:00:15.109 UTC: 	 Encoded data for curl request: subresource=delegatedn
-DEBUG 2023-07-12 10:00:15.110 UTC: 	 Executing command :
- curl -v -X GET -H "User-Agent: CRABClient/v3.230417" -H "Accept: */*" --data @/tmp/crab_curlDatak4_AL8 --cert "/tmp/x509up_u160400" --key "/tmp/x509up_u160400" --capath "/etc/grid-security/certificates/" "https://cmsweb.cern.ch:8443/crabserver/prod/info?subresource=delegatedn" | tee /dev/stderr 
-DEBUG 2023-07-12 10:00:15.229 UTC: 	 output : {"result": [
+DEBUG 2023-09-28 08:47:47.650 UTC: 	 Proxy valid for 191:58:08 hours
+DEBUG 2023-09-28 08:47:47.908 UTC: 	 Encoded data for curl request: subresource=delegatedn
+DEBUG 2023-09-28 08:47:47.939 UTC: 	 Executing command :
+ curl -v -X GET -H "User-Agent: CRABClient/v3.230612" -H "Accept: */*" --data @/tmp/crab_curlData1PLjq0 --cert "/tmp/x509up_u160400" --key "/tmp/x509up_u160400" --capath "/etc/grid-security/certificates/" "https://cmsweb.cern.ch:8443/crabserver/prod/info?subresource=delegatedn" | tee /dev/stderr 
+DEBUG 2023-09-28 08:47:48.058 UTC: 	 output : {"result": [
  {"services": ["/DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod|dev)-tw(01|02|03).cern.ch|/DC=ch/DC=cern/OU=computers/CN=stefanov(m|m2).cern.ch|/DC=ch/DC=cern/OU=computers/CN=dciangot-tw.cern.ch"]}
 ]}
 
@@ -53,7 +53,7 @@ DEBUG 2023-07-12 10:00:15.229 UTC: 	 output : {"result": [
 * TLSv1.2 (IN), TLS handshake, Server finished (14):
 { [4 bytes data]
 * TLSv1.2 (OUT), TLS handshake, Certificate (11):
-} [6807 bytes data]
+} [6367 bytes data]
 * TLSv1.2 (OUT), TLS handshake, Client key exchange (16):
 } [70 bytes data]
 * TLSv1.2 (OUT), TLS handshake, CERT verify (15):
@@ -78,7 +78,7 @@ DEBUG 2023-07-12 10:00:15.229 UTC: 	 output : {"result": [
 } [5 bytes data]
 > GET /crabserver/prod/info?subresource=delegatedn HTTP/1.1
 > Host: cmsweb.cern.ch:8443
-> User-Agent: CRABClient/v3.230417
+> User-Agent: CRABClient/v3.230612
 > Accept: */*
 > Content-Length: 22
 > Content-Type: application/x-www-form-urlencoded
@@ -87,7 +87,7 @@ DEBUG 2023-07-12 10:00:15.229 UTC: 	 output : {"result": [
 * upload completely sent off: 22 out of 22 bytes
 { [5 bytes data]
 < HTTP/1.1 200 OK
-< Date: Wed, 12 Jul 2023 10:00:15 GMT
+< Date: Thu, 28 Sep 2023 08:47:48 GMT
 < Server: Apache
 < Content-Type: application/json
 < Content-Length: 216
@@ -95,74 +95,74 @@ DEBUG 2023-07-12 10:00:15.229 UTC: 	 output : {"result": [
 < Cache-Control: max-age=3600
 < X-Rest-Status: 100
 < Etag: "531fb58a933656ea08a7f418b273fdae3c95932a"
-< X-Rest-Time: 2293.110 us
-< CMS-Server-Time: D=9651 t=1689156015214522
+< X-Rest-Time: 2619.028 us
+< CMS-Server-Time: D=38469 t=1695890868014629
 < 
 { [5 bytes data]
-100   238  100   216  100    22   5684    578 --:--:-- --:--:-- --:--:--  6263
+100   238  100   216  100    22   2918    297 --:--:-- --:--:-- --:--:--  3216
 * Connection #0 to host cmsweb.cern.ch left intact
 {"result": [
  {"services": ["/DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod|dev)-tw(01|02|03).cern.ch|/DC=ch/DC=cern/OU=computers/CN=stefanov(m|m2).cern.ch|/DC=ch/DC=cern/OU=computers/CN=dciangot-tw.cern.ch"]}
 ]}
 
  retcode : 0
-DEBUG 2023-07-12 10:00:15.230 UTC: 	 Registering user credentials on myproxy for /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod|dev)-tw(01|02|03).cern.ch|/DC=ch/DC=cern/OU=computers/CN=stefanov(m|m2).cern.ch|/DC=ch/DC=cern/OU=computers/CN=dciangot-tw.cern.ch
-DEBUG 2023-07-12 10:00:15.230 UTC: 	 Executing command :
+DEBUG 2023-09-28 08:47:48.060 UTC: 	 Registering user credentials on myproxy for /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod|dev)-tw(01|02|03).cern.ch|/DC=ch/DC=cern/OU=computers/CN=stefanov(m|m2).cern.ch|/DC=ch/DC=cern/OU=computers/CN=dciangot-tw.cern.ch
+DEBUG 2023-09-28 08:47:48.060 UTC: 	 Executing command :
  voms-proxy-info --identity --file /tmp/x509up_u160400
-DEBUG 2023-07-12 10:00:15.999 UTC: 	 output : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=eferrand/CN=868007/CN=Edoardo Ferrando
+DEBUG 2023-09-28 08:47:48.782 UTC: 	 output : /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=eferrand/CN=868007/CN=Edoardo Ferrando
 
  error: 
  retcode : 0
-DEBUG 2023-07-12 10:00:15.999 UTC: 	 Getting myproxy life time left for 0262b0c9520af28138a0a772ef5883a9c89cfa50
-DEBUG 2023-07-12 10:00:15.999 UTC: 	 Executing command :
+DEBUG 2023-09-28 08:47:48.783 UTC: 	 Getting myproxy life time left for 0262b0c9520af28138a0a772ef5883a9c89cfa50
+DEBUG 2023-09-28 08:47:48.783 UTC: 	 Executing command :
  myproxy-info -s myproxy.cern.ch -l 0262b0c9520af28138a0a772ef5883a9c89cfa50
-DEBUG 2023-07-12 10:00:16.649 UTC: 	 output : username: 0262b0c9520af28138a0a772ef5883a9c89cfa50
+DEBUG 2023-09-28 08:47:49.253 UTC: 	 output : username: 0262b0c9520af28138a0a772ef5883a9c89cfa50
 owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=eferrand/CN=868007/CN=Edoardo Ferrando
   renewal policy: /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod|dev)-tw(01|02|03).cern.ch|/DC=ch/DC=cern/OU=computers/CN=stefanov(m|m2).cern.ch|/DC=ch/DC=cern/OU=computers/CN=dciangot-tw.cern.ch
   trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod|dev)-tw(01|02|03).cern.ch|/DC=ch/DC=cern/OU=computers/CN=stefanov(m|m2).cern.ch|/DC=ch/DC=cern/OU=computers/CN=dciangot-tw.cern.ch
-  timeleft: 97:15:12  (4.1 days)
+  timeleft: 0:00:00
 
  error: 
  retcode : 0
-DEBUG 2023-07-12 10:00:16.649 UTC: 	 Myproxy is valid: 350100
-DEBUG 2023-07-12 10:00:16.649 UTC: 	 Executing command :
+DEBUG 2023-09-28 08:47:49.254 UTC: 	 Myproxy is valid: 0
+DEBUG 2023-09-28 08:47:49.254 UTC: 	 Executing command :
  openssl x509 -noout -dates -in ~/.globus/usercert.pem
-DEBUG 2023-07-12 10:00:16.751 UTC: 	 output : notBefore=Jun 16 07:49:59 2023 GMT
+DEBUG 2023-09-28 08:47:49.284 UTC: 	 output : notBefore=Jun 16 07:49:59 2023 GMT
 notAfter=Jul 20 07:49:59 2024 GMT
 
  error: 
  retcode : 0
-DEBUG 2023-07-12 10:00:16.782 UTC: 	 Delegating a myproxy for 720:00 hours
-DEBUG 2023-07-12 10:00:16.782 UTC: 	 Executing command :
+DEBUG 2023-09-28 08:47:49.306 UTC: 	 Delegating a myproxy for 720:00 hours
+DEBUG 2023-09-28 08:47:49.306 UTC: 	 Executing command :
  export GT_PROXY_MODE=rfc ; myproxy-init -d -n -s myproxy.cern.ch -C ~/.globus/usercert.pem -y ~/.globus/userkey.pem -x -R '/DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod|dev)-tw(01|02|03).cern.ch|/DC=ch/DC=cern/OU=computers/CN=stefanov(m|m2).cern.ch|/DC=ch/DC=cern/OU=computers/CN=dciangot-tw.cern.ch' -x -Z '/DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod|dev)-tw(01|02|03).cern.ch|/DC=ch/DC=cern/OU=computers/CN=stefanov(m|m2).cern.ch|/DC=ch/DC=cern/OU=computers/CN=dciangot-tw.cern.ch' -l 0262b0c9520af28138a0a772ef5883a9c89cfa50 -t 168 -c 720:00
-DEBUG 2023-07-12 10:00:24.648 UTC: 	 output : Your identity: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=eferrand/CN=868007/CN=Edoardo Ferrando
-Creating proxy ......................... Done
+DEBUG 2023-09-28 08:47:56.418 UTC: 	 output : Your identity: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=eferrand/CN=868007/CN=Edoardo Ferrando
+Creating proxy .................................................................................. Done
 Proxy Verify OK
-Your proxy is valid until: Fri Aug 11 12:00:24 2023
+Your proxy is valid until: Sat Oct 28 10:47:56 2023
 A proxy valid for 720 hours (30.0 days) for user 0262b0c9520af28138a0a772ef5883a9c89cfa50 now exists on myproxy.cern.ch.
 
  error: 
  retcode : 0
-DEBUG 2023-07-12 10:00:24.648 UTC: 	 Executing command :
+DEBUG 2023-09-28 08:47:56.418 UTC: 	 Executing command :
  myproxy-info -s myproxy.cern.ch -l 0262b0c9520af28138a0a772ef5883a9c89cfa50
-DEBUG 2023-07-12 10:00:25.139 UTC: 	 output : username: 0262b0c9520af28138a0a772ef5883a9c89cfa50
+DEBUG 2023-09-28 08:47:56.709 UTC: 	 output : username: 0262b0c9520af28138a0a772ef5883a9c89cfa50
 owner: /DC=ch/DC=cern/OU=Organic Units/OU=Users/CN=eferrand/CN=868007/CN=Edoardo Ferrando
   renewal policy: /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod|dev)-tw(01|02|03).cern.ch|/DC=ch/DC=cern/OU=computers/CN=stefanov(m|m2).cern.ch|/DC=ch/DC=cern/OU=computers/CN=dciangot-tw.cern.ch
   trusted retrieval policy: /DC=ch/DC=cern/OU=computers/CN=crab-(preprod|prod|dev)-tw(01|02|03).cern.ch|/DC=ch/DC=cern/OU=computers/CN=stefanov(m|m2).cern.ch|/DC=ch/DC=cern/OU=computers/CN=dciangot-tw.cern.ch
-  timeleft: 719:59:59  (30.0 days)
+  timeleft: 720:00:00  (30.0 days)
 
  error: 
  retcode : 0
-DEBUG 2023-07-12 10:00:25.139 UTC: 	 My-proxy delegated.
-DEBUG 2023-07-12 10:00:25.139 UTC: 	 Result of myproxy credential check:
-  Credential exists on myproxy: username: 0262b0c9520af28138a0a772ef5883a9c89cfa50  - validity: 29 days, 23:59:00
-DEBUG 2023-07-12 10:00:25.139 UTC: 	 Command use: submit
-DEBUG 2023-07-12 10:00:25.139 UTC: 	 Options use: ['--config', <WMCore.Configuration.Configuration object at 0x7fac8fb41610>]
-DEBUG 2023-07-12 10:00:25.140 UTC: 	 Encoded data for curl request: subresource=version
-DEBUG 2023-07-12 10:00:25.140 UTC: 	 Executing command :
- curl -v -X GET -H "User-Agent: CRABClient/v3.230417" -H "Accept: */*" --data @/tmp/crab_curlDataz7sv3g --cert "/tmp/x509up_u160400" --key "/tmp/x509up_u160400" --capath "/etc/grid-security/certificates/" "https://cmsweb.cern.ch:8443/crabserver/prod/info?subresource=version" | tee /dev/stderr 
-DEBUG 2023-07-12 10:00:25.262 UTC: 	 output : {"result": [
- ["3.3.19", "3.3.20", "v3", "development", "v3.230612"]
+DEBUG 2023-09-28 08:47:56.709 UTC: 	 My-proxy delegated.
+DEBUG 2023-09-28 08:47:56.709 UTC: 	 Result of myproxy credential check:
+  Credential exists on myproxy: username: 0262b0c9520af28138a0a772ef5883a9c89cfa50  - validity: 30 days, 0:00:00
+DEBUG 2023-09-28 08:47:56.710 UTC: 	 Command use: submit
+DEBUG 2023-09-28 08:47:56.710 UTC: 	 Options use: ['--config', <WMCore.Configuration.Configuration object at 0x7ffbdc1ba650>]
+DEBUG 2023-09-28 08:47:56.710 UTC: 	 Encoded data for curl request: subresource=version
+DEBUG 2023-09-28 08:47:56.712 UTC: 	 Executing command :
+ curl -v -X GET -H "User-Agent: CRABClient/v3.230612" -H "Accept: */*" --data @/tmp/crab_curlDatah74U2I --cert "/tmp/x509up_u160400" --key "/tmp/x509up_u160400" --capath "/etc/grid-security/certificates/" "https://cmsweb.cern.ch:8443/crabserver/prod/info?subresource=version" | tee /dev/stderr 
+DEBUG 2023-09-28 08:47:56.806 UTC: 	 output : {"result": [
+ ["3.3.19", "3.3.20", "v3", "development", "v3.230913"]
 ]}
 
  error:   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
@@ -190,7 +190,7 @@ DEBUG 2023-07-12 10:00:25.262 UTC: 	 output : {"result": [
 * TLSv1.2 (IN), TLS handshake, Server finished (14):
 { [4 bytes data]
 * TLSv1.2 (OUT), TLS handshake, Certificate (11):
-} [6807 bytes data]
+} [6367 bytes data]
 * TLSv1.2 (OUT), TLS handshake, Client key exchange (16):
 } [70 bytes data]
 * TLSv1.2 (OUT), TLS handshake, CERT verify (15):
@@ -215,7 +215,7 @@ DEBUG 2023-07-12 10:00:25.262 UTC: 	 output : {"result": [
 } [5 bytes data]
 > GET /crabserver/prod/info?subresource=version HTTP/1.1
 > Host: cmsweb.cern.ch:8443
-> User-Agent: CRABClient/v3.230417
+> User-Agent: CRABClient/v3.230612
 > Accept: */*
 > Content-Length: 19
 > Content-Type: application/x-www-form-urlencoded
@@ -224,36 +224,36 @@ DEBUG 2023-07-12 10:00:25.262 UTC: 	 output : {"result": [
 * upload completely sent off: 19 out of 19 bytes
 { [5 bytes data]
 < HTTP/1.1 200 OK
-< Date: Wed, 12 Jul 2023 10:00:25 GMT
+< Date: Thu, 28 Sep 2023 08:47:56 GMT
 < Server: Apache
 < Content-Type: application/json
 < Content-Length: 72
 < Vary: Accept
 < Cache-Control: max-age=3600
 < X-Rest-Status: 100
-< Etag: "91ed94498907a79e17193e58eed00199098d74be"
-< X-Rest-Time: 5456.924 us
-< CMS-Server-Time: D=14425 t=1689156025241272
+< Etag: "8b965172a387813a8898eb28eff3d7afe41e5f08"
+< X-Rest-Time: 2187.967 us
+< CMS-Server-Time: D=39204 t=1695890876762115
 < 
 { [5 bytes data]
-100    91  100    72  100    19   1756    463 --:--:-- --:--:-- --:--:--  2219
+100    91  100    72  100    19   1014    267 --:--:-- --:--:-- --:--:--  1281
 * Connection #0 to host cmsweb.cern.ch left intact
 {"result": [
- ["3.3.19", "3.3.20", "v3", "development", "v3.230612"]
+ ["3.3.19", "3.3.20", "v3", "development", "v3.230913"]
 ]}
 
  retcode : 0
-DEBUG 2023-07-12 10:00:25.262 UTC: 	 CRABClient version: v3.230417
-DEBUG 2023-07-12 10:00:25.262 UTC: 	 Instance is prod
-DEBUG 2023-07-12 10:00:25.262 UTC: 	 Server base url is cmsweb.cern.ch
-DEBUG 2023-07-12 10:00:25.263 UTC: 	 Command api workflow
-DEBUG 2023-07-12 10:00:25.263 UTC: 	 Started submission
-DEBUG 2023-07-12 10:00:25.263 UTC: 	 Working on /eos/home-e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/test/crab_projects/samples_data/crab_2018_ZMesonGammaAnalysis_Tau_B
-DEBUG 2023-07-12 10:00:25.263 UTC: 	 Encoded data for curl request: subresource=backendurls
-DEBUG 2023-07-12 10:00:25.263 UTC: 	 Executing command :
- curl -v -X GET -H "User-Agent: CRABClient/v3.230417" -H "Accept: */*" --data @/tmp/crab_curlDataX8oQo2 --cert "/tmp/x509up_u160400" --key "/tmp/x509up_u160400" --capath "/etc/grid-security/certificates/" "https://cmsweb.cern.ch:8443/crabserver/prod/info?subresource=backendurls" | tee /dev/stderr 
-DEBUG 2023-07-12 10:00:25.336 UTC: 	 output : {"result": [
- {"cacheSSL": "https://cmsweb.cern.ch/S3/crabcache_prod", "htcondorSchedds": {"crab3@vocms059.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/059", "weightfactor": 0}, "crab3@vocms068.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/068", "weightfactor": 1}, "crab3@vocms069.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/069", "weightfactor": 1}, "crab3@vocms0106.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0106", "weightfactor": 1}, "crab3@vocms0107.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0107", "weightfactor": 1}, "crab3@vocms0119.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0119", "weightfactor": 1}, "crab3@vocms0120.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0120", "weightfactor": 1}, "crab3@vocms0121.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0121", "weightfactor": 0}, "crab3@vocms0122.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0122", "weightfactor": 1}, "crab3@vocms0137.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0137", "weightfactor": 1}, "crab3@vocms0144.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0144", "weightfactor": 1}, "crab3@vocms0155.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0155", "weightfactor": 0}, "crab3@vocms0194.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0194", "weightfactor": 0}, "crab3@vocms0195.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0195", "weightfactor": 0}, "crab3@vocms0196.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0196", "weightfactor": 1}, "crab3@vocms0197.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0197", "weightfactor": 1}, "crab3@vocms0198.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0198", "weightfactor": 0}, "crab3@vocms0199.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0199", "weightfactor": 0}, "crab3@crab-preprod-scd03.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/crab-preprod-scd03", "weightfactor": 0}}, "htcondorPool": "cmsgwms-collector-global.cern.ch:9620,cmsgwms-collector-global.fnal.gov:9620"}
+DEBUG 2023-09-28 08:47:56.808 UTC: 	 CRABClient version: v3.230612
+DEBUG 2023-09-28 08:47:56.808 UTC: 	 Instance is prod
+DEBUG 2023-09-28 08:47:56.808 UTC: 	 Server base url is cmsweb.cern.ch
+DEBUG 2023-09-28 08:47:56.808 UTC: 	 Command api workflow
+DEBUG 2023-09-28 08:47:56.808 UTC: 	 Started submission
+DEBUG 2023-09-28 08:47:56.808 UTC: 	 Working on /eos/home-e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/test/crab_projects/samples_data/crab_2018_ZMesonGammaAnalysis_Tau_B
+DEBUG 2023-09-28 08:47:56.808 UTC: 	 Encoded data for curl request: subresource=backendurls
+DEBUG 2023-09-28 08:47:56.826 UTC: 	 Executing command :
+ curl -v -X GET -H "User-Agent: CRABClient/v3.230612" -H "Accept: */*" --data @/tmp/crab_curlDataEIQvWM --cert "/tmp/x509up_u160400" --key "/tmp/x509up_u160400" --capath "/etc/grid-security/certificates/" "https://cmsweb.cern.ch:8443/crabserver/prod/info?subresource=backendurls" | tee /dev/stderr 
+DEBUG 2023-09-28 08:47:56.904 UTC: 	 output : {"result": [
+ {"cacheSSL": "https://cmsweb.cern.ch/S3/crabcache_prod", "htcondorSchedds": {"crab3@vocms059.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/059", "weightfactor": 0}, "crab3@vocms068.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/068", "weightfactor": 1}, "crab3@vocms069.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/069", "weightfactor": 1}, "crab3@vocms0106.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0106", "weightfactor": 1}, "crab3@vocms0107.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0107", "weightfactor": 1}, "crab3@vocms0119.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0119", "weightfactor": 1}, "crab3@vocms0120.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0120", "weightfactor": 1}, "crab3@vocms0121.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0121", "weightfactor": 1}, "crab3@vocms0122.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0122", "weightfactor": 1}, "crab3@vocms0137.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0137", "weightfactor": 1}, "crab3@vocms0144.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0144", "weightfactor": 1}, "crab3@vocms0155.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0155", "weightfactor": 1}, "crab3@vocms0194.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0194", "weightfactor": 1}, "crab3@vocms0195.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0195", "weightfactor": 1}, "crab3@vocms0196.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0196", "weightfactor": 1}, "crab3@vocms0197.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0197", "weightfactor": 1}, "crab3@vocms0198.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0198", "weightfactor": 1}, "crab3@vocms0199.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0199", "weightfactor": 1}, "crab3@crab-preprod-scd03.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/crab-preprod-scd03", "weightfactor": 1}}, "htcondorPool": "cmsgwms-collector-global.cern.ch:9620,cmsgwms-collector-global.fnal.gov:9620"}
 ]}
 
  error:   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
@@ -281,7 +281,7 @@ DEBUG 2023-07-12 10:00:25.336 UTC: 	 output : {"result": [
 * TLSv1.2 (IN), TLS handshake, Server finished (14):
 { [4 bytes data]
 * TLSv1.2 (OUT), TLS handshake, Certificate (11):
-} [6807 bytes data]
+} [6367 bytes data]
 * TLSv1.2 (OUT), TLS handshake, Client key exchange (16):
 } [70 bytes data]
 * TLSv1.2 (OUT), TLS handshake, CERT verify (15):
@@ -306,7 +306,7 @@ DEBUG 2023-07-12 10:00:25.336 UTC: 	 output : {"result": [
 } [5 bytes data]
 > GET /crabserver/prod/info?subresource=backendurls HTTP/1.1
 > Host: cmsweb.cern.ch:8443
-> User-Agent: CRABClient/v3.230417
+> User-Agent: CRABClient/v3.230612
 > Accept: */*
 > Content-Length: 23
 > Content-Type: application/x-www-form-urlencoded
@@ -315,31 +315,31 @@ DEBUG 2023-07-12 10:00:25.336 UTC: 	 output : {"result": [
 * upload completely sent off: 23 out of 23 bytes
 { [5 bytes data]
 < HTTP/1.1 200 OK
-< Date: Wed, 12 Jul 2023 10:00:25 GMT
+< Date: Thu, 28 Sep 2023 08:47:56 GMT
 < Server: Apache
 < Content-Type: application/json
 < Content-Length: 2260
 < Vary: Accept
 < Cache-Control: max-age=3600
 < X-Rest-Status: 100
-< Etag: "e0ff744c6a2e7b4e29850e5f6f5e284a47023ecb"
-< X-Rest-Time: 2243.519 us
-< CMS-Server-Time: D=8697 t=1689156025322990
+< Etag: "e5afd968985a5ac36314c1da2c197312220b0de9"
+< X-Rest-Time: 2442.122 us
+< CMS-Server-Time: D=9776 t=1695890876888512
 < 
 { [5 bytes data]
-100  2283  100  2260  100    23  72903    741 --:--:-- --:--:-- --:--:-- 73645
+100  2283  100  2260  100    23  53809    547 --:--:-- --:--:-- --:--:-- 55682
 * Connection #0 to host cmsweb.cern.ch left intact
 {"result": [
- {"cacheSSL": "https://cmsweb.cern.ch/S3/crabcache_prod", "htcondorSchedds": {"crab3@vocms059.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/059", "weightfactor": 0}, "crab3@vocms068.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/068", "weightfactor": 1}, "crab3@vocms069.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/069", "weightfactor": 1}, "crab3@vocms0106.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0106", "weightfactor": 1}, "crab3@vocms0107.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0107", "weightfactor": 1}, "crab3@vocms0119.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0119", "weightfactor": 1}, "crab3@vocms0120.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0120", "weightfactor": 1}, "crab3@vocms0121.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0121", "weightfactor": 0}, "crab3@vocms0122.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0122", "weightfactor": 1}, "crab3@vocms0137.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0137", "weightfactor": 1}, "crab3@vocms0144.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0144", "weightfactor": 1}, "crab3@vocms0155.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0155", "weightfactor": 0}, "crab3@vocms0194.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0194", "weightfactor": 0}, "crab3@vocms0195.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0195", "weightfactor": 0}, "crab3@vocms0196.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0196", "weightfactor": 1}, "crab3@vocms0197.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0197", "weightfactor": 1}, "crab3@vocms0198.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0198", "weightfactor": 0}, "crab3@vocms0199.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0199", "weightfactor": 0}, "crab3@crab-preprod-scd03.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/crab-preprod-scd03", "weightfactor": 0}}, "htcondorPool": "cmsgwms-collector-global.cern.ch:9620,cmsgwms-collector-global.fnal.gov:9620"}
+ {"cacheSSL": "https://cmsweb.cern.ch/S3/crabcache_prod", "htcondorSchedds": {"crab3@vocms059.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/059", "weightfactor": 0}, "crab3@vocms068.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/068", "weightfactor": 1}, "crab3@vocms069.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/069", "weightfactor": 1}, "crab3@vocms0106.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0106", "weightfactor": 1}, "crab3@vocms0107.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0107", "weightfactor": 1}, "crab3@vocms0119.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0119", "weightfactor": 1}, "crab3@vocms0120.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0120", "weightfactor": 1}, "crab3@vocms0121.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0121", "weightfactor": 1}, "crab3@vocms0122.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0122", "weightfactor": 1}, "crab3@vocms0137.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0137", "weightfactor": 1}, "crab3@vocms0144.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0144", "weightfactor": 1}, "crab3@vocms0155.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0155", "weightfactor": 1}, "crab3@vocms0194.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0194", "weightfactor": 1}, "crab3@vocms0195.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0195", "weightfactor": 1}, "crab3@vocms0196.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0196", "weightfactor": 1}, "crab3@vocms0197.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0197", "weightfactor": 1}, "crab3@vocms0198.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0198", "weightfactor": 1}, "crab3@vocms0199.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/0199", "weightfactor": 1}, "crab3@crab-preprod-scd03.cern.ch": {"proxiedurl": "https://cmsweb.cern.ch:8443/scheddmon/crab-preprod-scd03", "weightfactor": 1}}, "htcondorPool": "cmsgwms-collector-global.cern.ch:9620,cmsgwms-collector-global.fnal.gov:9620"}
 ]}
 
  retcode : 0
-DEBUG 2023-07-12 10:00:26.671 UTC: 	 Loading required information from the environment
-DEBUG 2023-07-12 10:00:26.671 UTC: 	 Found CMSSW_10_6_27 for slc7_amd64_gcc700 with base /eos/home-e/eferrand/ZMesonGamma/CMSSW_10_6_27
-DEBUG 2023-07-12 10:00:26.671 UTC: 	 Loading required information from the environment
-DEBUG 2023-07-12 10:00:26.671 UTC: 	 Found CMSSW_10_6_27 for slc7_amd64_gcc700 with base /eos/home-e/eferrand/ZMesonGamma/CMSSW_10_6_27
-DEBUG 2023-07-12 10:00:26.671 UTC: 	 UNIQUE NAME: tarUUID daae96f5-621a-4c97-8cdd-1a1a2981c0bf 
-DEBUG 2023-07-12 10:00:26.671 UTC: 	 self.config: from WMCore.Configuration import Configuration
+DEBUG 2023-09-28 08:47:57.595 UTC: 	 Loading required information from the environment
+DEBUG 2023-09-28 08:47:57.595 UTC: 	 Found CMSSW_10_6_27 for slc7_amd64_gcc700 with base /eos/home-e/eferrand/ZMesonGamma/CMSSW_10_6_27
+DEBUG 2023-09-28 08:47:57.595 UTC: 	 Loading required information from the environment
+DEBUG 2023-09-28 08:47:57.595 UTC: 	 Found CMSSW_10_6_27 for slc7_amd64_gcc700 with base /eos/home-e/eferrand/ZMesonGamma/CMSSW_10_6_27
+DEBUG 2023-09-28 08:47:57.595 UTC: 	 UNIQUE NAME: tarUUID ca89662a-ff88-4160-b827-3f220a4fe4e8 
+DEBUG 2023-09-28 08:47:57.595 UTC: 	 self.config: from WMCore.Configuration import Configuration
 config = Configuration()
 config.section_('General')
 config.General.transferOutputs = True
@@ -361,6 +361,6 @@ config.Data.lumiMask = 'json/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JS
 config.section_('Site')
 config.Site.storageSite = 'T2_IT_Legnaro'
 
-DEBUG 2023-07-12 10:00:26.671 UTC: 	 self.config.JobType.psetName: cmssw_config/run_ZMesonGamma.py
-INFO 2023-07-12 10:00:26.676 UTC: 	 Importing CMSSW configuration cmssw_config/run_ZMesonGamma.py
-DEBUG 2023-07-12 10:00:26.676 UTC: 	 Additional parameters for the CMSSW configuration are: ['runningOnData=True']
+DEBUG 2023-09-28 08:47:57.595 UTC: 	 self.config.JobType.psetName: cmssw_config/run_ZMesonGamma.py
+INFO 2023-09-28 08:47:57.601 UTC: 	 Importing CMSSW configuration cmssw_config/run_ZMesonGamma.py
+DEBUG 2023-09-28 08:47:57.601 UTC: 	 Additional parameters for the CMSSW configuration are: ['runningOnData=True']

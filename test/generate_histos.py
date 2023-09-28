@@ -179,7 +179,7 @@ for jentry in xrange(nentries):
     jetPt          = mytree.bestJet_pT   
     jetEta         = mytree.bestJet_eta
     MesonIso       = mytree.iso_couple
-    MesonIsoCh     = mytree.iso_couple_ch #bestIso_couple_ch
+    MesonIsoCh     = mytree.bestIso_couple_ch #bestIso_couple_ch
     MesonIso0      = mesonPt/(mesonPt + (mytree.pairSumPt05 - mytree.pairSumPt05Ch))
     firstTrkiso    = mytree.iso_K1
     firstTrkisoCh  = mytree.iso_K1_ch
@@ -382,9 +382,14 @@ histo_map["h_efficiency"].GetXaxis().SetRangeUser(0.,7.1)
 #histo_map["h_efficiency"].GetYaxis().SetRangeUser(0.,30.)
 #histo_map["h_efficiency"].SetMaximum(max(histo_map["h_efficiency"].GetHistogram().GetMaximum(),30.))
 histo_map["h_efficiency"].Draw("HIST TEXT0")
-if not samplename == "Data" :
-    c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/h_efficiency.pdf")
-    c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/h_efficiency.png")
+if not samplename == "Data" and isPhiAnalysis:
+    c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Phi/h_efficiency.pdf")
+    c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Phi/h_efficiency.png")
+elif not samplename == "Data" and isRhoAnalysis:
+    c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Rho/h_efficiency.pdf")
+    c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Rho/h_efficiency.png")
+
+
 else:
     if isPhiAnalysis and CRflag == 0:
         c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/SR/h_efficiency.pdf")
