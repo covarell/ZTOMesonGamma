@@ -67,11 +67,11 @@ else:
        return allFiles     
 
    # Get the list of all files in directory tree at given path                                                                                                                                           
-   listOfFiles = getListOfFiles(input_path) ######                                                                                                                                                          
+   #listOfFiles = getListOfFiles(input_path) ######                                                                                                                                                          
    #print(listOfFiles)  
 
 process.source = cms.Source ("PoolSource",
-                             fileNames = cms.untracked.vstring (listOfFiles), #inputFiles or listOfFiles
+                             fileNames = cms.untracked.vstring (inputFiles), #inputFiles or listOfFiles
                              duplicateCheckMode = cms.untracked.string ('noDuplicateCheck')
                              )
 

@@ -292,6 +292,8 @@ for jentry in xrange(nentries):
     _bestPairDeltaR[0] = deltaR
     _nJets[0]          = nJets
 
+    tree_output.Fill()
+
 #HISTO LABELS #########################################################################################################
 histo_map["h_ZMass"].GetXaxis().SetTitle("m_{trk^{+}trk^{-}#gamma} [GeV/c^2]")
 histo_map["h_ZMass"].SetTitle("Tracks+Photon invariant mass (Cut on phi inv. mass)")
@@ -382,10 +384,10 @@ histo_map["h_efficiency"].GetXaxis().SetRangeUser(0.,7.1)
 #histo_map["h_efficiency"].GetYaxis().SetRangeUser(0.,30.)
 #histo_map["h_efficiency"].SetMaximum(max(histo_map["h_efficiency"].GetHistogram().GetMaximum(),30.))
 histo_map["h_efficiency"].Draw("HIST TEXT0")
-if not samplename == "Data" and isPhiAnalysis:
+if not samplename == "output" and isPhiAnalysis:
     c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Phi/h_efficiency.pdf")
     c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Phi/h_efficiency.png")
-elif not samplename == "Data" and isRhoAnalysis:
+elif not samplename == "output" and isRhoAnalysis:
     c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Rho/h_efficiency.pdf")
     c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Rho/h_efficiency.png")
 
