@@ -71,7 +71,7 @@ else:
    #print(listOfFiles)  
 
 process.source = cms.Source ("PoolSource",
-                             fileNames = cms.untracked.vstring (inputFiles), #inputFiles or listOfFiles
+                             fileNames = cms.untracked.vstring (inputFiles), #####################inputFiles or listOfFiles
                              duplicateCheckMode = cms.untracked.string ('noDuplicateCheck')
                              )
 
