@@ -10,18 +10,18 @@ Meson = args.Meson
 
 #Take data rootfiles for control regions
 if Meson == "phi" :
-    DataSR = ROOT.TFile("SR_Phi_"+CAT+"_Data.root")
-    Sidebands = ROOT.TFile("CR_Phi_"+CAT+"_Sidebands.root")
+    DataSR = ROOT.TFile("histos/latest_productions/SR_Phi_"+CAT+"_Data.root")
+    Sidebands = ROOT.TFile("histos/latest_productions/CR_Phi_"+CAT+"_Sidebands.root")
 elif Meson == "rho" :
-    DataSR = ROOT.TFile("SR_Rho_"+CAT+"_Data.root")
-    Sidebands = ROOT.TFile("CR_Rho_"+CAT+"_Sidebands.root")
+    DataSR = ROOT.TFile("histos/latest_productions/SR_Rho_"+CAT+"_Data.root")
+    Sidebands = ROOT.TFile("histos/latest_productions/CR_Rho_"+CAT+"_Sidebands.root")
     #Sidebands = ROOT.TFile("histos/latest_production/histos_CR_"+CAT+"_RightSideband.root")
 
 #Output file creation
 if Meson == "phi" :
-    fOut = ROOT.TFile("CR_Phi_"+CAT+"_SidebandsNorm.root","RECREATE")
+    fOut = ROOT.TFile("histos/latest_productions/CR_Phi_"+CAT+"_SidebandsNorm.root","RECREATE")
 elif Meson == "rho" :
-    fOut = ROOT.TFile("CR_Rho_"+CAT+"_SidebandsNorm.root","RECREATE")
+    fOut = ROOT.TFile("histos/latest_productions/CR_Rho_"+CAT+"_SidebandsNorm.root","RECREATE")
 
 fOut.cd()
 

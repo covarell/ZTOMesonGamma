@@ -27,7 +27,7 @@ for filename in sys.argv[4:]:
     list_inputfiles.append(filename)
 
 fileIn = ROOT.TFile(list_inputfiles[0])
-CAT = (filename.split("_")[2]) 
+CAT = (filename.split("_")[3]) 
 
 print "#############################"
 print "is Phi = ",isPhi
@@ -51,7 +51,7 @@ canvas     = dict()
 histo_container = [] #just for memory management
 
 #Get the list of histograms
-signalfile = ROOT.TFile("SR_Phi_"+CAT+"_Signal.root")
+signalfile = ROOT.TFile("histos/latest_productions/SR_Rho_"+CAT+"_Signal.root")###################
 list_histos = []
 keylist = signalfile.GetListOfKeys()
 key = ROOT.TKey()
@@ -111,7 +111,7 @@ histo_blacklist = {"h_genPhotonEt","h_genMesonPt","h_RecoVsGenPhotonPtRel","h_Re
 
 for filename in list_inputfiles:
     fileIn = ROOT.TFile(filename)
-    sample_name = (filename.split("_")[3])[:-5] 
+    sample_name = (filename.split("_")[4])[:-5] 
     print "=============== ", sample_name
     for histo_name in list_histos:
         if histo_name in histo_blacklist: continue
@@ -238,7 +238,7 @@ for histo_name in list_histos:
         if histo_name == "h_ZMass":
             #hstack[histo_name].Rebin(2)            
             hstack[histo_name].GetXaxis().SetTitle("m_{ditrk#gamma} [GeV]")
-            hstack[histo_name].GetXaxis().SetLimits(0.,700.)##############
+            hstack[histo_name].GetXaxis().SetLimits(0.,200.)##############
 
 
         if histo_name == "h_nJets25":
