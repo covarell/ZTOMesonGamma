@@ -11,13 +11,14 @@ debug         = False
 isBDT         = False #BDT bool
 isDataBlind   = False #Bool for blind analysis
 isPhiAnalysis = False # for Z -> Phi Gamma
-isRhoAnalysis = True # for Z -> Rho Gamma
+isRhoAnalysis = False # for Z -> Rho Gamma
 
 #Supress the opening of many Canvas's
 ROOT.gROOT.SetBatch(True)
 
 # PARSER and INPUT #############################################################################################
 p = argparse.ArgumentParser(description='Select rootfile to plot')
+p.add_argument('meson_option', help='Type <<rho>> for rho, <<phi>> for phi') #flag for type of meson
 p.add_argument('CR_option', help='Type <<0>> for SR, <<1>> for CR') #flag for bkg estimation
 p.add_argument('isBDT_option', help='Type <<preselection>> or <<BDT>>') #flag for loose selection or tight selection (from BDT output)
 p.add_argument('isBlindAnalysis', help='Type <<blind>> or <<unblind>>') #flag for loose selection or tight selection (from BDT output)
@@ -35,6 +36,14 @@ h_Events = fInput.Get("ZMesonGamma/hEvents")
 #[:-n] is not an emoji, it deletes last n symbols from the string
 samplename =(args.rootfile_name.split("ZMesonGamma_")[1])[:-5] 
 print "samplename = ", samplename
+
+if args.meson_option == "phi" :
+    isPhiAnalysis = True
+    print "meson: Phi"
+
+elif args.meson_option == "rho" :
+    isRhoAnalysis = True
+    print "meson: Rho"
 
 if args.isBlindAnalysis == "blind":
     isDataBlind = True
