@@ -466,10 +466,14 @@ for histo_name in list_histos:
         totalMC.Draw("sameE2")
         line_on_one.Draw("SAME")
     ################################################
-    if isPhi :
-        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/Bkg/"
-    else :
-        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/Bkg/"
+    if isPhi and CAT == "preselection" :
+        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/preselection/"
+    elif isPhi and CAT == "BDT" :
+        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/BDT/"
+    elif not isPhi and  CAT == "preselection" :
+        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/preselection/"
+    elif not isPhi and  CAT == "BDT" :
+        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/BDT/"
 
 
     canvas[histo_name].SaveAs(output_dir + histo_name + ".pdf")
