@@ -42,8 +42,8 @@ else:
    process.GlobalTag = GlobalTag(process.GlobalTag, '106X_upgrade2018_realistic_v15_L1v1')  # OLD ONE : 102X_upgrade2018_realistic_v18
    #inputFiles={'file:/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD/Zrhogamma_2018UL_12.root','file:/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD/Zrhogamma_2018UL_11.root'} 
    inputFiles={'file:/eos/user/p/pellicci/MesonGamma_root/2023/Zphigamma_miniAOD/Zphigamma_2018UL_7.root'}#,'file:/eos/user/p/pellicci/MesonGamma_root/2023/Zphigamma_miniAOD/Zphigamma_2018UL_67.root'}
-   input_path = '/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD/'
-   #input_path = '/eos/user/p/pellicci/MesonGamma_root/2023/Zphigamma_miniAOD/'
+   #input_path = '/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD/'###########################
+   input_path = '/eos/user/p/pellicci/MesonGamma_root/2023/Zphigamma_miniAOD/'############################
 
    #INPUT FILE LIST
    '''                                                                                                                                                                                                   
@@ -67,11 +67,11 @@ else:
        return allFiles     
 
    # Get the list of all files in directory tree at given path                                                                                                                                           
-   #listOfFiles = getListOfFiles(input_path) ######                                                                                                                                                          
+   listOfFiles = getListOfFiles(input_path) ##################                                                                                                                                                         
    #print(listOfFiles)  
 
 process.source = cms.Source ("PoolSource",
-                             fileNames = cms.untracked.vstring (inputFiles), #####################inputFiles or listOfFiles
+                             fileNames = cms.untracked.vstring (listOfFiles), #####################inputFiles or listOfFiles
                              duplicateCheckMode = cms.untracked.string ('noDuplicateCheck')
                              )
 

@@ -140,7 +140,7 @@ for entry in xrange(h_BDT_effS.GetNbinsX()):
     effS = h_BDT_effS.GetBinContent(entry)
     effS = float(format(effS, '.3f'))
     signif_maximizing_eff = float(format(signif_maximizing_eff, '.3f'))
-    #print "effS: ", effS, "signif_max_eff: ", signif_maximizing_eff
+    print "effS: ", effS, "signif_max_eff: ", signif_maximizing_eff
     if effS == signif_maximizing_eff:
         BDT_output =  h_BDT_effS.GetBinCenter(entry)
         _effS = effS

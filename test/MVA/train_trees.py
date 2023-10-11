@@ -2,13 +2,28 @@ import ROOT
 import os
 import argparse
 
+# PARSER and INPUT #############################################################################################
+p = argparse.ArgumentParser(description='Select rootfile')
+p.add_argument('meson_option', help='Type <<rho>> for rho, <<phi>> for phi') #flag for type of meson
+args = p.parse_args()
+
+
 #INPUT FILES
-fIn_bkg  = ROOT.TFile("../histos/latest_productions/CR_Rho_preselection_Sidebands.root")
-#tree_bkg = fIn_bkg.Get("tree_output_forMVA")
-tree_bkg = fIn_bkg.Get("tree_output")
-fIn_sig  = ROOT.TFile("../histos/latest_productions/SR_Rho_preselection_Signal.root")
-#tree_sig = fIn_sig.Get("tree_output_forMVA")
-tree_sig = fIn_sig.Get("tree_output")
+if args.meson_option == "rho" :
+    fIn_bkg  = ROOT.TFile("../histos/latest_productions/CR_Rho_preselection_Sidebands.root")
+    #tree_bkg = fIn_bkg.Get("tree_output_forMVA")
+    tree_bkg = fIn_bkg.Get("tree_output")
+    fIn_sig  = ROOT.TFile("../histos/latest_productions/SR_Rho_preselection_Signal.root")
+    #tree_sig = fIn_sig.Get("tree_output_forMVA")
+    tree_sig = fIn_sig.Get("tree_output")
+
+elif args.meson_option == "phi" :
+    fIn_bkg  = ROOT.TFile("../histos/latest_productions/CR_Phi_preselection_Sidebands.root")
+    #tree_bkg = fIn_bkg.Get("tree_output_forMVA")
+    tree_bkg = fIn_bkg.Get("tree_output")
+    fIn_sig  = ROOT.TFile("../histos/latest_productions/SR_Phi_preselection_Signal.root")
+    #tree_sig = fIn_sig.Get("tree_output_forMVA")
+    tree_sig = fIn_sig.Get("tree_output")
 
 #OUTPUT FILE
 fOut = ROOT.TFile("outputs/Nominal_training.root","RECREATE")
