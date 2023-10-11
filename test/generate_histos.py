@@ -4,8 +4,11 @@ import math
 import numpy as np
 import sys
 from array import array
+from functions_smuggler import Simplified_Workflow_Handler
 
 #Following bools are given as input
+debug         = False
+isBDT         = False #BDT bool
 isDataBlind   = False #Bool for blind analysis
 isPhiAnalysis = False # for Z -> Phi Gamma
 isRhoAnalysis = True # for Z -> Rho Gamma
@@ -16,6 +19,7 @@ ROOT.gROOT.SetBatch(True)
 # PARSER and INPUT #############################################################################################
 p = argparse.ArgumentParser(description='Select rootfile to plot')
 p.add_argument('CR_option', help='Type <<0>> for SR, <<1>> for CR') #flag for bkg estimation
+p.add_argument('isBDT_option', help='Type <<preselection>> or <<BDT>>') #flag for loose selection or tight selection (from BDT output)
 p.add_argument('isBlindAnalysis', help='Type <<blind>> or <<unblind>>') #flag for loose selection or tight selection (from BDT output)
 p.add_argument('rootfile_name', help='Type rootfile name')
 p.add_argument('outputfile_option', help='Provide output file name')
@@ -41,6 +45,22 @@ if CRflag > 0 :
     print "Processing the control region ", CRflag
 else :
     print "Processing the signal region"
+
+if (args.isBDT_option == "BDT"):
+    isBDT = True
+    fInputBDT = ROOT.TFile("MVA/BDToutput.root","READ")
+    BDTtree = fInputBDT.Get("BDTtree")
+    BDTtree.GetEntry(0)
+    BDT_OUT = BDTtree._BDT_output
+    #BDT_OUT = 0.
+    print "BDT_OUT = ",BDT_OUT
+    fInputBDT.Close()
+
+print "Category = ", args.isBDT_option
+print "-----------------------------------------------"
+
+################################################################################################################
+myWF = Simplified_Workflow_Handler("Signal","Data",isBDT)
 
 
 #Normalization for MC dataset ################################################################################
@@ -147,6 +167,7 @@ tree_output.Branch('bestPairDeltaR',_bestPairDeltaR,'_bestPairDeltaR/D')
 ##tree_output.Branch('eventWeight',_eventWeight,'_eventWeight/D')
 tree_output.Branch('nJets',_nJets,'_nJets/D')
 
+
 #------------- counters -----------------
 nEventsMesonAnalysis  = 0
 nEventsOverLeptonVeto = 0
@@ -233,6 +254,20 @@ for jentry in xrange(nentries):
     if nElectrons > 0: continue
     if nMuons     > 0: continue
     nEventsOverLeptonVeto += 1
+
+
+    #TIGHT SELECTION from BDT output -------------------------------------------------  
+    if isBDT: 
+        BDT_out = myWF.get_BDT_output(firstTrkisoCh,MesonIso0,mesonPt,photonEt,ZMass)#,photonEta,nJets)#,JetNeutralEmEn,JetChargedHadEn,JetNeutralHadEn) 
+        #histo_map["h_BDT_out"].Fill(BDT_out)
+
+        if debug: print "BDT value before selection = ", BDT_out
+        if args.isBDT_option == "BDT":
+            if BDT_out < BDT_OUT: #Cut on BDT output
+                if debug: print "BDT cut NOT passed"
+                continue
+
+
 
     #FILL HISTOS #####################################################################################################
     #if DATA -> Blind Analysis on Z inv mass plot
