@@ -51,7 +51,11 @@ canvas     = dict()
 histo_container = [] #just for memory management
 
 #Get the list of histograms
-signalfile = ROOT.TFile("histos/latest_productions/SR_Rho_"+CAT+"_Signal.root")###################
+if isPhi :
+    signalfile = ROOT.TFile("histos/latest_productions/SR_Phi_"+CAT+"_Signal.root")
+else :
+    signalfile = ROOT.TFile("histos/latest_productions/SR_Rho_"+CAT+"_Signal.root")
+
 list_histos = []
 keylist = signalfile.GetListOfKeys()
 key = ROOT.TKey()

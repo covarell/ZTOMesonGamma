@@ -9,13 +9,28 @@ ROOT.gROOT.SetBatch(True)
 #Choose an injected BR (since you moved to BR = 1 here you can set it at 10^-5 to make comparison with previous productions)
 BR_inj = 0.00001
 
-#Input files
-fInputSignal = ROOT.TFile("../histos/latest_productions/SR_Rho_preselection_Signal.root")
-sig_tree     = fInputSignal.Get("tree_output")
+p = argparse.ArgumentParser(description='Select rootfile')
+p.add_argument('meson_option', help='Type <<rho>> for rho, <<phi>> for phi') #flag for type of meson
+args = p.parse_args()
 
-fInputData  = ROOT.TFile("../histos/latest_productions/SR_Rho_preselection_Data.root")
-data_tree   = fInputData.Get("tree_output")
-h_mesonMass = fInputData.Get("h_MesonMass")
+
+#INPUT FILES
+if args.meson_option == "rho" :
+    fInputSignal = ROOT.TFile("../histos/latest_productions/SR_Rho_preselection_Signal.root")
+    sig_tree     = fInputSignal.Get("tree_output")
+
+    fInputData  = ROOT.TFile("../histos/latest_productions/SR_Rho_preselection_Data.root")
+    data_tree   = fInputData.Get("tree_output")
+    h_mesonMass = fInputData.Get("h_MesonMass")
+
+elif args.meson_option == "phi" :
+    fInputSignal = ROOT.TFile("../histos/latest_productions/SR_Phi_preselection_Signal.root")
+    sig_tree     = fInputSignal.Get("tree_output")
+
+    fInputData  = ROOT.TFile("../histos/latest_productions/SR_Phi_preselection_Data.root")
+    data_tree   = fInputData.Get("tree_output")
+    h_mesonMass = fInputData.Get("h_MesonMass")
+
 
 Nbkg_passed = 0
 nEntriesData = int(h_mesonMass.GetEntries())
