@@ -133,19 +133,25 @@ canvas2.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAn
 h_BDT_effS = BDT_file.Get("default/Method_BDT/BDT/MVA_BDT_effS")
 signif_maximizing_eff = sig_eff_array[np.argmax(signif_array)]
 print "signif_maximizing_eff = ",signif_maximizing_eff
+
 BDT_output = 0. 
-
+t = 1.
 for entry in xrange(h_BDT_effS.GetNbinsX()):
-
     effS = h_BDT_effS.GetBinContent(entry)
-    effS = float(format(effS, '.3f'))
-    signif_maximizing_eff = float(format(signif_maximizing_eff, '.3f'))
-    print "effS: ", effS, "signif_max_eff: ", signif_maximizing_eff
+    effS = float(format(effS, '.4f'))
+    signif_maximizing_eff = float(format(signif_maximizing_eff, '.4f'))
+    #print "effS: ", effS, "signif_max_eff: ", signif_maximizing_eff
+    '''
     if effS == signif_maximizing_eff:
         BDT_output =  h_BDT_effS.GetBinCenter(entry)
         _effS = effS
+    '''
+    if abs(effS - signif_maximizing_eff) < t :#and not effS == 0:
+        t = abs(effS - signif_maximizing_eff)
+        BDT_output =  h_BDT_effS.GetBinCenter(entry)
+        _effS = effS
 
-print ""
+print "t = " ,t
 print "RESULT"
 print "-------------------------------------------------------------"
 print "Nsig_passed       = " ,Nsig_passed
