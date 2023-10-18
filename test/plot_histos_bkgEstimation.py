@@ -130,13 +130,17 @@ for filename in list_inputfiles:
 
         histo_container.append(copy.copy(histo))
         
-        if not histo_name == "h_nMuons" '''and not histo_name == "h_nPhotons38WP80" and not histo_name == "h_nPhotons20WP90" '''and not histo_name == "h_nJets25" and not histo_name == "h_nElectrons":
-            if isTightSelection and not (histo_name == "h_firstTrkIso" or histo_name == "h_firstTrkIsoCh" '''or histo_name == "h_firstTrkIso_neutral"''' or histo_name == "h_secondTrkIso" or histo_name == "h_secondTrkIsoCh" or histo_name == "h_pairIsoCh" or histo_name == "h_pairIso"):
+        if not histo_name == "h_nMuons" and not histo_name == "h_nJets25" and not histo_name == "h_nElectrons":
+            if isTightSelection and not (histo_name == "h_firstTrkIso" or histo_name == "h_firstTrkIsoCh" '''or histo_name == "h_firstTrkIso_neutral"''' or histo_name == "h_secondTrkIso" or histo_name == "h_secondTrkIsoCh" or histo_name == "h_pairIsoCh" or histo_name == "h_pairIso" or histo_name == "h_ZMass"):
                 histo_container[-1].Rebin(10)
-            elif histo_name == "h_ZMass":
+            elif isTightSelection and histo_name == "h_ZMass" and isPhi:
+                histo_container[-1].Rebin(6)
+            elif isTightSelection and histo_name == "h_ZMass" and not isPhi:
                 histo_container[-1].Rebin(5)
                 #hsignalVBF[histo_name].Rebin(1/5)
                 #hsignalggH[histo_name].Rebin(1/5)
+            elif not isTightSelection and histo_name == "h_ZMass":
+                histo_container[-1].Rebin(5)
 
             else:
                 histo_container[-1].Rebin(5)
@@ -235,8 +239,10 @@ for histo_name in list_histos:
         if histo_name == "h_nJets25" or histo_name == "h_nMuons" or histo_name == "h_nElectrons" '''or histo_name == "h_nPhotons"''':
             hstack[histo_name].SetMaximum(10 * hdata[histo_name].GetMaximum())
             hstack[histo_name].SetMinimum(1.)  #cannot use values < 1 otherwise log is negative
-        elif histo_name == "h_ZMass" and isTightSelection :
-            hstack[histo_name].SetMaximum(4.1 * hdata[histo_name].GetMaximum())           
+        elif histo_name == "h_ZMass" and isTightSelection and isPhi :
+            hstack[histo_name].SetMaximum(3. * hdata[histo_name].GetMaximum()) 
+        elif histo_name == "h_ZMass" and isTightSelection and not isPhi :
+            hstack[histo_name].SetMaximum(3. * hdata[histo_name].GetMaximum())                  
         else:
             hstack[histo_name].SetMaximum(2.1 * hdata[histo_name].GetMaximum())
 
