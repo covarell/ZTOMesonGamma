@@ -49,10 +49,10 @@ dataloader.AddVariable("firstTrkIsoCh","F")
 dataloader.AddVariable("pairIso0","F")
 #dataloader.AddVariable("_bestCouplePt/_HpT","F")
 #dataloader.AddVariable("_photonEt/_HpT","F")
-dataloader.AddVariable("bestPairPt/ZMass","F")
-dataloader.AddVariable("photonEt/ZMass","F")
+#dataloader.AddVariable("bestPairPt/ZMass","F")
+#dataloader.AddVariable("photonEt/ZMass","F")################remove
 #dataloader.AddVariable("_photonEta","F")
-dataloader.AddVariable("bestPairEta","F")
+#dataloader.AddVariable("bestPairEta","F")##################add
 #dataloader.AddVariable("_JetNeutralEmEnergy","F")
 #dataloader.AddVariable("_JetChargedHadEnergy","F")
 #dataloader.AddVariable("_JetNeutralHadEnergy","F")

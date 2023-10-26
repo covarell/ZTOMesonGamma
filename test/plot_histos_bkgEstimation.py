@@ -132,9 +132,9 @@ for filename in list_inputfiles:
         
         if not histo_name == "h_nMuons" and not histo_name == "h_nJets25" and not histo_name == "h_nElectrons":
             if isTightSelection and not (histo_name == "h_firstTrkIso" or histo_name == "h_firstTrkIsoCh" '''or histo_name == "h_firstTrkIso_neutral"''' or histo_name == "h_secondTrkIso" or histo_name == "h_secondTrkIsoCh" or histo_name == "h_pairIsoCh" or histo_name == "h_pairIso" or histo_name == "h_ZMass"):
-                histo_container[-1].Rebin(10)
-            elif isTightSelection and histo_name == "h_ZMass" and isPhi:
                 histo_container[-1].Rebin(6)
+            elif isTightSelection and histo_name == "h_ZMass" and isPhi:
+                histo_container[-1].Rebin(7)
             elif isTightSelection and histo_name == "h_ZMass" and not isPhi:
                 histo_container[-1].Rebin(5)
                 #hsignalVBF[histo_name].Rebin(1/5)
@@ -150,19 +150,8 @@ for filename in list_inputfiles:
             histo_container[-1].SetLineColor(4)   #4 for blue, 2 for red
             histo_container[-1].SetLineWidth(4)   #kind of thick
             hsignal[histo_name] = histo_container[-1]
-            '''    
-        elif sample_name == "SignalggH":
-            histo_container[-1].SetLineStyle(1)   
-            histo_container[-1].SetLineColor(4)   #4 for blue, 2 for red
-            histo_container[-1].SetLineWidth(4)   #kind of thick
-            hsignalggH[histo_name] = histo_container[-1]
-
-        elif sample_name == "SignalVBF":
-            histo_container[-1].SetLineStyle(1)   
-            histo_container[-1].SetLineColor(8)   #4 for blue, 2 for red
-            histo_container[-1].SetLineWidth(4)   #kind of thick
-            hsignalVBF[histo_name] = histo_container[-1]
-            '''    
+            
+              
         elif "Data" in sample_name :
             histo_container[-1].SetMarkerStyle(20)   #point
             histo_container[-1].SetBinErrorOption(ROOT.TH1.kPoisson)
@@ -389,8 +378,6 @@ for histo_name in list_histos:
 
     if signal_magnify != 1:
         hsignal[histo_name].Scale(signal_magnify)   
-        #hsignalggH[histo_name].Scale(signal_magnify)   
-        #hsignalVBF[histo_name].Scale(signal_magnify)   
         #if histo_name == "h_ZMass":
             #hsignalVBF[histo_name].Rebin(1/5) #do this to have more granularity in the signal curve
             #hsignalggH[histo_name].Rebin(1/5)

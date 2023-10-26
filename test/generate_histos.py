@@ -90,7 +90,7 @@ else: weightSum = 1.'''
 
 #HISTOS #########################################################################################################
 histo_map = dict()
-list_histos = ["h_ZMass", "h_MesonMass", "h_firstTrkPt", "h_secondTrkPt", "h_firstTrkEta", "h_secondTrkEta", "h_firstTrkPhi", "h_secondTrkPhi", "h_bestPairPt", "h_bestPairEta", "h_bestPairDeltaR", "h_bestJetPt", "h_bestJetEta", "h_firstTrkIso","h_firstTrkIsoCh","h_secondTrkIso","h_secondTrkIsoCh","h_pairIso","h_pairIsoCh", "h_photonEnergy", "h_photonEta", "h_nJets25","h_nMuons","h_nElectrons", "h_pairIsoNeutral", "h_efficiency"] 
+list_histos = ["h_ZMass", "h_MesonMass", "h_firstTrkPt", "h_secondTrkPt", "h_firstTrkEta", "h_secondTrkEta", "h_firstTrkPhi", "h_secondTrkPhi", "h_bestPairPt", "h_bestPairEta", "h_bestPairDeltaR", "h_bestJetPt", "h_bestJetEta", "h_firstTrkIso","h_firstTrkIsoCh","h_secondTrkIso","h_secondTrkIsoCh","h_pairIso","h_pairIsoCh", "h_photonEnergy", "h_photonEta", "h_nJets25","h_nMuons","h_nElectrons", "h_pairIsoNeutral", "h_efficiency", "h_MesonGammaDeltaPhi"] 
 
 histo_map[list_histos[0]]  = ROOT.TH1F(list_histos[0],"M_{Z}", 300, 50, 200.)    
 #else: histo_map[list_histos[0]]  = ROOT.TH1F(list_histos[0],"M_{Z}", 300, 40., 140.) 
@@ -122,6 +122,7 @@ histo_map[list_histos[22]] = ROOT.TH1F(list_histos[22],"n. of muons", 6, -0.5, 5
 histo_map[list_histos[23]] = ROOT.TH1F(list_histos[23],"n. of electrons", 5, -0.5, 5.5)
 histo_map[list_histos[24]] = ROOT.TH1F(list_histos[24],"Iso_neutral of the meson", 100, 0.,1.)
 histo_map[list_histos[25]] = ROOT.TH1F(list_histos[25],"Efficiency steps", 5, 0.,5.)
+histo_map[list_histos[26]] = ROOT.TH1F(list_histos[26],"#Delta#phi between meson and photon", 100, -math.pi, math.pi)
 
 
 #CREATE OUTPUT ROOTFILE ############################################################################################
@@ -151,7 +152,8 @@ _firstTrkIso    = np.zeros(1, dtype=float)
 _secondTrkIso   = np.zeros(1, dtype=float)  
 _firstTrkIsoCh  = np.zeros(1, dtype=float)  
 _secondTrkIsoCh = np.zeros(1, dtype=float) 
-_bestPairDeltaR = np.zeros(1, dtype=float) 
+_bestPairDeltaR = np.zeros(1, dtype=float)
+_MesonGammaDeltaPhi = np.zeros(1, dtype=float)
 
 
 tree_output = ROOT.TTree('tree_output','tree_output')
@@ -176,6 +178,8 @@ tree_output.Branch('secondTrkIsoCh',_secondTrkIsoCh,'_secondTrkIsoCh/D')
 tree_output.Branch('bestPairDeltaR',_bestPairDeltaR,'_bestPairDeltaR/D')
 ##tree_output.Branch('eventWeight',_eventWeight,'_eventWeight/D')
 tree_output.Branch('nJets',_nJets,'_nJets/D')
+tree_output.Branch('MesonGammaDeltaPhi',_MesonGammaDeltaPhi,'MesonGammaDeltaPhi/D')
+
 
 
 #------------- counters -----------------
@@ -225,7 +229,8 @@ for jentry in xrange(nentries):
     coupleDeltaPhi = math.fabs(mytree.firstTrkPhi - mytree.secondTrkPhi)
     if coupleDeltaPhi > 3.14:
         coupleDeltaPhi = 6.28 - coupleDeltaPhi
-    deltaR = math.sqrt((mytree.firstTrkEta - mytree.secondTrkEta)**2 + (coupleDeltaPhi)**2)    
+    deltaR = math.sqrt((mytree.firstTrkEta - mytree.secondTrkEta)**2 + (coupleDeltaPhi)**2)
+    MesonGammaDeltaPhi = (mytree.bestCouplePhi - mytree.photon_phi)   
 
 
     #If I'm performing a PhiGamma analysis I don't want to choose those events tagged as a RhoGamma events, and viceversa
@@ -268,7 +273,7 @@ for jentry in xrange(nentries):
 
     #TIGHT SELECTION from BDT output -------------------------------------------------  
     if isBDT: 
-        BDT_out = myWF.get_BDT_output(firstTrkisoCh,MesonIso0,mesonPt,photonEt,ZMass)#,photonEta,nJets)#,JetNeutralEmEn,JetChargedHadEn,JetNeutralHadEn) 
+        BDT_out = myWF.get_BDT_output(firstTrkisoCh,MesonIso0,ZMass)#photonEt,mesonEta,mesonPt,photonEta,nJets)#,JetNeutralEmEn,JetChargedHadEn,JetNeutralHadEn) 
         #histo_map["h_BDT_out"].Fill(BDT_out)
 
         if debug: print "BDT value before selection = ", BDT_out
@@ -314,6 +319,8 @@ for jentry in xrange(nentries):
     histo_map["h_nJets25"].Fill(nJets)#, eventWeight)
     histo_map["h_nMuons"].Fill(nMuons)#, eventWeight)
     histo_map["h_nElectrons"].Fill(nElectrons)#, eventWeight)
+    histo_map["h_MesonGammaDeltaPhi"].Fill(MesonGammaDeltaPhi)#, eventWeight)
+
 
     #FILL TREE ########################################################################################################
     _ZMass[0]          = ZMass
@@ -336,6 +343,7 @@ for jentry in xrange(nentries):
     _secondTrkIsoCh[0] = secondTrkisoCh
     _bestPairDeltaR[0] = deltaR
     _nJets[0]          = nJets
+    _MesonGammaDeltaPhi[0] = MesonGammaDeltaPhi
 
     tree_output.Fill()
 
@@ -390,6 +398,8 @@ histo_map["h_nElectrons"].GetXaxis().SetTitle("nElectrons over selection")
 histo_map["h_nElectrons"].SetTitle("# of electrons")
 histo_map["h_efficiency"].GetXaxis().SetTitle("")
 histo_map["h_efficiency"].GetYaxis().SetTitle("#epsilon (%)")
+histo_map["h_MesonGammaDeltaPhi"].GetXaxis().SetTitle("")
+histo_map["h_MesonGammaDeltaPhi"].SetTitle("#Delta_#phi between meson and photon")
 
 
 #Tree writing ##########################################################################################################
@@ -429,10 +439,10 @@ histo_map["h_efficiency"].GetXaxis().SetRangeUser(0.,7.1)
 #histo_map["h_efficiency"].GetYaxis().SetRangeUser(0.,30.)
 #histo_map["h_efficiency"].SetMaximum(max(histo_map["h_efficiency"].GetHistogram().GetMaximum(),30.))
 histo_map["h_efficiency"].Draw("HIST TEXT0")
-if not samplename == "output" and isPhiAnalysis:
+if not samplename == "Data" and isPhiAnalysis:
     c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Phi/h_efficiency.pdf")
     c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Phi/h_efficiency.png")
-elif not samplename == "output" and isRhoAnalysis:
+elif not samplename == "Data" and isRhoAnalysis:
     c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Rho/h_efficiency.pdf")
     c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Rho/h_efficiency.png")
 
