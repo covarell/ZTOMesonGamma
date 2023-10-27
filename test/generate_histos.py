@@ -273,7 +273,7 @@ for jentry in xrange(nentries):
 
     #TIGHT SELECTION from BDT output -------------------------------------------------  
     if isBDT: 
-        BDT_out = myWF.get_BDT_output(firstTrkisoCh,MesonIso0,ZMass)#photonEt,mesonEta,mesonPt,photonEta,nJets)#,JetNeutralEmEn,JetChargedHadEn,JetNeutralHadEn) 
+        BDT_out = myWF.get_BDT_output(firstTrkisoCh,MesonIso0,ZMass,mesonEta,MesonGammaDeltaPhi)#,mesonPt,photonEt,photonEta,nJets)#,JetNeutralEmEn,JetChargedHadEn,JetNeutralHadEn) 
         #histo_map["h_BDT_out"].Fill(BDT_out)
 
         if debug: print "BDT value before selection = ", BDT_out

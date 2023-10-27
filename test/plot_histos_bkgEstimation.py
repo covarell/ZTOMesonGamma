@@ -134,7 +134,7 @@ for filename in list_inputfiles:
             if isTightSelection and not (histo_name == "h_firstTrkIso" or histo_name == "h_firstTrkIsoCh" '''or histo_name == "h_firstTrkIso_neutral"''' or histo_name == "h_secondTrkIso" or histo_name == "h_secondTrkIsoCh" or histo_name == "h_pairIsoCh" or histo_name == "h_pairIso" or histo_name == "h_ZMass"):
                 histo_container[-1].Rebin(6)
             elif isTightSelection and histo_name == "h_ZMass" and isPhi:
-                histo_container[-1].Rebin(7)
+                histo_container[-1].Rebin(6)
             elif isTightSelection and histo_name == "h_ZMass" and not isPhi:
                 histo_container[-1].Rebin(5)
                 #hsignalVBF[histo_name].Rebin(1/5)
@@ -229,9 +229,9 @@ for histo_name in list_histos:
             hstack[histo_name].SetMaximum(10 * hdata[histo_name].GetMaximum())
             hstack[histo_name].SetMinimum(1.)  #cannot use values < 1 otherwise log is negative
         elif histo_name == "h_ZMass" and isTightSelection and isPhi :
-            hstack[histo_name].SetMaximum(3. * hdata[histo_name].GetMaximum()) 
+            hstack[histo_name].SetMaximum(2.5 * hdata[histo_name].GetMaximum()) 
         elif histo_name == "h_ZMass" and isTightSelection and not isPhi :
-            hstack[histo_name].SetMaximum(3. * hdata[histo_name].GetMaximum())                  
+            hstack[histo_name].SetMaximum(2.5 * hdata[histo_name].GetMaximum())                  
         else:
             hstack[histo_name].SetMaximum(2.1 * hdata[histo_name].GetMaximum())
 
@@ -319,15 +319,7 @@ for histo_name in list_histos:
 
         if histo_name == "h_bestPairDeltaR" :
             hstack[histo_name].GetXaxis().SetTitle("#DeltaR_{ditrk}/m_{ditrk}")
-
-        '''if histo_name == "h_nPhotons38WP80" :
-            hstack[histo_name].GetXaxis().SetTitle("n.#gamma_{38WP80}")
-            hstack[histo_name].GetXaxis().SetRangeUser(-0.5,4.5)
-
-        if histo_name == "h_nPhotons20WP90" :
-            hstack[histo_name].GetXaxis().SetTitle("n.#gamma_{20WP90}")
-            hstack[histo_name].GetXaxis().SetRangeUser(-0.5,4.5)'''
-
+        
         if histo_name == "h_photonEnergy" :
             hstack[histo_name].GetXaxis().SetTitle("E_{T}^{#gamma}[GeV]")
             #hstack[histo_name].GetXaxis().SetRangeUser(35.,160.)
@@ -343,18 +335,9 @@ for histo_name in list_histos:
         if histo_name == "h_nMuons" :
             hstack[histo_name].GetXaxis().SetTitle("n.muons")
             hstack[histo_name].GetXaxis().SetRangeUser(-0.5,3.5)
-
-        '''if histo_name == "h_decayChannel":
-            hstack[histo_name].GetXaxis().SetTitle("decay channel")
-
-        if histo_name == "h_dPhiGammaTrk":
-            hstack[histo_name].GetXaxis().SetTitle("#Delta#phi_{#gamma,Trk_{1}} [rad]")
-                
-        if histo_name == "h_eTOverHmass" :
-            hstack[histo_name].GetXaxis().SetTitle("E_{T}^{#gamma}/m_{ditrk#gamma}")
-
-        if histo_name == "h_pTOverHmass" :
-            hstack[histo_name].GetXaxis().SetTitle("p_{T}^{ditrk}/m_{ditrk#gamma}")'''
+        
+        if histo_name == "h_MesonGammaDeltaPhi" :
+            hstack[histo_name].GetXaxis().SetTitle("#Delta#phi_{meson, #gamma} [rad] ")
 
         hstack[histo_name].Draw("SAME,histo")
 

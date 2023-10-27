@@ -17,16 +17,15 @@ trk1isoCh_array            = array('f', [0.])
 pairIso_array              = array('f', [0.])
 #mesonPt_array              = array('f', [0.])
 #photonEt_array             = array('f', [0.])
-#bestPairEta_array          = array('f', [0.])
+bestPairEta_array          = array('f', [0.])
 #photonEta_array            = array('f', [0.])
 #nJet_array                 = array('f', [0.])
 #JetNeutralEmEnergy_array   = array('f', [0.])
 #JetChargedHadEnergy_array  = array('f', [0.])
 #JetNeutralHadEnergy_array  = array('f', [0.])
-
 #metPt_array      = array('f', [0.])
 #bestJetPt_array  = array('f', [0.])
-#dPhiGammaTrk_array = array('f', [0.])
+mesonGammaDeltaPhi_array  = array('f', [0.])
 
 reader = ROOT.TMVA.Reader("!Color")
 
@@ -46,35 +45,36 @@ class Simplified_Workflow_Handler:
         reader.AddVariable("pairIso0",pairIso_array)
         #reader.AddVariable("bestPairPt/ZMass",mesonPt_array)
         #reader.AddVariable("photonEt/ZMass",photonEt_array)
-        #reader.AddVariable("bestPairEta",bestPairEta_array)
+        #reader.AddVariable("photonEta",photonEta_array)
+        reader.AddVariable("bestPairEta",bestPairEta_array)
         #reader.AddVariable("_photonEt/_HpT",photonEt_array)
         #reader.AddVariable("_bestCouplePt/_HpT",mesonPt_array)
         #reader.AddVariable("_photonEt/_HpT",photonEt_array)
         #reader.AddVariable("_JetNeutralEmEnergy",JetNeutralEmEnergy_array)
         #reader.AddVariable("_JetChargedHadEnergy",JetChargedHadEnergy_array)   
         #reader.AddVariable("_JetNeutralHadEnergy",JetNeutralHadEnergy_array)
-
         #reader.AddVariable("_metPt",metPt_array)
         #reader.AddVariable("_bestJetPt/mesonGammaMass",bestJetPt_array)
-        #reader.AddVariable("_dPhiGammaTrk",dPhiGammaTrk_array)
+        reader.AddVariable("MesonGammaDeltaPhi",mesonGammaDeltaPhi_array)
 
         if isBDT:
             reader.BookMVA("BDT","MVA/default/weights/TMVAClassification_BDT.weights.xml")
 
     #Get BDT output function ###########################################################################################################
 
-    def get_BDT_output(self,trk1isoCh,pairIso,mesonGammaMass):#,photonEt
+    def get_BDT_output(self,trk1isoCh,pairIso,mesonGammaMass,bestPairEta,mesonGammaDeltaPhi):#photonEt,photonEta
         trk1isoCh_array[0] = trk1isoCh
         pairIso_array[0]   = pairIso
         #mesonPt_array[0]   = mesonPt/mesonGammaMass
         #photonEt_array[0]  = photonEt/mesonGammaMass
-        #bestPairEta_array[0] = bestPairEta
+        #photonEta_array[0]  = photonEta
+        bestPairEta_array[0] = bestPairEta
         #JetNeutralEmEnergy_array[0]  = JetNeutralEmEn
         #JetChargedHadEnergy_array[0] = JetChargedHadEn
         #JetNeutralHadEnergy_array[0] = JetNeutralHadEn
         #metPt_array[0]     = metPt
         #bestJetPt_array[0] = bestJetPt/mesonGammaMass
-        #dPhiGammaTrk_array[0] = dPhiGammaTrk
+        mesonGammaDeltaPhi_array[0] = mesonGammaDeltaPhi
 
         return reader.EvaluateMVA("BDT")
 
