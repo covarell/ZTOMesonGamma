@@ -288,7 +288,7 @@ for jentry in xrange(nentries):
     #if DATA -> Blind Analysis on Z inv mass plot
     if samplename == "Data":
         if isDataBlind:
-            if ZMass < 80. or ZMass > 110.:
+            if ZMass < 80. or ZMass > 100.:##########110
                 histo_map["h_ZMass"].Fill(ZMass)#, eventWeight)
         else:
             histo_map["h_ZMass"].Fill(ZMass)#, eventWeight)

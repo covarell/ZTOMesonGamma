@@ -361,9 +361,11 @@ for histo_name in list_histos:
 
     if signal_magnify != 1:
         hsignal[histo_name].Scale(signal_magnify)   
-        #if histo_name == "h_ZMass":
-            #hsignalVBF[histo_name].Rebin(1/5) #do this to have more granularity in the signal curve
-            #hsignalggH[histo_name].Rebin(1/5)
+        if histo_name == "h_ZMass" and isPhi:
+            hsignal[histo_name].Scale(0.2) 
+        if histo_name == "h_ZMass" and not isPhi:
+            hsignal[histo_name].Scale(0.2)
+            #hsignalggH[histo_name].Rebin(1/5)#do this to have more granularity in the signal curve
 
     hdata[histo_name].Draw("SAME,E1,X0")
     hsignal[histo_name].Draw("SAME,hist")
