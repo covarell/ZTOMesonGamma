@@ -46,16 +46,16 @@ mass = ROOT.RooRealVar("ZMass","ZMass",50.,200.,"GeV")
 mass.setRange("full",50.,200.)
 
 #Initialize a Chebychev pdf
-a_bkg = ROOT.RooRealVar("a_bkg_chebychev_"+CHANNEL+"_preselection","a_bkg",0.,-3.,3.)
-b_bkg = ROOT.RooRealVar("b_bkg_chebychev_"+CHANNEL+"_preselection","b_bkg",0.,-3.,3.)
-c_bkg = ROOT.RooRealVar("c_bkg_chebychev_"+CHANNEL+"_preselection","c_bkg",0.,-3.,3.)
-d_bkg = ROOT.RooRealVar("d_bkg_chebychev_"+CHANNEL+"_preselection","d_bkg",0.,-3.,3.)
-e_bkg = ROOT.RooRealVar("e_bkg_chebychev_"+CHANNEL+"_preselection","e_bkg",0.,-3.,3.)
+a_bkg = ROOT.RooRealVar("a_bkg_cheb_"+CHANNEL,"a_bkg",0.,-3.,3.)
+b_bkg = ROOT.RooRealVar("b_bkg_cheb_"+CHANNEL,"b_bkg",0.,-3.,3.)
+c_bkg = ROOT.RooRealVar("c_bkg_cheb_"+CHANNEL,"c_bkg",0.,-3.,3.)
+d_bkg = ROOT.RooRealVar("d_bkg_cheb_"+CHANNEL,"d_bkg",0.,-3.,3.)
+e_bkg = ROOT.RooRealVar("e_bkg_cheb_"+CHANNEL,"e_bkg",0.,-3.,3.)
 
 if CHANNEL == "Phi": 
     bkgPDF_chebychev = ROOT.RooChebychev("chebychev_preselection_bkg","bkgPDF",mass,ROOT.RooArgList(a_bkg,b_bkg,c_bkg,d_bkg,e_bkg))
 else:
-    bkgPDF_chebychev = ROOT.RooChebychev("chebychev_preselection_bkg","bkgPDF",mass,ROOT.RooArgList(a_bkg,b_bkg,c_bkg,d_bkg))
+    bkgPDF_chebychev = ROOT.RooChebychev("chebychev_preselection_bkg","bkgPDF",mass,ROOT.RooArgList(a_bkg,b_bkg,c_bkg))
     
 
 #Initialize a Bernstein pdf
@@ -70,18 +70,19 @@ bkgPDF_bernstein = ROOT.RooBernstein("bernstein_preselection_bkg", "bkgPDF", mas
 
 
 #Initialize a Landau pdf
-land_mean = ROOT.RooRealVar('land_mean', 'land_mean', 103., 101.,104.) #103
-land_sigma = ROOT.RooRealVar('land_sigma', 'land_sigma', 13., 11., 14.) #17
+land_mean = ROOT.RooRealVar('land_mean', 'land_mean', 100., 40.,120.) 
+land_sigma = ROOT.RooRealVar('land_sigma', 'land_sigma', 14., 0., 80.) 
 
 bkgPDF_landau = ROOT.RooLandau("landau_bkg", "bkgPDF", mass, land_mean, land_sigma)
 #bkgPDF_landau = bkgPDF_chebychev
 
 
 #Initialize a Gaussian pdf
-gaus_mean = ROOT.RooRealVar('gaus_mean', 'gaus_mean', 110., 108., 112.) #117
-gaus_sigma = ROOT.RooRealVar('gaus_sigma', 'gaus_sigma', 33., 25., 34.) #34
+gaus_mean = ROOT.RooRealVar('gaus_mean', 'gaus_mean', 108., 30., 120.) 
+gaus_sigma = ROOT.RooRealVar('gaus_sigma', 'gaus_sigma', 34., 0., 80.) 
 
 bkgPDF_gaus = ROOT.RooGaussian("gaus_bkg", "bkgPDF", mass, gaus_mean, gaus_sigma)
+
 
 #Input file and tree ---------------------------------------------------------------
 if isPhiGammaAnalysis:
@@ -122,8 +123,8 @@ else:
     xframe_landau = mass.frame(120)
 
 observed_data.plotOn(xframe_landau)
-bkgPDF_landau.plotOn(xframe_landau)
-#bkgPDF_landau.plotOn(xframe_landau,ROOT.RooFit.NormRange("full"), ROOT.RooFit.NormRange("full"),ROOT.RooFit.Name("bkgPDF_landau"),ROOT.RooFit.LineColor(ROOT.kBlue))
+#bkgPDF_landau.plotOn(xframe_landau)
+convolution_pdf.plotOn(xframe_landau)
 xframe_landau.SetTitle("#sqrt{s} = 13 TeV       lumi = 39.54/fb")
 xframe_landau.GetXaxis().SetTitle("m_{ditrk,#gamma} [GeV]")
 xframe_landau.SetMaximum(1.3*xframe_landau.GetMaximum())
@@ -159,11 +160,11 @@ leg1.Draw()
 CMS_lumi.CMS_lumi(canvas_landau, iPeriod, iPos) #Print integrated lumi and energy information
 
 if isPhiGammaAnalysis:
-    canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/fit_sidebands.pdf")
-    canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/fit_sidebands.png")
+    canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/fit_bkg.pdf")
+    canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/fit_bkg.png")
 else:
-    canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/fit_sidebands.pdf")
-    canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/fit_sidebands.png")
+    canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/fit_bkg.pdf")
+    canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/fit_bkg.png")
 
 '''
 
