@@ -132,13 +132,13 @@ else:
     canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/Fit/fit_signal.pdf")
     canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/Fit/fit_signal.png")
 
-'''
+
 # Multipdf ------------------------------------------------------------------------------------------------------------------------------
 cat = ROOT.RooCategory("pdf_index","Index of Pdf which is active")
 mypdfs = ROOT.RooArgList()
-mypdfs.add(convolution_pdf)
+mypdfs.add(sigPDF_voig)
 
-multipdf = ROOT.RooMultiPdf("multipdf_"+CHANNEL+"_bkg","All Pdfs",cat,mypdfs)
+multipdf = ROOT.RooMultiPdf("multipdf_"+CHANNEL+"_sig","All Pdfs",cat,mypdfs)
 
 #create Workspace ------------------------------------------------------------------------------------------------------------------------------
 norm     = nEntries #fileInput.Get("h_ZMass").Integral() #get the normalization of ggH signal (area under ggH signal)
@@ -172,4 +172,4 @@ workspace.Write()
 
 fOut.Close()
 
-'''
+

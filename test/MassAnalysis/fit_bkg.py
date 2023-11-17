@@ -139,7 +139,7 @@ else:
     canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/Fit/fit_bkg.pdf")
     canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/Fit/fit_bkg.png")
 
-'''
+
 # Multipdf ------------------------------------------------------------------------------------------------------------------------------
 cat = ROOT.RooCategory("pdf_index","Index of Pdf which is active")
 mypdfs = ROOT.RooArgList()
