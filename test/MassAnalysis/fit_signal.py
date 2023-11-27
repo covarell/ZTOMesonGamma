@@ -148,7 +148,7 @@ print "************************************** n. events = ",nEntries
 #workspace = ROOT.RooWorkspace("myworkspace")
 #getattr(workspace,'import')(bkgPDF_chebychev)
 #getattr(workspace,'import')(bkgPDF_bernstein)
-
+'''
 inputWS = ROOT.TFile("workspaces/workspace_STAT_"+CHANNEL+"_GFpreselection_2018.root") #there's only one ws for both ggH and VBF 
 inputWS.cd()
 workspace = inputWS.Get("workspace_STAT_"+CHANNEL+"_GFpreselection_2018")
@@ -171,5 +171,5 @@ workspace.Write()
 #workspace.Print()
 
 fOut.Close()
-
+'''
 
