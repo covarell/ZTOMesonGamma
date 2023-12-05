@@ -143,33 +143,19 @@ multipdf = ROOT.RooMultiPdf("multipdf_"+CHANNEL+"_sig","All Pdfs",cat,mypdfs)
 #create Workspace ------------------------------------------------------------------------------------------------------------------------------
 norm     = nEntries #fileInput.Get("h_ZMass").Integral() #get the normalization of ggH signal (area under ggH signal)
 print "************************************** n. events = ",nEntries
-#bkg_norm = ROOT.RooRealVar(multipdf.GetName()+ "_norm", multipdf.GetName()+ "_norm", norm,0.5*norm, 2*norm)
+bkg_norm = ROOT.RooRealVar(multipdf.GetName()+ "_norm", multipdf.GetName()+ "_norm", norm,0.5*norm, 2*norm)
 
-#workspace = ROOT.RooWorkspace("myworkspace")
-#getattr(workspace,'import')(bkgPDF_chebychev)
-#getattr(workspace,'import')(bkgPDF_bernstein)
-'''
-inputWS = ROOT.TFile("workspaces/workspace_STAT_"+CHANNEL+"_GFpreselection_2018.root") #there's only one ws for both ggH and VBF 
-inputWS.cd()
-workspace = inputWS.Get("workspace_STAT_"+CHANNEL+"_GFpreselection_2018")
-#getattr(workspace,'import')(bkgPDF_chebychev)
-#getattr(workspace,'import')(bkgPDF_bernstein)
-#getattr(workspace,'import')(bkgPDF_exponential)
+workspace = ROOT.RooWorkspace("myworkspace")
 getattr(workspace,'import')(cat)
 getattr(workspace,'import')(multipdf)
 getattr(workspace,'import')(observed_data)
 getattr(workspace,'import')(bkg_norm)
 print("integral BKG",bkg_norm.Print())
-#workspace.Print()
-
-#fOut = ROOT.TFile("workspaces/ws_sidebands.root","RECREATE")
-fOut = ROOT.TFile("workspaces/workspace_STAT_"+CHANNEL+"_GFpreselection_2018.root","UPDATE")
-fOut.cd()
-workspace.Write()
-#print "-------------------------------------------"
-#print "Final print to check the workspace update:"
-#workspace.Print()
-
-fOut.Close()
-'''
+#fOut = ROOT.TFile("workspaces/workspace_STAT_"+CHANNEL+".root","RECREATE")
+#fOut.cd()
+#workspace.Write()
+workspace.writeToFile("workspaces/workspace_STAT_"+CHANNEL+".root")
+print "-------------------------------------------"
+print "Final print to check the workspace update:"
+workspace.Print()
 
