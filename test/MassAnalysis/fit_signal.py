@@ -42,7 +42,7 @@ CMS_lumi.cmsTextSize = 0.8
 CMS_lumi.lumi_13TeV = "39.54 fb^{-1}" 
 
 #Parameters of the PDF ---------------------------------------------------------------
-mass = ROOT.RooRealVar("ZMass","ZMass",75.,110.,"GeV")
+mass = ROOT.RooRealVar("ZMass","ZMass",80.,102.,"GeV")
 mass.setRange("full",80.,102.)
 
 
@@ -69,7 +69,6 @@ print "nEntries = ",nEntries
 
 
 #Do the fit ------------------------------------------------------------------------------------------------------------------------------
-#convolution_pdf = ROOT.RooFFTConvPdf("convolution", "Landau (X) Gaussian", mass, bkgPDF_landau, bkgPDF_gaus)
 fitResult_voig = sigPDF_voig.fitTo(observed_data,ROOT.RooFit.Save())
 #fitResult_landau = convolution_pdf.fitTo(observed_data,ROOT.RooFit.Save())
 #Do the F-test ------------------------------------------------------------------------------------------------------------------------------
@@ -91,12 +90,11 @@ else:
     xframe_voig = mass.frame(120)
 
 observed_data.plotOn(xframe_voig)
-#convolution_pdf.plotOn(xframe_landau)
 sigPDF_voig.plotOn(xframe_voig,ROOT.RooFit.NormRange("full"),ROOT.RooFit.Range("full"),ROOT.RooFit.Name("signal_pdf"), ROOT.RooFit.LineColor(ROOT.kBlue))
 xframe_voig.SetTitle("#sqrt{s} = 13 TeV       lumi = 39.54/fb")
 xframe_voig.GetXaxis().SetTitle("m_{ditrk,#gamma} [GeV]")
 xframe_voig.SetMaximum(1.3*xframe_voig.GetMaximum())
-sigPDF_voig.paramOn(xframe_voig,ROOT.RooFit.Layout(0.65,0.94,0.91),ROOT.RooFit.Format("NEU",ROOT.RooFit.AutoPrecision(1))) #,ROOT.RooFit.Layout(0.65,0.90,0.90)
+sigPDF_voig.paramOn(xframe_voig,ROOT.RooFit.Layout(0.65,0.94,0.91),ROOT.RooFit.Format("NEU",ROOT.RooFit.AutoPrecision(1)))
 xframe_voig.getAttText().SetTextSize(0.02)
 xframe_voig.Draw() #remember to draw the frame before the legend initialization to fill the latter correctly
 
@@ -110,7 +108,7 @@ print "n param voightian = ",nParam_voig
 print ""
 
 
-leg1 = ROOT.TLegend(0.5,0.52,0.72,0.90) #right positioning
+leg1 = ROOT.TLegend(0.6,0.42,0.82,0.80) #right positioning
 leg1.SetHeader(" ")
 leg1.SetNColumns(1)
 leg1.SetFillColorAlpha(0,0.)
@@ -145,17 +143,22 @@ norm     = nEntries #fileInput.Get("h_ZMass").Integral() #get the normalization 
 print "************************************** n. events = ",nEntries
 bkg_norm = ROOT.RooRealVar(multipdf.GetName()+ "_norm", multipdf.GetName()+ "_norm", norm,0.5*norm, 2*norm)
 
-workspace = ROOT.RooWorkspace("myworkspace")
+workspace = ROOT.RooWorkspace("workspace")
 getattr(workspace,'import')(cat)
 getattr(workspace,'import')(multipdf)
 getattr(workspace,'import')(observed_data)
 getattr(workspace,'import')(bkg_norm)
 print("integral BKG",bkg_norm.Print())
-#fOut = ROOT.TFile("workspaces/workspace_STAT_"+CHANNEL+".root","RECREATE")
+#fOut = ROOT.TFile("workspaces/workspace_bkg_"+CHANNEL+".root","RECREATE")
 #fOut.cd()
 #workspace.Write()
-workspace.writeToFile("workspaces/workspace_STAT_"+CHANNEL+".root")
+#workspace.writeToFile("workspaces/workspace_bkg_"+CHANNEL+".root")
+fOutput = ROOT.TFile("workspaces/workspace_sig_"+CHANNEL+".root","RECREATE")
+workspace.Write()
+fOutput.Write()
+fOutput.Close()
 print "-------------------------------------------"
 print "Final print to check the workspace update:"
 workspace.Print()
+
 

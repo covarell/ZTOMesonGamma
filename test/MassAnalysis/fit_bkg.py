@@ -42,22 +42,39 @@ CMS_lumi.cmsTextSize = 0.8
 CMS_lumi.lumi_13TeV = "39.54 fb^{-1}" 
 
 #Parameters of the PDF ---------------------------------------------------------------
-mass = ROOT.RooRealVar("ZMass","ZMass",50.,200.,"GeV")
+mass = ROOT.RooRealVar("ZMass","ZMass",70.,200.,"GeV")
 mass.setRange("full",70.,200.)
 
 
 #Initialize a Landau pdf
-land_mean = ROOT.RooRealVar('land_mean', 'land_mean', 70., 40.,100.) 
+land_mean = ROOT.RooRealVar('land_mean', 'land_mean', 70., 40.,130.) 
 land_sigma = ROOT.RooRealVar('land_sigma', 'land_sigma', 14., 0., 30.) 
-
 bkgPDF_landau = ROOT.RooLandau("landau_bkg", "bkgPDF", mass, land_mean, land_sigma)
 
 
 #Initialize a Gaussian pdf
-gaus_mean = ROOT.RooRealVar('gaus_mean', 'gaus_mean', 35., 20., 100.) 
+gaus_mean = ROOT.RooRealVar('gaus_mean', 'gaus_mean', 35., 20., 130.) 
 gaus_sigma = ROOT.RooRealVar('gaus_sigma', 'gaus_sigma', 5., 0., 30.) 
-
 bkgPDF_gaus = ROOT.RooGaussian("gaus_bkg", "bkgPDF", mass, gaus_mean, gaus_sigma)
+
+#convolution_pdf = ROOT.RooFFTConvPdf("convolution_bkg", "Landau (X) Gaussian", mass, bkgPDF_landau, bkgPDF_gaus)
+if not isPhiGammaAnalysis:
+    n_1 = ROOT.RooRealVar("n1","number1 of events",20000,0,32000) 
+    n_2 = ROOT.RooRealVar("n2","number2 of events",1000,0,32000)
+else: 
+    n_1 = ROOT.RooRealVar("n1","number1 of events",2500,0,3700) 
+    n_2 = ROOT.RooRealVar("n2","number2 of events",500,0,3700)
+
+n=ROOT.RooArgList()
+n.add(n_1)
+n.add(n_2) 
+pdfs=ROOT.RooArgList()
+pdfs.add(bkgPDF_landau)
+pdfs.add(bkgPDF_gaus)
+convolution_pdf = ROOT.RooAddPdf("convolution_bkg", "Landau (X) Gaussian", pdfs, n)
+
+parList = ROOT.RooArgSet(land_mean, land_sigma, gaus_mean, gaus_sigma)
+
 
 
 #Input file and tree ---------------------------------------------------------------
@@ -75,7 +92,6 @@ print "nEntries = ",nEntries
 
 
 #Do the fit ------------------------------------------------------------------------------------------------------------------------------
-convolution_pdf = ROOT.RooFFTConvPdf("convolution", "Landau (X) Gaussian", mass, bkgPDF_landau, bkgPDF_gaus)
 #fitResult_landau = bkgPDF_landau.fitTo(observed_data,ROOT.RooFit.Save())
 #fitResult_landau = bkgPDF_gaus.fitTo(observed_data,ROOT.RooFit.Save())
 fitResult_landau = convolution_pdf.fitTo(observed_data,ROOT.RooFit.Save())
@@ -103,7 +119,7 @@ convolution_pdf.plotOn(xframe_landau,ROOT.RooFit.NormRange("full"),ROOT.RooFit.R
 xframe_landau.SetTitle("#sqrt{s} = 13 TeV       lumi = 39.54/fb")
 xframe_landau.GetXaxis().SetTitle("m_{ditrk,#gamma} [GeV]")
 xframe_landau.SetMaximum(1.3*xframe_landau.GetMaximum())
-convolution_pdf.paramOn(xframe_landau,ROOT.RooFit.Layout(0.65,0.94,0.91),ROOT.RooFit.Format("NEU",ROOT.RooFit.AutoPrecision(1))) #,ROOT.RooFit.Layout(0.65,0.90,0.90)
+convolution_pdf.paramOn(xframe_landau,ROOT.RooFit.Parameters(parList), ROOT.RooFit.Layout(0.65,0.94,0.91),ROOT.RooFit.Format("NEU",ROOT.RooFit.AutoPrecision(1))) #,ROOT.RooFit.Layout(0.65,0.90,0.90)
 xframe_landau.getAttText().SetTextSize(0.02)
 xframe_landau.Draw() #remember to draw the frame before the legend initialization to fill the latter correctly
 
@@ -143,7 +159,7 @@ else:
 # Multipdf ------------------------------------------------------------------------------------------------------------------------------
 cat = ROOT.RooCategory("pdf_index","Index of Pdf which is active")
 mypdfs = ROOT.RooArgList()
-#mypdfs.add(convolution_pdf)######################check
+mypdfs.add(convolution_pdf)#################
 mypdfs.add( bkgPDF_landau)
 mypdfs.add( bkgPDF_gaus)
 
@@ -155,19 +171,20 @@ norm     = nEntries #fileInput.Get("h_ZMass").Integral() #get the normalization 
 print "************************************** n. events = ",nEntries
 bkg_norm = ROOT.RooRealVar(multipdf.GetName()+ "_norm", multipdf.GetName()+ "_norm", norm,0.5*norm, 2*norm)
 
-workspace = ROOT.RooWorkspace("myworkspace")
+workspace = ROOT.RooWorkspace("workspace")
 getattr(workspace,'import')(cat)
-getattr(workspace,'import')(multipdf)######################check
+getattr(workspace,'import')(multipdf)
 getattr(workspace,'import')(observed_data)
 getattr(workspace,'import')(bkg_norm)
 print("integral BKG",bkg_norm.Print())
-#fOut = ROOT.TFile("workspaces/workspace_STAT_"+CHANNEL+".root","RECREATE")
+#fOut = ROOT.TFile("workspaces/workspace_bkg_"+CHANNEL+".root","RECREATE")
 #fOut.cd()
 #workspace.Write()
-workspace.writeToFile("workspaces/workspace_STAT_"+CHANNEL+".root")
+#workspace.writeToFile("workspaces/workspace_bkg_"+CHANNEL+".root")
+fOutput = ROOT.TFile("workspaces/workspace_bkg_"+CHANNEL+".root","RECREATE")
+workspace.Write()
+fOutput.Write()
+fOutput.Close()
 print "-------------------------------------------"
 print "Final print to check the workspace update:"
 workspace.Print()
-
-
-
