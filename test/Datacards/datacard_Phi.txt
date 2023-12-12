@@ -1,0 +1,21 @@
+-------------------------------------
+imax 1 number of channels
+jmax 2 number of background minus 1
+kmax * number of nuisance parameters
+-------------------------------------
+shapes	sig			BDT	workspaces/workspace_Phi.root  workspace_Phi:voigtian_signal
+shapes	bkg			BDT	workspaces/workspace_Phi.root  workspace_Phi:multipdf_Phi_bkg
+shapes	data_obs	BDT	workspaces/workspace_Phi.root  workspace_Phi:observed_data
+
+-------------------------------------
+bin	         BDT
+observation	 -1
+-------------------------------------
+bin		BDT		BDT
+process	sig		bkg
+process	0	 	1
+rate	0.01    1
+-------------------------------------
+lumi_13TeV_2018     lnN     1.025	      1.025	    -
+-------------------------------------
+pdf_index discrete
