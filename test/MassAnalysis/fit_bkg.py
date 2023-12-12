@@ -47,17 +47,22 @@ mass.setRange("full",70.,200.)
 
 
 #Initialize a Landau pdf
-land_mean = ROOT.RooRealVar('land_mean', 'land_mean', 70., 40.,130.) 
-land_sigma = ROOT.RooRealVar('land_sigma', 'land_sigma', 14., 0., 30.) 
+land_mean = ROOT.RooRealVar('land_mean', 'land_mean', 103., 95.,110.) 
+land_sigma = ROOT.RooRealVar('land_sigma', 'land_sigma', 13., 10., 15.) 
 bkgPDF_landau = ROOT.RooLandau("landau_bkg", "bkgPDF", mass, land_mean, land_sigma)
 
+land_add_mean = ROOT.RooRealVar('land_mean', 'land_mean', 103., 95.,110.) 
+land_add_sigma = ROOT.RooRealVar('land_sigma', 'land_sigma', 13., 10., 15.) 
+bkgPDF_landau_add = ROOT.RooLandau("landau_add_bkg", "bkgLandAdd", mass, land_add_mean, land_add_sigma)
 
 #Initialize a Gaussian pdf
 gaus_mean = ROOT.RooRealVar('gaus_mean', 'gaus_mean', 35., 20., 130.) 
 gaus_sigma = ROOT.RooRealVar('gaus_sigma', 'gaus_sigma', 5., 0., 30.) 
-bkgPDF_gaus = ROOT.RooGaussian("gaus_bkg", "bkgPDF", mass, gaus_mean, gaus_sigma)
+bkgPDF_gaus_add = ROOT.RooGaussian("gaus_bkg", "bkgGaussAdd", mass, gaus_mean, gaus_sigma)
 
-#convolution_pdf = ROOT.RooFFTConvPdf("convolution_bkg", "Landau (X) Gaussian", mass, bkgPDF_landau, bkgPDF_gaus)
+#bkgPDF_landau=bkgPDF_landau
+
+#bkgPDF_landau = ROOT.RooFFTConvPdf("convolution_bkg", "Landau (X) Gaussian", mass, bkgPDF_landau, bkgPDF_gaus)
 if not isPhiGammaAnalysis:
     n_1 = ROOT.RooRealVar("n1","number1 of events",20000,0,32000) 
     n_2 = ROOT.RooRealVar("n2","number2 of events",1000,0,32000)
@@ -69,11 +74,13 @@ n=ROOT.RooArgList()
 n.add(n_1)
 n.add(n_2) 
 pdfs=ROOT.RooArgList()
-pdfs.add(bkgPDF_landau)
-pdfs.add(bkgPDF_gaus)
-convolution_pdf = ROOT.RooAddPdf("convolution_bkg", "Landau (X) Gaussian", pdfs, n)
+pdfs.add(bkgPDF_landau_add)
+pdfs.add(bkgPDF_gaus_add)
+add_pdf = ROOT.RooAddPdf("convolution_bkg", "Landau (X) Gaussian", pdfs, n)
 
-parList = ROOT.RooArgSet(land_mean, land_sigma, gaus_mean, gaus_sigma)
+#bkgPDF_landau=add_pdf#######
+
+parList = ROOT.RooArgSet(land_add_mean, land_add_sigma, gaus_mean, gaus_sigma)
 
 
 
@@ -94,7 +101,7 @@ print "nEntries = ",nEntries
 #Do the fit ------------------------------------------------------------------------------------------------------------------------------
 #fitResult_landau = bkgPDF_landau.fitTo(observed_data,ROOT.RooFit.Save())
 #fitResult_landau = bkgPDF_gaus.fitTo(observed_data,ROOT.RooFit.Save())
-fitResult_landau = convolution_pdf.fitTo(observed_data,ROOT.RooFit.Save())
+fitResult_landau = bkgPDF_landau.fitTo(observed_data,ROOT.RooFit.Save())
 #Do the F-test ------------------------------------------------------------------------------------------------------------------------------
 #print "################## F-TEST"
 #print "minNll = ", fitResult_bernstein.minNll()
@@ -114,15 +121,15 @@ else:
     xframe_landau = mass.frame(120)
 
 observed_data.plotOn(xframe_landau)
-#convolution_pdf.plotOn(xframe_landau)
-convolution_pdf.plotOn(xframe_landau,ROOT.RooFit.NormRange("full"),ROOT.RooFit.Range("full"),ROOT.RooFit.Name("convolution_pdf"), ROOT.RooFit.LineColor(ROOT.kBlue))
+#bkgPDF_landau.plotOn(xframe_landau)
+bkgPDF_landau.plotOn(xframe_landau,ROOT.RooFit.NormRange("full"),ROOT.RooFit.Range("full"),ROOT.RooFit.Name("bkgPDF_landau"), ROOT.RooFit.LineColor(ROOT.kBlue))##
 xframe_landau.SetTitle("#sqrt{s} = 13 TeV       lumi = 39.54/fb")
 xframe_landau.GetXaxis().SetTitle("m_{ditrk,#gamma} [GeV]")
 xframe_landau.SetMaximum(1.3*xframe_landau.GetMaximum())
-convolution_pdf.paramOn(xframe_landau,ROOT.RooFit.Parameters(parList), ROOT.RooFit.Layout(0.65,0.94,0.91),ROOT.RooFit.Format("NEU",ROOT.RooFit.AutoPrecision(1))) #,ROOT.RooFit.Layout(0.65,0.90,0.90)
+bkgPDF_landau.paramOn(xframe_landau, ROOT.RooFit.Layout(0.65,0.94,0.91),ROOT.RooFit.Format("NEU",ROOT.RooFit.AutoPrecision(1))) #,ROOT.RooFit.Layout(0.65,0.90,0.90)
 xframe_landau.getAttText().SetTextSize(0.02)
 xframe_landau.Draw() #remember to draw the frame before the legend initialization to fill the latter correctly
-
+#,ROOT.RooFit.Parameters(parList)
 
 #Calculate Chi square and parameters 
 nParam_landau = fitResult_landau.floatParsFinal().getSize()
@@ -159,9 +166,9 @@ else:
 # Multipdf ------------------------------------------------------------------------------------------------------------------------------
 cat = ROOT.RooCategory("pdf_index","Index of Pdf which is active")
 mypdfs = ROOT.RooArgList()
-mypdfs.add(convolution_pdf)#################
-mypdfs.add( bkgPDF_landau)
-mypdfs.add( bkgPDF_gaus)
+mypdfs.add(bkgPDF_landau)
+mypdfs.add(add_pdf)
+#mypdfs.add( bkgPDF_gaus)
 
 
 multipdf = ROOT.RooMultiPdf("multipdf_"+CHANNEL+"_bkg","All Pdfs",cat,mypdfs)
@@ -171,20 +178,19 @@ norm     = nEntries #fileInput.Get("h_ZMass").Integral() #get the normalization 
 print "************************************** n. events = ",nEntries
 bkg_norm = ROOT.RooRealVar(multipdf.GetName()+ "_norm", multipdf.GetName()+ "_norm", norm,0.5*norm, 2*norm)
 
-workspace = ROOT.RooWorkspace("workspace")
+inputWS = ROOT.TFile("workspaces/workspace_"+CHANNEL+".root")  
+inputWS.cd()
+workspace = inputWS.Get("workspace_"+CHANNEL+"")
 getattr(workspace,'import')(cat)
 getattr(workspace,'import')(multipdf)
 getattr(workspace,'import')(observed_data)
 getattr(workspace,'import')(bkg_norm)
 print("integral BKG",bkg_norm.Print())
-#fOut = ROOT.TFile("workspaces/workspace_bkg_"+CHANNEL+".root","RECREATE")
-#fOut.cd()
-#workspace.Write()
-#workspace.writeToFile("workspaces/workspace_bkg_"+CHANNEL+".root")
-fOutput = ROOT.TFile("workspaces/workspace_bkg_"+CHANNEL+".root","RECREATE")
+
+fOut = ROOT.TFile("workspaces/workspace_"+CHANNEL+".root","UPDATE")
+fOut.cd()
 workspace.Write()
-fOutput.Write()
-fOutput.Close()
 print "-------------------------------------------"
 print "Final print to check the workspace update:"
 workspace.Print()
+fOut.Close()
