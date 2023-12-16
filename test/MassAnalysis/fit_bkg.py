@@ -42,7 +42,7 @@ CMS_lumi.cmsTextSize = 0.8
 CMS_lumi.lumi_13TeV = "39.54 fb^{-1}" 
 
 #Parameters of the PDF ---------------------------------------------------------------
-mass = ROOT.RooRealVar("ZMass","ZMass",70.,200.,"GeV")
+mass = ROOT.RooRealVar("ZMass","ZMass",70.,200.,"GeV")#70 200
 mass.setRange("full",70.,200.)
 
 
@@ -156,18 +156,21 @@ leg1.Draw()
 CMS_lumi.CMS_lumi(canvas_landau, iPeriod, iPos) #Print integrated lumi and energy information
 
 if isPhiGammaAnalysis:
-    canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/Fit/fit_bkg.pdf")
-    canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/Fit/fit_bkg.png")
+    #canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/Fit/fit_bkg.pdf")
+    #canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/Fit/fit_bkg.png")
+    canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Fit/fit_bkg.pdf")
+    canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Fit/fit_bkg.png")
 else:
-    canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/Fit/fit_bkg.pdf")
-    canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/Fit/fit_bkg.png")
-
+    #canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/Fit/fit_bkg.pdf")
+    #canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/Fit/fit_bkg.png")
+    canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Fit/fit_bkg.pdf")
+    canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Fit/fit_bkg.png")
 
 # Multipdf ------------------------------------------------------------------------------------------------------------------------------
 cat = ROOT.RooCategory("pdf_index","Index of Pdf which is active")
 mypdfs = ROOT.RooArgList()
 mypdfs.add(bkgPDF_landau)
-mypdfs.add(add_pdf)
+#mypdfs.add(add_pdf)
 #mypdfs.add( bkgPDF_gaus)
 
 

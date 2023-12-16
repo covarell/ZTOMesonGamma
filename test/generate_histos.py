@@ -8,6 +8,7 @@ from functions_smuggler import Simplified_Workflow_Handler
 
 #Following bools are given as input
 debug         = False
+verbose       = False
 isBDT         = False #BDT bool
 isDataBlind   = False #Bool for blind analysis
 isPhiAnalysis = False # for Z -> Phi Gamma
@@ -21,7 +22,7 @@ p = argparse.ArgumentParser(description='Select rootfile to plot')
 p.add_argument('meson_option', help='Type <<rho>> for rho, <<phi>> for phi') #flag for type of meson
 p.add_argument('CR_option', help='Type <<0>> for SR, <<1>> for CR') #flag for bkg estimation
 p.add_argument('isBDT_option', help='Type <<preselection>> or <<BDT>>') #flag for loose selection or tight selection (from BDT output)
-p.add_argument('isBlindAnalysis', help='Type <<blind>> or <<unblind>>') #flag for loose selection or tight selection (from BDT output)
+p.add_argument('isBlindAnalysis', help='Type <<blind>> or <<unblind>>') #flag for blind analysis
 p.add_argument('rootfile_name', help='Type rootfile name')
 p.add_argument('outputfile_option', help='Provide output file name')
 
@@ -75,7 +76,11 @@ myWF = Simplified_Workflow_Handler("Signal","Data",isBDT)
 
 #Normalization for MC dataset ################################################################################
 
-#normalization_weight = 
+if isPhiAnalysis:
+    normalization_weight = (1./25000.) * (1928000./0.0336) * 0.49 
+else:
+    normalization_weight = (1./25000.) * (1928000./0.0336)
+ 
 
 #Combine luminosity
 #luminosity2018A = 14.00 #fb^-1
@@ -84,16 +89,16 @@ myWF = Simplified_Workflow_Handler("Signal","Data",isBDT)
 #luminosity2018D = 31.93 #fb^-1
 luminosity = 39.54 #total lumi delivered during the trigger activity: 39.54 #fb^-1
 
-'''if not samplename == "Data":
+if not samplename == "Data":
     weightSum = 0.
-else: weightSum = 1.'''
+else: weightSum = 1.
 
 #HISTOS #########################################################################################################
 histo_map = dict()
 list_histos = ["h_ZMass", "h_MesonMass", "h_firstTrkPt", "h_secondTrkPt", "h_firstTrkEta", "h_secondTrkEta", "h_firstTrkPhi", "h_secondTrkPhi", "h_bestPairPt", "h_bestPairEta", "h_bestPairDeltaR", "h_bestJetPt", "h_bestJetEta", "h_firstTrkIso","h_firstTrkIsoCh","h_secondTrkIso","h_secondTrkIsoCh","h_pairIso","h_pairIsoCh", "h_photonEnergy", "h_photonEta", "h_nJets25","h_nMuons","h_nElectrons", "h_pairIsoNeutral", "h_efficiency", "h_MesonGammaDeltaPhi"] 
 
-histo_map[list_histos[0]]  = ROOT.TH1F(list_histos[0],"M_{Z}", 300, 50, 200.)    
-#else: histo_map[list_histos[0]]  = ROOT.TH1F(list_histos[0],"M_{Z}", 300, 40., 140.) 
+histo_map[list_histos[0]]  = ROOT.TH1F(list_histos[0],"M_{Z}", 300, 50., 200.)   #120,60,120 
+#histo_map[list_histos[0]]  = ROOT.TH1F(list_histos[0],"M_{Z}", 120, 60., 120.)   #120,60,120 
 if isPhiAnalysis : histo_map[list_histos[1]]  = ROOT.TH1F(list_histos[1],"M_{meson}", 100, 1., 1.05) 
 elif isRhoAnalysis: histo_map[list_histos[1]]  = ROOT.TH1F(list_histos[1],"M_{meson}", 100, 0.5, 1.) 
 histo_map[list_histos[2]]  = ROOT.TH1F(list_histos[2],"p_{T} of the 1st track", 100, 0.,70.)
@@ -121,7 +126,9 @@ histo_map[list_histos[21]] = ROOT.TH1F(list_histos[21],"n. of jets over pre-filt
 histo_map[list_histos[22]] = ROOT.TH1F(list_histos[22],"n. of muons", 6, -0.5, 5.5)
 histo_map[list_histos[23]] = ROOT.TH1F(list_histos[23],"n. of electrons", 5, -0.5, 5.5)
 histo_map[list_histos[24]] = ROOT.TH1F(list_histos[24],"Iso_neutral of the meson", 100, 0.,1.)
-histo_map[list_histos[25]] = ROOT.TH1F(list_histos[25],"Efficiency steps", 5, 0.,5.)
+if not samplename == "Data" :
+    histo_map[list_histos[25]] = ROOT.TH1F(list_histos[25],"Efficiency steps", 6, 0.,6.)###############################################
+else : histo_map[list_histos[25]] = ROOT.TH1F(list_histos[25],"Efficiency steps", 5, 0.,5.)
 histo_map[list_histos[26]] = ROOT.TH1F(list_histos[26],"#Delta#phi between meson and photon", 100, -math.pi, math.pi)
 
 
@@ -154,17 +161,18 @@ _firstTrkIsoCh  = np.zeros(1, dtype=float)
 _secondTrkIsoCh = np.zeros(1, dtype=float) 
 _bestPairDeltaR = np.zeros(1, dtype=float)
 _MesonGammaDeltaPhi = np.zeros(1, dtype=float)
+_eventWeight    = np.zeros(1, dtype=float)
 
 
 tree_output = ROOT.TTree('tree_output','tree_output')
-tree_output.Branch('ZMass',_ZMass,'ZMass/D')
-tree_output.Branch('mesonMass',_mesonMass,'MesonMass/D')
-tree_output.Branch('firstTrkPt',_firstTrkPt,'firstTrkPt/D')
-tree_output.Branch('secondTrkPt',_secondTrkPt,'secondTrkPt/D')
-tree_output.Branch('firstTrkEta',_firstTrkEta,'firstTrkEta/D')
-tree_output.Branch('secondTrkEta',_secondTrkEta,'secondTrkEta/D')
-tree_output.Branch('bestPairPt',_bestPairPt,'bestPairPt/D')
-tree_output.Branch('bestPairEta',_bestPairEta,'bestPairEta/D')
+tree_output.Branch('ZMass',_ZMass,'_ZMass/D')
+tree_output.Branch('mesonMass',_mesonMass,'_MesonMass/D')
+tree_output.Branch('firstTrkPt',_firstTrkPt,'_firstTrkPt/D')
+tree_output.Branch('secondTrkPt',_secondTrkPt,'_secondTrkPt/D')
+tree_output.Branch('firstTrkEta',_firstTrkEta,'_firstTrkEta/D')
+tree_output.Branch('secondTrkEta',_secondTrkEta,'_secondTrkEta/D')
+tree_output.Branch('bestPairPt',_bestPairPt,'_bestPairPt/D')
+tree_output.Branch('bestPairEta',_bestPairEta,'_bestPairEta/D')
 tree_output.Branch('pairIsoCh',_pairIsoCh,'_pairIsoCh/D')
 tree_output.Branch('pairIso',_pairIso,'_pairIso/D')
 tree_output.Branch('pairIso0',_pairIso0,'_pairso0/D')
@@ -176,9 +184,9 @@ tree_output.Branch('firstTrkIsoCh',_firstTrkIsoCh,'_firstTrkIsoCh/D')
 tree_output.Branch('secondTrkIso',_secondTrkIso,'_secondTrkIso/D')
 tree_output.Branch('secondTrkIsoCh',_secondTrkIsoCh,'_secondTrkIsoCh/D')
 tree_output.Branch('bestPairDeltaR',_bestPairDeltaR,'_bestPairDeltaR/D')
-##tree_output.Branch('eventWeight',_eventWeight,'_eventWeight/D')
+tree_output.Branch('eventWeight',_eventWeight,'_eventWeight/D')############
 tree_output.Branch('nJets',_nJets,'_nJets/D')
-tree_output.Branch('MesonGammaDeltaPhi',_MesonGammaDeltaPhi,'MesonGammaDeltaPhi/D')
+tree_output.Branch('MesonGammaDeltaPhi',_MesonGammaDeltaPhi,'_MesonGammaDeltaPhi/D')
 
 
 
@@ -240,6 +248,8 @@ for jentry in xrange(nentries):
         continue
     nEventsMesonAnalysis+=1
 
+    if not samplename == "Data":
+        if  (ZMass < 60. or ZMass > 120.): continue  #Cross section cut for signal
 
     #Define Control and Signal regions: ------------------------------------------
     if isPhiAnalysis: #for Phi meson
@@ -261,7 +271,7 @@ for jentry in xrange(nentries):
     if not samplename == "Data" :
         PUWeight    = mytree.PU_Weight
         weight_sign = mytree.MC_Weight/abs(mytree.MC_Weight) #just take the sign of the MC gen weight
-        #eventWeight =  luminosity * normalization_weight * weight_sign * PUWeight
+        eventWeight =  luminosity * normalization_weight * weight_sign * PUWeight
     else:
         eventWeight = 1.
 
@@ -282,44 +292,53 @@ for jentry in xrange(nentries):
                 if debug: print "BDT cut NOT passed"
                 continue
 
-
+    if verbose:
+            print "EVENT WEIGHT"
+            print "--------------------------------------"
+            print "luminosity             = ",luminosity
+            print "normalization_weight   = ",normalization_weight
+            print "mytree.MC_Weight       = ",mytree.MC_Weight, " (this is not considered)"
+            print "weight sign            = ",weight_sign
+            print "PUWeight               = ",PUWeight
+            print "Final eventWeight **** = ",_eventWeight
+            print "ZMass                  = ",ZMass
 
     #FILL HISTOS #####################################################################################################
     #if DATA -> Blind Analysis on Z inv mass plot
     if samplename == "Data":
         if isDataBlind:
             if ZMass < 80. or ZMass > 100.:##########110
-                histo_map["h_ZMass"].Fill(ZMass)#, eventWeight)
+                histo_map["h_ZMass"].Fill(ZMass, eventWeight)
         else:
-            histo_map["h_ZMass"].Fill(ZMass)#, eventWeight)
+            histo_map["h_ZMass"].Fill(ZMass, eventWeight)
     else:
-        histo_map["h_ZMass"].Fill(ZMass)#, eventWeight)
+        histo_map["h_ZMass"].Fill(ZMass, eventWeight)
             
-    histo_map["h_MesonMass"].Fill(mesonMass)#	, eventWeight)
-    histo_map["h_firstTrkPt"].Fill(firstTrkPt)#, eventWeight)
-    histo_map["h_secondTrkPt"].Fill(secondTrkPt)#, eventWeight)
-    histo_map["h_firstTrkEta"].Fill(firstTrkEta,)# eventWeight)    
-    histo_map["h_secondTrkEta"].Fill(secondTrkEta)#, eventWeight)   
-    histo_map["h_firstTrkPhi"].Fill(firstTrkPhi)#, eventWeight)    
-    histo_map["h_secondTrkPhi"].Fill(secondTrkPhi)#, eventWeight)  
-    histo_map["h_bestPairPt"].Fill(mesonPt)#, eventWeight)
-    histo_map["h_bestPairEta"].Fill(mesonEta)#, eventWeight)
-    histo_map["h_pairIsoCh"].Fill(MesonIsoCh)#, eventWeight)
-    histo_map["h_bestJetPt"].Fill(jetPt)#, eventWeight)
-    histo_map["h_bestJetEta"].Fill(jetEta)#, eventWeight)
-    histo_map["h_photonEnergy"].Fill(photonEt)#, eventWeight)
-    histo_map["h_photonEta"].Fill(photonEta)#, eventWeight)
-    histo_map["h_bestPairDeltaR"].Fill(deltaR)#/mesonMass)#, eventWeight)
-    histo_map["h_pairIso"].Fill(MesonIso)#, eventWeight)
-    histo_map["h_firstTrkIso"].Fill(firstTrkiso)#, eventWeight)
-    histo_map["h_firstTrkIsoCh"].Fill(firstTrkisoCh)#, eventWeight)
-    histo_map["h_secondTrkIso"].Fill(secondTrkiso)#, eventWeight)
-    histo_map["h_secondTrkIsoCh"].Fill(secondTrkisoCh)#, eventWeight)
-    histo_map["h_pairIsoNeutral"].Fill(MesonIso0)#, eventWeight)
-    histo_map["h_nJets25"].Fill(nJets)#, eventWeight)
-    histo_map["h_nMuons"].Fill(nMuons)#, eventWeight)
-    histo_map["h_nElectrons"].Fill(nElectrons)#, eventWeight)
-    histo_map["h_MesonGammaDeltaPhi"].Fill(MesonGammaDeltaPhi)#, eventWeight)
+    histo_map["h_MesonMass"].Fill(mesonMass , eventWeight)
+    histo_map["h_firstTrkPt"].Fill(firstTrkPt, eventWeight)
+    histo_map["h_secondTrkPt"].Fill(secondTrkPt, eventWeight)
+    histo_map["h_firstTrkEta"].Fill(firstTrkEta, eventWeight)    
+    histo_map["h_secondTrkEta"].Fill(secondTrkEta, eventWeight)   
+    histo_map["h_firstTrkPhi"].Fill(firstTrkPhi, eventWeight)    
+    histo_map["h_secondTrkPhi"].Fill(secondTrkPhi, eventWeight)  
+    histo_map["h_bestPairPt"].Fill(mesonPt, eventWeight)
+    histo_map["h_bestPairEta"].Fill(mesonEta, eventWeight)
+    histo_map["h_pairIsoCh"].Fill(MesonIsoCh, eventWeight)
+    histo_map["h_bestJetPt"].Fill(jetPt, eventWeight)
+    histo_map["h_bestJetEta"].Fill(jetEta, eventWeight)
+    histo_map["h_photonEnergy"].Fill(photonEt, eventWeight)
+    histo_map["h_photonEta"].Fill(photonEta, eventWeight)
+    histo_map["h_bestPairDeltaR"].Fill(deltaR, eventWeight)#/mesonMass
+    histo_map["h_pairIso"].Fill(MesonIso, eventWeight)
+    histo_map["h_firstTrkIso"].Fill(firstTrkiso, eventWeight)
+    histo_map["h_firstTrkIsoCh"].Fill(firstTrkisoCh, eventWeight)
+    histo_map["h_secondTrkIso"].Fill(secondTrkiso, eventWeight)
+    histo_map["h_secondTrkIsoCh"].Fill(secondTrkisoCh, eventWeight)
+    histo_map["h_pairIsoNeutral"].Fill(MesonIso0, eventWeight)
+    histo_map["h_nJets25"].Fill(nJets, eventWeight)
+    histo_map["h_nMuons"].Fill(nMuons, eventWeight)
+    histo_map["h_nElectrons"].Fill(nElectrons, eventWeight)
+    histo_map["h_MesonGammaDeltaPhi"].Fill(MesonGammaDeltaPhi, eventWeight)
 
 
     #FILL TREE ########################################################################################################
@@ -344,8 +363,13 @@ for jentry in xrange(nentries):
     _bestPairDeltaR[0] = deltaR
     _nJets[0]          = nJets
     _MesonGammaDeltaPhi[0] = MesonGammaDeltaPhi
+    _eventWeight[0]        = eventWeight
 
     tree_output.Fill()
+
+    if not samplename == 'Data' :
+        weightSum += eventWeight
+        #print "Signal weight sum   = ",float(weightSum)
 
 #HISTO LABELS #########################################################################################################
 histo_map["h_ZMass"].GetXaxis().SetTitle("m_{trk^{+}trk^{-}#gamma} [GeV/c^2]")
@@ -410,6 +434,8 @@ bin2content  = h_Events.GetBinContent(2)
 bin3content  = h_Events.GetBinContent(3)
 bin4content  = h_Events.GetBinContent(4)
 bin5content  = h_Events.GetBinContent(5)
+if not samplename == "Data" :
+    bin6content  = h_Events.GetBinContent(6)##############
 
 
 nSignal      = bin1content
@@ -420,12 +446,17 @@ histo_map["h_efficiency"].Fill(1.5,bin2content*scale_factor)
 histo_map["h_efficiency"].Fill(2.5,bin3content*scale_factor)
 histo_map["h_efficiency"].Fill(3.5,bin4content*scale_factor)
 histo_map["h_efficiency"].Fill(4.5,bin5content*scale_factor)
+if not samplename == "Data" :
+    histo_map["h_efficiency"].Fill(5.5,bin6content*scale_factor)##########
+
 
 histo_map["h_efficiency"].GetXaxis().SetBinLabel(1,"Events processed")
 histo_map["h_efficiency"].GetXaxis().SetBinLabel(2,"Events triggered")
 histo_map["h_efficiency"].GetXaxis().SetBinLabel(3,"Photon requested")
-histo_map["h_efficiency"].GetXaxis().SetBinLabel(4,"Best couple found")
-histo_map["h_efficiency"].GetXaxis().SetBinLabel(5,"trk-cand pT selection")
+histo_map["h_efficiency"].GetXaxis().SetBinLabel(5,"Best couple found")
+histo_map["h_efficiency"].GetXaxis().SetBinLabel(6,"trk-cand pT selection")
+if not samplename == "Data" :
+    histo_map["h_efficiency"].GetXaxis().SetBinLabel(4,"Iso selection")######################
 
 
 c11 = ROOT.TCanvas()
@@ -440,26 +471,37 @@ histo_map["h_efficiency"].GetXaxis().SetRangeUser(0.,7.1)
 #histo_map["h_efficiency"].SetMaximum(max(histo_map["h_efficiency"].GetHistogram().GetMaximum(),30.))
 histo_map["h_efficiency"].Draw("HIST TEXT0")
 if not samplename == "Data" and isPhiAnalysis:
-    c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Phi/h_efficiency.pdf")
-    c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Phi/h_efficiency.png")
+    #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Phi/h_efficiency.pdf")
+    #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Phi/h_efficiency.png")
+    c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Signal/h_efficiency.pdf")
+    c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Signal/h_efficiency.png")
 elif not samplename == "Data" and isRhoAnalysis:
-    c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Rho/h_efficiency.pdf")
-    c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Rho/h_efficiency.png")
-
+    #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Rho/h_efficiency.pdf")
+    #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Rho/h_efficiency.png")
+    c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Signal/h_efficiency.pdf")
+    c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Signal/h_efficiency.png")
 
 else:
     if isPhiAnalysis and CRflag == 0:
-        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/SR/h_efficiency.pdf")
-        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/SR/h_efficiency.png")
+        #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/SR/h_efficiency.pdf")
+        #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/SR/h_efficiency.png")
+        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Data/SR/h_efficiency.pdf")
+        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Data/SR/h_efficiency.png")
     elif isPhiAnalysis and CRflag == 1:
-        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/CR/h_efficiency.pdf")
-        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/CR/h_efficiency.png")
+        #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/CR/h_efficiency.pdf")
+        #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/CR/h_efficiency.png")
+        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Data/CR/h_efficiency.pdf")
+        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Data/CR/h_efficiency.png")
     elif isRhoAnalysis and CRflag == 0:
-        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/SR/h_efficiency.pdf")
-        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/SR/h_efficiency.png")
+        #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/SR/h_efficiency.pdf")
+        #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/SR/h_efficiency.png")
+        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Data/SR/h_efficiency.pdf")
+        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Data/SR/h_efficiency.png")
     elif isRhoAnalysis and CRflag == 1: 
-        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/CR/h_efficiency.pdf")
-        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/CR/h_efficiency.png")
+        #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/CR/h_efficiency.pdf")
+        #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/CR/h_efficiency.png")
+        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Data/CR/h_efficiency.pdf")
+        c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Data/CR/h_efficiency.png")
 
 
 #HISTOS WRITING ########################################################################################################
@@ -468,4 +510,5 @@ for hist_name in list_histos:
     histo_map[hist_name].Write()
 fOut.Close()
 
-    
+if not samplename == "Data":
+    print "eff", histo_map["h_firstTrkIsoCh"].GetEntries()/25000.

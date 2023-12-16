@@ -42,11 +42,11 @@ CMS_lumi.cmsTextSize = 0.8
 CMS_lumi.lumi_13TeV = "39.54 fb^{-1}" 
 
 #Parameters of the PDF ---------------------------------------------------------------
-mass = ROOT.RooRealVar("ZMass","ZMass",80.,102.,"GeV")
-mass.setRange("full",80.,102.)
+mass = ROOT.RooRealVar("ZMass","ZMass",75.,105.,"GeV")#70,110
+mass.setRange("full",70.,110.)
 
 
-#Initialize a Voightian pdf
+#Initialize a Voigtian pdf
 mean  = ROOT.RooRealVar('mean', 'mean', 90., 80., 110.) 
 width = ROOT.RooRealVar('width', 'width', 5., 0., 10.)
 sigma = ROOT.RooRealVar('sigma', 'sigma', 5., 0., 10.) 
@@ -62,8 +62,34 @@ else :
 fileInput.cd()
 tree = fileInput.Get("tree_output")
 
+#prepare a rebinned TH1 for Higgs mass ---------------------------------------------------------------
+xLowRange  = 75.
+xHighRange = 105.
+
+h_mZ = ROOT.TH1F("h_mZ","h_mZ", int(xHighRange - xLowRange), xLowRange, xHighRange)
+
+nentries_sig = tree.GetEntriesFast()
+print "nEntries_sig = ",nentries_sig
+
+tot=0.
+for jentry in xrange(nentries_sig):
+    ientry = tree.LoadTree( jentry )
+    if ientry < 0:
+        print "break"
+        break
+    nb = tree.GetEntry(jentry)
+    if nb <= 0:
+        print "nb < 0"
+        continue
+    #tot+=tree.eventWeight
+    #print "eventWeight =", tree.eventWeight
+    #print "somma =", tot
+
+    h_mZ.Fill(tree.ZMass, tree.eventWeight)
+
 #Retrieve observed_data from the tree, insert the variable also ---------------------------------------------------------------
-observed_data = ROOT.RooDataSet("observed_data","observed_data",ROOT.RooArgSet(mass),ROOT.RooFit.Import(tree))
+#observed_data = ROOT.RooDataSet("observed_data","observed_data",ROOT.RooArgSet(mass),ROOT.RooFit.Import(tree))
+observed_data = ROOT.RooDataHist("observed_data", "observed_data", ROOT.RooArgList(mass), h_mZ)
 nEntries = observed_data.numEntries() 
 print "nEntries = ",nEntries
 
@@ -124,11 +150,15 @@ leg1.Draw()
 CMS_lumi.CMS_lumi(canvas_voig, iPeriod, iPos) #Print integrated lumi and energy information
 
 if isPhiGammaAnalysis:
-    canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/Fit/fit_signal.pdf")
-    canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/Fit/fit_signal.png")
+    #canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/Fit/fit_signal.pdf")
+    #canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/Fit/fit_signal.png")
+    canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Fit/fit_signal.pdf")
+    canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Fit/fit_signal.png")
 else:
-    canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/Fit/fit_signal.pdf")
-    canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/Fit/fit_signal.png")
+    #canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/Fit/fit_signal.pdf")
+    #canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/Fit/fit_signal.png")
+    canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Fit/fit_signal.pdf")
+    canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Fit/fit_signal.png")
 
 '''
 # Multipdf ------------------------------------------------------------------------------------------------------------------------------
@@ -140,7 +170,8 @@ mypdfs.add(sigPDF_voig)
 '''
 #create Workspace ------------------------------------------------------------------------------------------------------------------------------
 norm = fileInput.Get("h_ZMass").Integral()  # get the normalization of ggH signal (area under ggH signal)
-sig_norm = ROOT.RooRealVar(sigPDF_voig.GetName() + "_norm", sigPDF_voig.GetName() + "_norm", 2*norm)
+print "norm = ", norm
+sig_norm = ROOT.RooRealVar(sigPDF_voig.GetName() + "_norm", sigPDF_voig.GetName() + "_norm", norm)
 
 workspace = ROOT.RooWorkspace("workspace_"+CHANNEL+"")
 getattr(workspace,'import')(sigPDF_voig)

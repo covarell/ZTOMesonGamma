@@ -63,8 +63,8 @@ for sigEntry in xrange(nEntriesSig):
     Zmass = sig_tree.ZMass
     if (Zmass < 85. or Zmass > 95.): continue
     #print Zmass
-    #Nsig_passed += sig_tree._eventWeight * BR_inj
-    Nsig_passed += 1. * BR_inj
+    Nsig_passed += sig_tree._eventWeight * BR_inj
+    #Nsig_passed += 1. * BR_inj
 
 
 print "nEntriesSig  = ",nEntriesSig
@@ -123,10 +123,20 @@ sign_vs_bkg.SetMarkerColor(4)
 sign_vs_bkg.Draw("AP")
 
 
-canvas1.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/MVA/signif_vs_effS.pdf")
-canvas1.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/MVA/signif_vs_effS.png")
-canvas2.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/MVA/signif_vs_effB.pdf")
-canvas2.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/MVA/signif_vs_effB.png")
+#canvas1.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/MVA/signif_vs_effS.pdf")
+#canvas1.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/MVA/signif_vs_effS.png")
+#canvas2.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/MVA/signif_vs_effB.pdf")
+#canvas2.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/MVA/signif_vs_effB.png")
+if args.meson_option == "rho" :
+    canvas1.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/MVA/signif_vs_effS.pdf")
+    canvas1.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/MVA/signif_vs_effS.png")
+    canvas2.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/MVA/signif_vs_effB.pdf")
+    canvas2.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/MVA/signif_vs_effB.png")
+else :
+    canvas1.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/MVA/signif_vs_effS.pdf")
+    canvas1.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/MVA/signif_vs_effS.png")
+    canvas2.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/MVA/signif_vs_effB.pdf")
+    canvas2.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/MVA/signif_vs_effB.png")
 
 #---- Now find the BDT output corresponding to the highest significance
 

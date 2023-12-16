@@ -10,7 +10,12 @@ import tdrstyle, CMS_lumi
 import ROOT
 
 #Supress the opening of many Canvas's
-ROOT.gROOT.SetBatch(True)   
+ROOT.gROOT.SetBatch(True)  
+
+# PARSER and INPUT #############################################################################################
+p = argparse.ArgumentParser(description='Select channel')
+p.add_argument('meson_option', help='Type <<rho>> for rho, <<phi>> for phi') #flag for type of meson
+args = p.parse_args() 
 
 
 def BDT_output():
@@ -111,8 +116,14 @@ def BDT_output():
     #arrow_CR.Draw()
     CMS_lumi.CMS_lumi(canvas1, iPeriod, iPos)
 
-    canvas1.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/MVA/h_BDT_output.pdf")
-    canvas1.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/MVA/h_BDT_output.png")
+    #canvas1.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/MVA/h_BDT_output.pdf")
+    #canvas1.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/MVA/h_BDT_output.png")
+    if args.meson_option == "rho" :    
+        canvas1.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/MVA/h_BDT_output.pdf")
+        canvas1.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/MVA/h_BDT_output.png")
+    else:
+        canvas1.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/MVA/h_BDT_output.pdf")
+        canvas1.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/MVA/h_BDT_output.png")
     
 
     #raw_input()
@@ -154,9 +165,15 @@ def rejB_vs_S():
     h_rejB_vs_S_1.Draw("hist")
     leg2.Draw("SAME")
 
-    canvas2.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/MVA/h_rejBvsS.pdf")##############
-    canvas2.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/MVA/h_rejBvsS.png")##############
-
+     
+    #canvas2.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/MVA/h_rejBvsS.pdf")##############
+    #canvas2.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/MVA/h_rejBvsS.png")##############
+    if args.meson_option == "rho" :
+        canvas2.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/MVA/h_rejBvsS.pdf")##############
+        canvas2.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/MVA/h_rejBvsS.png")##############
+    else :
+        canvas2.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/MVA/h_rejBvsS.pdf")##############
+        canvas2.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/MVA/h_rejBvsS.png")##############
     #raw_input()
 
 if __name__ == "__main__":

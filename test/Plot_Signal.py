@@ -11,19 +11,19 @@ ROOT.gROOT.SetBatch(True)
 signal_magnify = int(sys.argv[1])
 CR_magnify = 1. #2079./1179.
 
-plotOnlyData = False
-isTightSelection = int(sys.argv[2])
+#plotOnlyData = False
+plotOnlyData = int(sys.argv[2])
+isTightSelection = int(sys.argv[3])#2
 
-isPhi = int(sys.argv[3]) #note that in python true = 1 and false = 0
+isPhi = int(sys.argv[4]) # 3 note that in python true = 1 and false = 0
 print "#############################"
 print "is Phi = ",isPhi
 print "#############################"
 
-inputnames = ["Signal"]
-
 list_inputfiles = []
-for filename in sys.argv[4:]:
+for filename in sys.argv[5:]:#4
     list_inputfiles.append(filename)
+    #print filename################
 
 #CMS-style plotting 
 tdrstyle.setTDRStyle()
@@ -40,8 +40,8 @@ histo_container = [] #just for memory management
 
 #Get the list of histograms
 list_histos = []
-#signalfile = ROOT.TFile("histos/latest_production/histos_SR_preselection_SignalggH.root")
-signalfile = ROOT.TFile(sys.argv[4])
+#signalfile = ROOT.TFile("histos/latest_productions/SR_Rho_preselection_Signal.root")
+signalfile = ROOT.TFile(sys.argv[5])#4
 keylist = signalfile.GetListOfKeys()
 key = ROOT.TKey()
 for key in keylist :
@@ -60,6 +60,7 @@ for filename in list_inputfiles:
     fileIn = ROOT.TFile(filename)
 
     sample_name = (filename.split("_")[2])[:-5] 
+    print sample_name
     for histo_name in list_histos:
         histo = fileIn.Get(histo_name)
 
@@ -131,7 +132,7 @@ for histo_name in list_histos:
         if histo_name == "h_ZMass":
             #hstack[histo_name].Rebin(2)            
             hstack[histo_name].GetXaxis().SetTitle("m_{ditrk,#gamma} [GeV]")
-            hstack[histo_name].GetXaxis().SetLimits(40.,140.)
+            hstack[histo_name].GetXaxis().SetLimits(60.,120.)
 
         if histo_name == "h_nJets25":
             hstack[histo_name].GetXaxis().SetTitle("nJets")
@@ -272,9 +273,9 @@ for histo_name in list_histos:
     ################################################
 
     if isPhi: 
-        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Phi/"
+        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Signal/"
     else:
-        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Rho/"
+        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Signal/"
 
     canvas[histo_name].SaveAs(output_dir + histo_name + ".pdf")
     canvas[histo_name].SaveAs(output_dir + histo_name + ".png")

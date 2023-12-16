@@ -11,19 +11,22 @@ ROOT.gROOT.SetBatch(True)
 signal_magnify = int(sys.argv[1])
 CR_magnify = 1. #2079./1179.
 
-plotOnlyData = True
-isTightSelection = int(sys.argv[2])
+plotOnlyData = int(sys.argv[2])
+isTightSelection = int(sys.argv[3])
 
-isPhi = int(sys.argv[3]) #note that in python true = 1 and false = 0
+isPhi = int(sys.argv[4]) #note that in python true = 1 and false = 0
 print "#############################"
 print "is Phi = ",isPhi
 print "#############################"
 
-inputname = "CR"
+#inputname = "CR"
+inputname = sys.argv[5]
+
 
 list_inputfiles = []
-for filename in sys.argv[4:]:
+for filename in sys.argv[6:]:
     list_inputfiles.append(filename)
+
 
 #CMS-style plotting 
 tdrstyle.setTDRStyle()
@@ -41,7 +44,7 @@ histo_container = [] #just for memory management
 #Get the list of histograms
 list_histos = []
 #signalfile = ROOT.TFile("histos/latest_production/histos_SR_preselection_SignalggH.root")
-signalfile = ROOT.TFile(sys.argv[4])
+signalfile = ROOT.TFile(sys.argv[6])
 keylist = signalfile.GetListOfKeys()
 key = ROOT.TKey()
 for key in keylist :
@@ -272,13 +275,17 @@ for histo_name in list_histos:
     ################################################
 
     if isPhi and inputname == "SR": 
-        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/SR/"
+        #output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/SR/"
+        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Data/SR/"
     elif isPhi and inputname == "CR":
-        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/CR/"
+        #output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/CR/"
+        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Data/CR/"
     elif not isPhi and inputname == "SR" :
-        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/SR/"
+        #output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/SR/"
+        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Data/SR/"
     elif not isPhi and inputname == "CR" :
-        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/CR/"
+        #output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/CR/"
+        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Data/CR/"
 
     canvas[histo_name].SaveAs(output_dir + histo_name + ".pdf")
     canvas[histo_name].SaveAs(output_dir + histo_name + ".png")

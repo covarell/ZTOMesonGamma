@@ -111,7 +111,7 @@ verboseIdFlag_(iConfig.getParameter<bool>("phoIdVerbose"))
   rhoToken_                           = consumes<double> (iConfig.getParameter <edm::InputTag>("rho"));
   //packedGenParticlesToken_            = consumes<std::vector<pat::GenParticle>>(edm::InputTag("packedGenParticles", "", "PAT"));
 
-  hEvents = fs->make<TH1F>("hEvents", "Event counting in different steps", 5, 0., 5.);
+  hEvents = fs->make<TH1F>("hEvents", "Event counting in different steps", 6, 0., 6.);
 
   nEventsProcessed           = 0;
   nEventsTriggered           = 0;
@@ -906,6 +906,8 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
           continue; 
         }
 
+        nEventsPairIsolationFilter++;
+
 
         //PT MAX OF THE JET - FILTER -------------------------------------------------
         if (verbose) cout<<"Current bestCoupleOfTheEvent_Pt = "<<bestCoupleOfTheJetPt<<endl;
@@ -1005,7 +1007,7 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   mesonMass = (bestFirstTrkP4 + bestSecondTrkP4).M();
 
   //Z INV MASS CALCULATION
-  ZMassFrom2KPhoton = (bestFirstTrkP4 + bestSecondTrkP4 + ph_p4).M(); //calculate inv mass of the Higgs candidate
+  ZMassFrom2KPhoton = (bestFirstTrkP4 + bestSecondTrkP4 + ph_p4).M(); //calculate inv mass of the Z candidate
     
 
   //CANDIDATES SORTING
@@ -1058,7 +1060,7 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
 
 
-  nEventsPairIsolationFilter++;
+  //nEventsPairIsolationFilter++;
 
 
 
@@ -1475,15 +1477,15 @@ void ZMesonGamma::endJob() {
   hEvents->Fill(0.5,nEventsProcessed);
   hEvents->Fill(1.5,nEventsTriggered);
   hEvents->Fill(2.5,nEventsIsPhoton);
-  hEvents->Fill(3.5,nEventsBestPairFound);  
-  hEvents->Fill(4.5,nEventsTrkPtFilter);  
-  //hEvents->Fill(5.5,nEventsPairIsolationFilter);
+  hEvents->Fill(4.5,nEventsBestPairFound);  
+  hEvents->Fill(5.5,nEventsTrkPtFilter);  
+  hEvents->Fill(3.5,nEventsPairIsolationFilter);
   hEvents->GetXaxis()->SetBinLabel(1,"processed");
   hEvents->GetXaxis()->SetBinLabel(2,"triggered");
   hEvents->GetXaxis()->SetBinLabel(3,"best photon");
-  hEvents->GetXaxis()->SetBinLabel(4,"best pair");
-  hEvents->GetXaxis()->SetBinLabel(5,"trks pT");
-  //hEvents->GetXaxis()->SetBinLabel(6,"trks iso");
+  hEvents->GetXaxis()->SetBinLabel(5,"best pair");
+  hEvents->GetXaxis()->SetBinLabel(6,"trks pT");
+  hEvents->GetXaxis()->SetBinLabel(4,"trks iso");
 }
 
 //define this as a plug-in
