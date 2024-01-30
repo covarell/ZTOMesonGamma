@@ -26,26 +26,11 @@ output_filename = args.outputfile_option
 mytree = fInput.Get("ZMesonGammaGen/mytree")
 
 
-#Normalization for MC dataset ################################################################################
-
-#normalization_weight = 
-
-#Combine luminosity
-#luminosity2018A = 14.00 #fb^-1
-#luminosity2018B = 3.41 #fb^-1   
-#luminosity2018C = 6.94 #fb^-1
-#luminosity2018D = 31.93 #fb^-1
-luminosity = 39.54 #total lumi delivered during the trigger activity: 39.54 #fb^-1
-
-'''if not samplename == "Data":
-    weightSum = 0.
-else: weightSum = 1.'''
-
 #HISTOS ###########################################################################################################
 histo_map = dict()
-list_histos = ["h_ZMass", "h_MesonMass", "h_firstTrkPt", "h_secondTrkPt", "h_firstTrkEta", "h_secondTrkEta", "h_firstTrkPhi", "h_secondTrkPhi", "h_firstTrkEnergy", "h_secondTrkEnergy","h_mesonPt", "h_mesonEta", "h_mesonPhi", "h_mesonEnergy", "h_photonPt", "h_photonEta", "h_photonPhi","h_photonEnergy", "h_ZpT", "h_ZEta", "h_ZPhi", "h_ZEnergy"] 
+list_histos = ["h_ZMass", "h_MesonMass", "h_firstTrkPt", "h_secondTrkPt", "h_firstTrkEta", "h_secondTrkEta", "h_firstTrkPhi", "h_secondTrkPhi", "h_firstTrkEnergy", "h_secondTrkEnergy","h_mesonPt", "h_mesonEta", "h_mesonPhi", "h_mesonEnergy", "h_photonPt", "h_photonEta", "h_photonPhi","h_photonEnergy", "h_ZpT", "h_ZEta", "h_ZPhi", "h_ZEnergy", "h_theta_pol"] 
 
-histo_map[list_histos[0]]  = ROOT.TH1F(list_histos[0],"M_{Z}", 300, 40., 140.) 
+histo_map[list_histos[0]]  = ROOT.TH1F(list_histos[0],"M_{Z}", 300, 50., 200.) 
 if   isPhiAnalysis: histo_map[list_histos[1]]  = ROOT.TH1F(list_histos[1],"M_{meson}", 100, 1., 1.05) 
 elif isRhoAnalysis: histo_map[list_histos[1]]  = ROOT.TH1F(list_histos[1],"M_{meson}", 100, 0.5, 1.) 
 histo_map[list_histos[2]]  = ROOT.TH1F(list_histos[2],"p_{T} of the 1st track", 100, 0.,70.)
@@ -69,6 +54,7 @@ histo_map[list_histos[18]] = ROOT.TH1F(list_histos[18],"p_{T} of Z", 100, 0., 25
 histo_map[list_histos[19]] = ROOT.TH1F(list_histos[19],"#eta_{Z}", 100, -2.5,2.5)
 histo_map[list_histos[20]] = ROOT.TH1F(list_histos[20],"#phi_{Z}", 100, -math.pi, math.pi)
 histo_map[list_histos[21]] = ROOT.TH1F(list_histos[21],"E_{T} of Z", 100, 0., 250.)
+histo_map[list_histos[22]] = ROOT.TH1F(list_histos[22],"#theta_{pol}", 100, 0., 3.3)
 
 
 
@@ -89,6 +75,7 @@ _bestPairPt     = np.zeros(1, dtype=float)
 _bestPairEta    = np.zeros(1, dtype=float)  
 _photonEt       = np.zeros(1, dtype=float)
 _photonEta      = np.zeros(1, dtype=float) 
+_theta          = np.zeros(1, dtype=float) 
 
 
 
@@ -104,6 +91,7 @@ tree_output.Branch('mesonPt',_bestPairPt,'mesonPt/D')
 tree_output.Branch('mesonEta',_bestPairEta,'mesonEta/D')
 tree_output.Branch('photonEt',_photonEt,'_photonEt/D')
 tree_output.Branch('photonEta',_photonEta,'_photonEta/D')
+tree_output.Branch('theta',_theta,'_theta/D')
 
 
 
@@ -141,62 +129,36 @@ for jentry in xrange(nentries):
     ZEta           = mytree.genZ_eta
     ZPhi           = mytree.genZ_phi
     ZEnergy        = mytree.genZ_E
+    theta          = mytree.theta_pol
 
 
-
-
-    '''
-    #Define Control and Signal regions: ------------------------------------------
-    if isPhiAnalysis: #for Phi meson
-        if CRflag == 0 and not (mesonMass > 1.008 and mesonMass < 1.032) :
-            continue
-
-        if CRflag == 1 and (mesonMass > 1.008 and mesonMass < 1.032) :
-            continue
-
-    if isRhoAnalysis: #for Rho meson
-        if CRflag == 0 and not (mesonMass > 0.62 and mesonMass < 0.92) :
-            continue
-
-        if CRflag == 1 and (mesonMass > 0.62 and mesonMass < 0.92) :
-            continue
-
-    #NORMALIZATION -------------------------------------------------------------------
-    #normalization for MC
-    PUWeight    = mytree.PU_Weight
-    weight_sign = mytree.MC_Weight/abs(mytree.MC_Weight) #just take the sign of the MC gen weight
-    #eventWeight =  luminosity * normalization_weight * weight_sign * PUWeight
-
-    #Lepton veto
-    if nElectrons > 0: continue
-    if nMuons     > 0: continue
-    nEventsOverLeptonVeto += 1
-    '''
+    eventWeight = 1.
     #FILL HISTOS #####################################################################################################
     #if DATA -> Blind Analysis on Z inv mass plot
     
-    histo_map["h_ZMass"].Fill(ZMass)#, eventWeight)          
-    histo_map["h_MesonMass"].Fill(mesonMass)#, eventWeight)
-    histo_map["h_firstTrkPt"].Fill(firstTrkPt)#, eventWeight)
-    histo_map["h_secondTrkPt"].Fill(secondTrkPt)#, eventWeight)
-    histo_map["h_firstTrkEta"].Fill(firstTrkEta,)# eventWeight)    
-    histo_map["h_secondTrkEta"].Fill(secondTrkEta)#, eventWeight)   
-    histo_map["h_firstTrkPhi"].Fill(firstTrkPhi)#, eventWeight)    
-    histo_map["h_secondTrkPhi"].Fill(secondTrkPhi)#, eventWeight)
-    histo_map["h_firstTrkEnergy"].Fill(firstTrkEnergy)#, eventWeight)    
-    histo_map["h_secondTrkEnergy"].Fill(secondTrkEnergy)#, eventWeight)
-    histo_map["h_mesonPt"].Fill(mesonPt)#, eventWeight)
-    histo_map["h_mesonEta"].Fill(mesonEta)#, eventWeight)
-    histo_map["h_mesonPhi"].Fill(mesonPhi)#, eventWeight)
-    histo_map["h_mesonEnergy"].Fill(mesonEnergy)#, eventWeight)
-    histo_map["h_photonPt"].Fill(photonPt)#, eventWeight)
-    histo_map["h_photonEta"].Fill(photonEta)#, eventWeight)
-    histo_map["h_photonPhi"].Fill(photonPhi)#, eventWeight)
-    histo_map["h_photonEnergy"].Fill(photonEt)#, eventWeight)
-    histo_map["h_ZpT"].Fill(ZpT)#, eventWeight)
-    histo_map["h_ZEta"].Fill(ZEta)#, eventWeight)
-    histo_map["h_ZPhi"].Fill(ZPhi)#, eventWeight)
-    histo_map["h_ZEnergy"].Fill(ZEnergy)#, eventWeight)
+    histo_map["h_ZMass"].Fill(ZMass, eventWeight)          
+    histo_map["h_MesonMass"].Fill(mesonMass, eventWeight)
+    histo_map["h_firstTrkPt"].Fill(firstTrkPt, eventWeight)
+    histo_map["h_secondTrkPt"].Fill(secondTrkPt, eventWeight)
+    histo_map["h_firstTrkEta"].Fill(firstTrkEta, eventWeight)    
+    histo_map["h_secondTrkEta"].Fill(secondTrkEta, eventWeight)   
+    histo_map["h_firstTrkPhi"].Fill(firstTrkPhi, eventWeight)    
+    histo_map["h_secondTrkPhi"].Fill(secondTrkPhi, eventWeight)
+    histo_map["h_firstTrkEnergy"].Fill(firstTrkEnergy, eventWeight)    
+    histo_map["h_secondTrkEnergy"].Fill(secondTrkEnergy, eventWeight)
+    histo_map["h_mesonPt"].Fill(mesonPt, eventWeight)
+    histo_map["h_mesonEta"].Fill(mesonEta, eventWeight)
+    histo_map["h_mesonPhi"].Fill(mesonPhi, eventWeight)
+    histo_map["h_mesonEnergy"].Fill(mesonEnergy, eventWeight)
+    histo_map["h_photonPt"].Fill(photonPt, eventWeight)
+    histo_map["h_photonEta"].Fill(photonEta, eventWeight)
+    histo_map["h_photonPhi"].Fill(photonPhi, eventWeight)
+    histo_map["h_photonEnergy"].Fill(photonEt, eventWeight)
+    histo_map["h_ZpT"].Fill(ZpT, eventWeight)
+    histo_map["h_ZEta"].Fill(ZEta, eventWeight)
+    histo_map["h_ZPhi"].Fill(ZPhi, eventWeight)
+    histo_map["h_ZEnergy"].Fill(ZEnergy, eventWeight)
+    histo_map["h_theta_pol"].Fill(theta, eventWeight)
 
 
 
@@ -213,7 +175,9 @@ for jentry in xrange(nentries):
     _bestPairEta[0]    = mesonEta     
     _photonEt[0]       = photonEt
     _photonEta[0]      = photonEta 
+    _theta[0]          = theta
     
+    tree_output.Fill()
 
 #HISTO LABELS #########################################################################################################
 histo_map["h_ZMass"].GetXaxis().SetTitle("m_{Z} [GeV/c^2]")
@@ -260,6 +224,10 @@ histo_map["h_ZPhi"].GetXaxis().SetTitle("#phi_{Z} [rad]")
 histo_map["h_ZPhi"].SetTitle("phi of the Z")
 histo_map["h_ZEnergy"].GetXaxis().SetTitle("E_{Z} [GeV]")
 histo_map["h_ZEnergy"].SetTitle("Energy of the Z")
+histo_map["h_theta_pol"].SetTitle("angle of polarization")
+histo_map["h_theta_pol"].GetXaxis().SetTitle("#theta [rad]")
+
+
 
 
 

@@ -19,10 +19,14 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
 inputFiles={'file:/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD/Zrhogamma_2018UL_11.root',
             'file:/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD/Zrhogamma_2018UL_0.root'}
 
-input_path = '/eos/user/p/pellicci/MesonGamma_root/2023/Zphigamma_miniAOD/'
+input_path = '/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD_new'
+
 
 ##/eos/user/p/pellicci/MesonGamma_root/2023/Zphigamma_miniAOD/ Phi
 ##/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD/ Rho
+
+##/eos/user/p/pellicci/MesonGamma_root/2023/Zrhogamma_miniAOD_new rho new
+##/eos/user/p/pellicci/MesonGamma_root/2023/Zphigamma_miniAOD_new phi new
 
 def getListOfFiles(dirName):                                                                                                                                                                          
     # create a list of file and sub directories                                                                                                                                                       
@@ -48,7 +52,7 @@ process.source = cms.Source ("PoolSource", fileNames = cms.untracked.vstring (li
 
 
 #Output file
-process.TFileService = cms.Service("TFileService", fileName = cms.string("ZMesonGammaGen_output.root"))
+process.TFileService = cms.Service("TFileService", fileName = cms.string("rootfiles/latest_productions/ZMesonGammaGen_output.root"))
 process.ZMesonGammaGen = cms.EDAnalyzer('ZMesonGammaGen') ##nome
 process.p = cms.Path(process.ZMesonGammaGen) ##nome
 

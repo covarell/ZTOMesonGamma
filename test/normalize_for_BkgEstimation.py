@@ -27,24 +27,32 @@ fOut.cd()
 
 #Get the list of histograms
 list_histos = []
+
 keylist = DataSR.GetListOfKeys()
+#print keylist
 key = ROOT.TKey()
+#print "prova"
 for key in keylist :
+    #print "prova"
     obj_class = ROOT.gROOT.GetClass(key.GetClassName())
     if not obj_class.InheritsFrom("TH1") :
         continue
     if not (key.ReadObj().GetName() == "h_efficiency" or key.ReadObj().GetName() == "h_cutOverflow"): #h_efficiency and h_cutOverflow is a plot plotted in other way   
         list_histos.append( key.ReadObj().GetName() )
 
-#list_histos = ["h_InvMass_TwoTrk_Photon","h_meson_InvMass_TwoTrk","h_firstTrk_pT","h_secondTrk_pT","h_firstTrk_Eta","h_secondTrk_Eta","h_firstTrk_Phi","h_secondTrk_Phi","h_bestCouplePt","h_bestCoupleEta","h_bestCoupleDeltaR","h_bestJetPt","h_bestJetEta","h_firstTrk_Iso","h_firstTrk_Iso_ch","h_secondTrk_Iso","h_secondTrk_Iso_ch","h_couple_Iso","h_couple_Iso_ch","h_photon_energy","h_photon_eta","h_nJets_25","h_nMuons","h_nElectrons","h_nPhotons38WP80","h_nPhotons20WP90","h_decayChannel","h_couple_Iso_neutral","h_met_pT","h_dPhiGammaTrk","h_pTOverHmass","h_eTOverHmass","h_JetChargedEmEnergy","h_JetNeutralEmEnergy","h_JetChargedHadEnergy","h_JetNeutralHadEnergy","h_massResolution","h_genPhotonEt","h_genMesonPt"]#,"h_BDT_out"]
+    #for histo_name in list_histos:    
+    #print "prova"
 
+#list_histos = ["h_ZMass","h_mesonMass","h_firstTrk_pT","h_secondTrk_pT","h_firstTrk_Eta","h_secondTrk_Eta","h_firstTrk_Phi","h_secondTrk_Phi","h_bestCouplePt","h_bestCoupleEta","h_bestCoupleDeltaR","h_bestJetPt","h_bestJetEta","h_firstTrk_Iso","h_firstTrk_Iso_ch","h_secondTrk_Iso","h_secondTrk_Iso_ch","h_couple_Iso","h_couple_Iso_ch","h_photon_energy","h_photon_eta","h_nJets_25","h_nMuons","h_nElectrons","h_nPhotons38WP80","h_nPhotons20WP90","h_decayChannel","h_couple_Iso_neutral","h_met_pT","h_dPhiGammaTrk","h_pTOverHmass","h_eTOverHmass","h_JetChargedEmEnergy","h_JetNeutralEmEnergy","h_JetChargedHadEnergy","h_JetNeutralHadEnergy","h_massResolution","h_genPhotonEt","h_genMesonPt"]#,"h_BDT_out"]
 for histo_name in list_histos:
     
     print "###############"
     print "histo_name = ",histo_name
 
     histoSR = DataSR.Get(histo_name)
+    #print histoSR
     histoCR = Sidebands.Get(histo_name)
+    #print histoCR
 
     if histo_name == "h_ZMass" or histo_name == "h_InvMass_TwoTrk_Photon_NoPhiMassCut":
         #print "CRIntegral =", histoCR.Integral()

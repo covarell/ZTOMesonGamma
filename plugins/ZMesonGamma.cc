@@ -1108,6 +1108,10 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   Kminus_dxy         = -999.;
   Kminus_dz          = -999.;
 
+  theta_pol     = -10.;
+  TLorentzVector mu[2];
+  theta_pol_tree = 0.;
+
   if(!runningOnData_){
     for(auto gen = prunedGenParticles->begin(); gen != prunedGenParticles->end(); ++gen){
       if( gen->pdgId() == 321  && gen->mother()->pdgId() == 333 && gen->mother()->mother()->pdgId() == 23)  Kplus_phi   = gen->phi(), Kplus_eta   = gen->eta(), KplusPt  = gen->pt();//, Kplus_dz  = gen->dz();//(&slimmedPV->at(0))->position()
@@ -1118,8 +1122,49 @@ void ZMesonGamma::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       if( gen->pdgId() == 113  && gen->mother()->pdgId() == 23) genMeson_pT  = gen->pt(), genMeson_phi  = gen->phi(),  genMeson_eta = gen->eta(), genMeson_m = gen->mass();
       if( gen->pdgId() == 22   && gen->mother()->pdgId() == 23) genPhoton_eT = gen->pt(), genPhoton_phi = gen->phi(), genPhoton_eta = gen->eta();
     }
-  } 
+  }
 
+
+  if(!runningOnData_){
+    //For the polarization reweighting
+    for(auto gen = prunedGenParticles->begin(); gen != prunedGenParticles->end(); ++gen){
+      if(gen->pdgId() == 23 && gen->numberOfDaughters() == 2){
+        //for each daughter
+        for(int i = 0; i < 2; i++){
+          //if daughters are not Phi or Rho and gamma, continue
+          if( !(gen->daughter(i)->pdgId() == 22 || (gen->daughter(i)->pdgId() == 333 || gen->daughter(i)->pdgId() == 113)) ) continue;
+            //if daughter(i) is a Phi or a Rho
+            if(gen->daughter(i)->pdgId() == 333 || gen->daughter(i)->pdgId() == 113){
+              if(gen->daughter(i)->numberOfDaughters() == 2){      
+                //for each Meson daughter
+                for(int j = 0; j < 2; j++){
+                  //if daughter(j) is a K+
+                  if(gen->daughter(i)->daughter(j)->pdgId() == 321){
+                    mu[1].SetPxPyPzE(gen->daughter(i)->daughter(j)->px(),gen->daughter(i)->daughter(j)->py(), gen->daughter(i)->daughter(j)->pz(),gen->daughter(i)->daughter(j)->energy());
+                    mu[0].SetPxPyPzE(gen->daughter(i)->px(),gen->daughter(i)->py(), gen->daughter(i)->pz(),gen->daughter(i)->energy());
+                    TVector3 trackBoost = mu[0].BoostVector();
+                    mu[1].Boost(- trackBoost);
+                    theta_pol = mu[0].Vect().Angle(mu[1].Vect());
+                  }
+                  //if daughter(j) is a pi+
+                  if(gen->daughter(i)->daughter(j)->pdgId() == 211){
+                    mu[1].SetPxPyPzE(gen->daughter(i)->daughter(j)->px(),gen->daughter(i)->daughter(j)->py(), gen->daughter(i)->daughter(j)->pz(),gen->daughter(i)->daughter(j)->energy());
+                    mu[0].SetPxPyPzE(gen->daughter(i)->px(),gen->daughter(i)->py(), gen->daughter(i)->pz(),gen->daughter(i)->energy());
+                    TVector3 trackBoost = mu[0].BoostVector();
+                    mu[1].Boost(- trackBoost);
+                    theta_pol = mu[0].Vect().Angle(mu[1].Vect());
+                  }
+               }
+              }
+            }
+        }
+      }
+    }    
+  }
+
+  theta_pol_tree = theta_pol;
+
+  
   //MC TRUTH CHECK
   if(!runningOnData_){ //ONLY FOR MC START
    
@@ -1453,6 +1498,7 @@ void ZMesonGamma::create_trees()
     mytree->Branch("deltaRKminus",&deltaRKminus);
     mytree->Branch("deltaR_Piplus",&deltaR_Piplus);
     mytree->Branch("deltaR_Piminus",&deltaR_Piminus);
+    mytree->Branch("theta_polarization",&theta_pol_tree);
 
   }
 

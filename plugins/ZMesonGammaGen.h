@@ -54,6 +54,9 @@ class ZMesonGammaGen : public edm::EDAnalyzer {
   float genTrackplus_phi_tree;
   float genTrackplus_E_tree;
 
+  float theta_pol; 
+  float theta_pol_tree;
+
   edm::EDGetTokenT<std::vector<reco::GenParticle> > prunedGenParticlesToken_; 
   //edm::EDGetTokenT<std::vector<reco::GenParticle> > genParticlesToken_; 
 

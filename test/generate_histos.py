@@ -193,6 +193,14 @@ tree_output.Branch('MesonGammaDeltaPhi',_MesonGammaDeltaPhi,'_MesonGammaDeltaPhi
 #------------- counters -----------------
 nEventsMesonAnalysis  = 0
 nEventsOverLeptonVeto = 0
+nEventsOverDiPhotonVeto   = 0
+nEventsAfterRegionDefiner = 0
+nEventsInZmassRange       = 0
+nEventsOverCuts           = 0
+nEventsLeftSB             = 0
+nEventsRightSB            = 0
+nHmatched                 = 0
+nMesonMatched             = 0
 
 
 #EVENTS LOOP ########################################################################################################
@@ -205,6 +213,9 @@ for jentry in xrange(nentries):
     if nb <= 0:
         print "nb < 0"
         continue
+
+    if debug: 
+        print "Processing EVENT n.",jentry+1," ..."
 
     #Retrieve variables from the tree 
     ZMass          = mytree.ZMassFrom2KPhoton
@@ -237,15 +248,25 @@ for jentry in xrange(nentries):
     coupleDeltaPhi = math.fabs(mytree.firstTrkPhi - mytree.secondTrkPhi)
     if coupleDeltaPhi > 3.14:
         coupleDeltaPhi = 6.28 - coupleDeltaPhi
-    deltaR = math.sqrt((mytree.firstTrkEta - mytree.secondTrkEta)**2 + (coupleDeltaPhi)**2)
-    MesonGammaDeltaPhi = (mytree.bestCouplePhi - mytree.photon_phi)   
+    deltaR         = math.sqrt((mytree.firstTrkEta - mytree.secondTrkEta)**2 + (coupleDeltaPhi)**2)
+    MesonGammaDeltaPhi = (mytree.bestCouplePhi - mytree.photon_phi)
+    
+
+
+
+    if samplename == "Data":
+        eventNumber     = mytree.eventNumber
+        runNumber       = mytree.runNumber
+    else:
+        isZMatched      = mytree.isHiggsMatched
+        isPhotonMatched = mytree.isPhotonMatched
+
 
 
     #If I'm performing a PhiGamma analysis I don't want to choose those events tagged as a RhoGamma events, and viceversa
-    if isPhiAnalysis and not isPhiEvent: 
-        continue
-    if isRhoAnalysis and not isRhoEvent: 
-        continue
+    if isPhiAnalysis and not isPhiEvent: continue
+    if isRhoAnalysis and not isRhoEvent: continue
+
     nEventsMesonAnalysis+=1
 
     if not samplename == "Data":
@@ -266,31 +287,38 @@ for jentry in xrange(nentries):
         if CRflag == 1 and (mesonMass > 0.62 and mesonMass < 0.92) :
             continue
 
+    nEventsAfterRegionDefiner+=1
+
+
+    ############################################################################
+    
+    if debug:
+        print ""
+        print"EVENT FEATURES"
+        print"--------------------------------------"
+        print "isRhoAnalysis = ",isRhoAnalysis
+        print "isRhoEvent    = ",isRhoEvent
+        print "CRflag        = ",CRflag
+        print "isDataBlind   = ",isDataBlind
+        print "MesonMass     = ",mesonMass
+        print ""
+
+    #--------------------------------------------------------------------------------------
+
+
     #NORMALIZATION -------------------------------------------------------------------
     #normalization for MC
     if not samplename == "Data" :
         PUWeight    = mytree.PU_Weight
         weight_sign = mytree.MC_Weight/abs(mytree.MC_Weight) #just take the sign of the MC gen weight
-        eventWeight =  luminosity * normalization_weight * weight_sign * PUWeight
+        if not mytree.theta_polarization == -10. :
+            polarizationWeight = 3.*math.cos(mytree.theta_polarization)*math.cos(mytree.theta_polarization)
+        else: 
+            polarizationWeight = 0.
+        eventWeight =  luminosity * normalization_weight * weight_sign * PUWeight*polarizationWeight
     else:
         eventWeight = 1.
 
-    #Lepton veto
-    if nElectrons > 0: continue
-    if nMuons     > 0: continue
-    nEventsOverLeptonVeto += 1
-
-
-    #TIGHT SELECTION from BDT output -------------------------------------------------  
-    if isBDT: 
-        BDT_out = myWF.get_BDT_output(firstTrkisoCh,MesonIso0,ZMass,mesonEta,MesonGammaDeltaPhi)#,mesonPt,photonEt,photonEta,nJets)#,JetNeutralEmEn,JetChargedHadEn,JetNeutralHadEn) 
-        #histo_map["h_BDT_out"].Fill(BDT_out)
-
-        if debug: print "BDT value before selection = ", BDT_out
-        if args.isBDT_option == "BDT":
-            if BDT_out < BDT_OUT: #Cut on BDT output
-                if debug: print "BDT cut NOT passed"
-                continue
 
     if verbose:
             print "EVENT WEIGHT"
@@ -303,11 +331,40 @@ for jentry in xrange(nentries):
             print "Final eventWeight **** = ",_eventWeight
             print "ZMass                  = ",ZMass
 
+
+    #Lepton veto
+    if nElectrons > 0: continue
+    if nMuons     > 0: continue
+
+    nEventsOverLeptonVeto += 1
+
+    #-------------- n events in the sidebands -----------------------------
+    if (ZMass < 50. or ZMass > 200.): continue
+    nEventsInZmassRange+=1
+
+    #TIGHT SELECTION from BDT output -------------------------------------------------  
+    if isBDT: 
+        BDT_out = myWF.get_BDT_output(firstTrkisoCh,MesonIso0,ZMass,mesonEta,MesonGammaDeltaPhi)#,mesonPt,photonEt,photonEta,nJets)#,JetNeutralEmEn,JetChargedHadEn,JetNeutralHadEn) 
+        #histo_map["h_BDT_out"].Fill(BDT_out)
+
+        if debug: print "BDT value before selection = ", BDT_out
+        if args.isBDT_option == "BDT":
+            if BDT_out < BDT_OUT: #Cut on BDT output
+                if debug: print "BDT cut NOT passed"
+                continue
+
+
+    
+    if samplename == 'Data':
+         if (CRflag == 0 and ZMass > 50. and ZMass < 80.) : nEventsLeftSB  += 1
+         if (CRflag == 0 and ZMass > 101. and ZMass < 200.) : nEventsRightSB += 1
+    
+
     #FILL HISTOS #####################################################################################################
     #if DATA -> Blind Analysis on Z inv mass plot
     if samplename == "Data":
         if isDataBlind:
-            if ZMass < 80. or ZMass > 100.:##########110
+            if ZMass < 80. or ZMass > 100.:##########100 for phi_preselection
                 histo_map["h_ZMass"].Fill(ZMass, eventWeight)
         else:
             histo_map["h_ZMass"].Fill(ZMass, eventWeight)
@@ -340,7 +397,7 @@ for jentry in xrange(nentries):
     histo_map["h_nElectrons"].Fill(nElectrons, eventWeight)
     histo_map["h_MesonGammaDeltaPhi"].Fill(MesonGammaDeltaPhi, eventWeight)
 
-
+    #if secondTrkPt < 10.: print "ZMass = ", ZMass
     #FILL TREE ########################################################################################################
     _ZMass[0]          = ZMass
     _mesonMass[0]      = mesonMass
@@ -366,6 +423,15 @@ for jentry in xrange(nentries):
     _eventWeight[0]        = eventWeight
 
     tree_output.Fill()
+
+    if debug:
+        print "***********************************"
+        print "*** EVENT RECORDED: tree filled ***"
+        print "***********************************"
+        print ""
+
+    #counters
+    nEventsOverCuts += 1
 
     if not samplename == 'Data' :
         weightSum += eventWeight
@@ -429,13 +495,18 @@ histo_map["h_MesonGammaDeltaPhi"].SetTitle("#Delta_#phi between meson and photon
 #Tree writing ##########################################################################################################
 tree_output.Write()
 
+#Variables for cut overflow
 bin1content  = h_Events.GetBinContent(1)
+nEventsProcessed = bin1content
 bin2content  = h_Events.GetBinContent(2)
+nEventsTriggered = bin2content
 bin3content  = h_Events.GetBinContent(3)
+nEventsPhoton = bin3content
 bin4content  = h_Events.GetBinContent(4)
 bin5content  = h_Events.GetBinContent(5)
 if not samplename == "Data" :
     bin6content  = h_Events.GetBinContent(6)##############
+nEventsMesonMassSR = nEventsRightSB + nEventsLeftSB
 
 
 nSignal      = bin1content
@@ -504,11 +575,59 @@ else:
         c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Data/CR/h_efficiency.png")
 
 
+#FINAL PRINTS ###########################################################
+print ""
+print ""
+print "CUT OVERFLOW"
+print "---------------------------------------"
+print "CRflag                    = ",CRflag," (SR if 0, CR if 1)"
+print "nEventsProcessed          = ",nEventsProcessed," (n. events in dataset)"
+print "nEventsTriggered          = ",nEventsTriggered," (n. events over HLT)"
+print "nEventsPhoton             = ",nEventsPhoton," (n. events with a best photon found)"
+print "nEventsMesonAnalysis      = ",nEventsMesonAnalysis," (split in PhiGamma or RhoGamma analysis)"
+#print "nEventsOverVBFOrt         = ",nEventsOverVBFOrt," (n. events over the VBF orthogonality: events with more than one jet are discarded)"
+print "nEventsAfterRegionDefiner = ",nEventsAfterRegionDefiner," (split in SR or CR of the ditrack inv mass)"
+print "nEventsOverLeptonVeto     = ",nEventsOverLeptonVeto," (n. events without any electron or muon)"
+#print "nEventsOverDiPhotonVeto   = ",nEventsOverDiPhotonVeto," (n. events with just one photon)"
+#print "nEventsPhotonLowEf        = ",nEventsPhotonLowEff," (n. events with no photons with low eff)"
+#if isK0sAnalysis: print "nEventsKpt20              = ",nEventsKpt20," (n. events with with kaon pT > 20)"
+print "nEventsInZmassRange       = ",nEventsInZmassRange," (n. events in 50 < Zmass < 200 GeV)"
+print "nEventsMesonMassSR        = ",nEventsMesonMassSR," (Events in SR of MesonMass and in SBs of Zmass)"
+print ""
+print "----------- SUMMARY -----------------------"
+if isBDT:
+    print "BDT output used = ",BDT_OUT
+if not samplename == "Data":
+    print "Signal MC sample (75250 events)"
+if isBDT:
+    print "n. events after preselection = ",jentry
+print "nEventsInZmassRange         = ",nEventsInZmassRange," (n. events in 50 < Zmass < 200 GeV)"
+print "n. events after cuts        = " , nEventsOverCuts
+
+if samplename == 'Data' and CRflag == 0:
+    print "n. events in the left sideband counted = ",nEventsLeftSB
+    print "n. events in the right sideband counted = ",nEventsRightSB 
+    print "Total events in the sidebands = ", nEventsRightSB + nEventsLeftSB
+
+if not samplename == "Data":
+    print "Signal weight sum   = ",float(weightSum)
+    print "Signal integral     = ",histo_map["h_ZMass"].Integral()
+    print "Total signal events = ",bin1content
+    print "Signal efficiency   = ",nEventsOverCuts/bin1content
+    
+print "-------------------------------------------"
+print ""
+print ""
+
+
 #HISTOS WRITING ########################################################################################################
 fOut.cd()
 for hist_name in list_histos:
     histo_map[hist_name].Write()
 fOut.Close()
 
-if not samplename == "Data":
-    print "eff", histo_map["h_firstTrkIsoCh"].GetEntries()/25000.
+
+
+#if not samplename == "Data":
+#    print "eff", histo_map["h_firstTrkIsoCh"].GetEntries()/25000.
+

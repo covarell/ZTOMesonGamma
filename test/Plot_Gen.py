@@ -59,7 +59,7 @@ for hname in list_histos:
 for filename in list_inputfiles:
     fileIn = ROOT.TFile(filename)
 
-    sample_name = (filename.split("_")[2])[:-5] 
+    #sample_name = (filename.split("_")[2])[:-5] 
     for histo_name in list_histos:
         histo = fileIn.Get(histo_name)
 
@@ -229,6 +229,9 @@ for histo_name in list_histos:
            
         if histo_name == "h_ZEnergy" :
             hstack[histo_name].GetXaxis().SetTitle("#E_{T}^{Z}[GeV]")
+
+        if histo_name == "h_theta_pol" :
+            hstack[histo_name].GetXaxis().SetTitle("#theta [rad]")
            
         hstack[histo_name].Draw("SAME,histo")
 
@@ -249,9 +252,9 @@ for histo_name in list_histos:
     ################################################
 
     if isPhi: 
-        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/GenLevel/"
+        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/GenLevel/"
     else:
-        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/GenLevel/"
+        output_dir = "/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/GenLevel/"
 
     canvas[histo_name].SaveAs(output_dir + histo_name + ".pdf")
     canvas[histo_name].SaveAs(output_dir + histo_name + ".png")

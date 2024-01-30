@@ -212,6 +212,9 @@ private:
   //for VBF veto
   int nJets20;
 
+  float theta_pol;
+  float theta_pol_tree;
+
 
   //Tokens
   edm::EDGetTokenT<std::vector<pat::PackedCandidate> > packedPFCandidatesToken_; 

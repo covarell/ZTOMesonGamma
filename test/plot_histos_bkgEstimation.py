@@ -176,7 +176,9 @@ for filename in list_inputfiles:
                 leg1.AddEntry(histo_container[-1],sample_name,"ep")
             
             elif sample_name == "Signal":
-                leg1.AddEntry(histo_container[-1],decayChannel, "f")
+                leg1.AddEntry(histo_container[-1],decayChannel + "BR: " + str(signal_magnify), "f")
+                #leg1.AddEntry(histo_container[-1],"signal_magnify","f")##################################
+
    
     fileIn.Close()
 
@@ -229,9 +231,9 @@ for histo_name in list_histos:
             hstack[histo_name].SetMaximum(10 * hdata[histo_name].GetMaximum())
             hstack[histo_name].SetMinimum(1.)  #cannot use values < 1 otherwise log is negative
         elif histo_name == "h_ZMass" and isTightSelection and isPhi :
-            hstack[histo_name].SetMaximum(2.5 * hdata[histo_name].GetMaximum()) 
+            hstack[histo_name].SetMaximum(2.* hdata[histo_name].GetMaximum()) 
         elif histo_name == "h_ZMass" and isTightSelection and not isPhi :
-            hstack[histo_name].SetMaximum(2.5 * hdata[histo_name].GetMaximum())                  
+            hstack[histo_name].SetMaximum(2.* hdata[histo_name].GetMaximum())                  
         else:
             hstack[histo_name].SetMaximum(2.1 * hdata[histo_name].GetMaximum())
 

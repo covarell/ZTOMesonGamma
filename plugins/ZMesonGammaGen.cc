@@ -37,6 +37,7 @@ ZMesonGammaGen::~ZMesonGammaGen()
 {
 }
 
+
 // ------------ method called for each event  ------------
 void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
@@ -84,7 +85,6 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   genZ_E_tree    = 0.;
   genZ_mass_tree = 0.;
 
-
   genGamma_ID_tree  = 0;
   genGamma_pT_tree  = 0.;
   genGamma_eta_tree = 0.;
@@ -110,9 +110,14 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   genTrackplus_phi_tree = 0.;
   genTrackplus_E_tree   = 0.;
 
+  theta_pol     = -10.;
+  TLorentzVector mu[2];
+  theta_pol_tree = 0.;
 
+
+  
   for(auto gen = genParticles->begin(); gen != genParticles->end(); ++gen){
-    
+
     //if it is a Z with 2 daughters (sometimes Pythia sends a Z in itself, therefore only 1 daughter)
     if(gen->pdgId() == 23 && gen->numberOfDaughters() == 2){
 
@@ -130,7 +135,7 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
         genZ_E    = gen->energy();
         genZ_mass = gen->p4().M();
               
-        //cout << gen->daughter(i)->pdgId() << endl;
+        //cout << "gen->daughter(i)->pdgId() = " << gen->daughter(i)->pdgId() << endl;
 
         //if daughter is Gamma
         if(gen->daughter(i)->pdgId() == 22){ 
@@ -156,6 +161,7 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   
           //if Meson has two daughters
           if(gen->daughter(i)->numberOfDaughters() == 2){
+            //cout << "try1" << endl;
       
             //for each Meson daughter
             for(int j = 0; j < 2; j++){
@@ -174,18 +180,22 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
               //if daughter(j) is a K+
               if(gen->daughter(i)->daughter(j)->pdgId() == 321){
 
+                //cout << "try2" << endl;
+
                 //save K+ variables
                 genTrackplus_ID  = gen->daughter(i)->daughter(j)->pdgId();
                 genTrackplus_pT  = gen->daughter(i)->daughter(j)->pt();
                 genTrackplus_eta = gen->daughter(i)->daughter(j)->eta();
                 genTrackplus_phi = gen->daughter(i)->daughter(j)->phi();
                 genTrackplus_E   = gen->daughter(i)->daughter(j)->energy();
+                
               }
 
        
               //if daughter(j) is a Pi-
               if(gen->daughter(i)->daughter(j)->pdgId() == -211){
 
+                //cout << "try3" << endl;
                 //save Pi- variables
                 genTrackminus_ID  = gen->daughter(i)->daughter(j)->pdgId();
                 genTrackminus_pT  = gen->daughter(i)->daughter(j)->pt();
@@ -197,17 +207,19 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
               //if daughter(j) is a Pi+
               if(gen->daughter(i)->daughter(j)->pdgId() == 211){
 
+                //cout << "try3" << endl;
                 //save Pi+ variables
                 genTrackplus_ID  = gen->daughter(i)->daughter(j)->pdgId();
                 genTrackplus_pT  = gen->daughter(i)->daughter(j)->pt();
                 genTrackplus_eta = gen->daughter(i)->daughter(j)->eta();
                 genTrackplus_phi = gen->daughter(i)->daughter(j)->phi();
                 genTrackplus_E   = gen->daughter(i)->daughter(j)->energy();
+              
               }
 
       
             } //j-forloop end
-            //cout<<"pdgIDE"<<endl;
+            //cout << "pdgIDE" << endl;
             //cout<<genTrackplus_ID<<endl;
           }//"if Phi/Rho has two daughters" end   //quindi: il mesone è sempre un phi/rho, infatti pdgID è stampato sempre, mentre non sempre il mesone decade in due figlie,
           //cout<<"pdgID"<<endl;             // infatti pdgIDE non sempre è stampato
@@ -215,10 +227,6 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
           //cout<<genTrackminus_ID<<endl;
         }//"if it is a Phi/Rho" end
       }//i-forloop end
-        //Evaluate Z invariant mass
-        //genZ_mass = TMath::Sqrt((genGamma_E+genMeson_E)*(genGamma_E+genMeson_E)-((genGamma_pT*TMath::Cos(genGamma_phi)+genMeson_pT*TMath::Cos(genMeson_phi))*(genGamma_pT*TMath::Cos(genGamma_phi)+genMeson_pT*TMath::Cos(genMeson_phi))+(genGamma_pT*TMath::Sin(genGamma_phi)+genMeson_pT*TMath::Sin(genMeson_phi))*(genGamma_pT*TMath::Sin(genGamma_phi)+genMeson_pT*TMath::Sin(genMeson_phi))+(genGamma_pT*TMath::SinH(genGamma_eta)+genMeson_pT*TMath::SinH(genMeson_eta))*(genGamma_pT*TMath::SinH(genGamma_eta)+genMeson_pT*TMath::SinH(genMeson_eta))));       
-        //Evaluate Meson invariant mass
-        //genMeson_mass = TMath::Sqrt((genTrackplus_E+genTrackminus_E)*(genTrackplus_E+genTrackminus_E)-((genTrackplus_pT*TMath::Cos(genTrackplus_phi)+genTrackminus_pT*TMath::Cos(genTrackminus_phi))*(genTrackplus_pT*TMath::Cos(genTrackplus_phi)+genTrackminus_pT*TMath::Cos(genTrackminus_phi))+(genTrackplus_pT*TMath::Sin(genTrackplus_phi)+genTrackminus_pT*TMath::Sin(genTrackminus_phi))*(genTrackplus_pT*TMath::Sin(genTrackplus_phi)+genTrackminus_pT*TMath::Sin(genTrackminus_phi))+(genTrackplus_pT*TMath::SinH(genTrackplus_eta)+genTrackminus_pT*TMath::SinH(genTrackminus_eta))*(genTrackplus_pT*TMath::SinH(genTrackplus_eta)+genTrackminus_pT*TMath::SinH(genTrackminus_eta))));
     }//"if it is a Z" end
   }//gen-forloop end
   
@@ -254,8 +262,48 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   genTrackplus_phi_tree = genTrackplus_phi;
   genTrackplus_E_tree   = genTrackplus_E;
   
+
+  //For the polarization reweighting
+  for(auto gen = genParticles->begin(); gen != genParticles->end(); ++gen){
+    if(gen->pdgId() == 23 && gen->numberOfDaughters() == 2){
+      //for each daughter
+      for(int i = 0; i < 2; i++){
+        //if daughters are not Phi or Rho and gamma, continue
+        if( !(gen->daughter(i)->pdgId() == 22 || (gen->daughter(i)->pdgId() == 333 || gen->daughter(i)->pdgId() == 113)) ) continue;
+          //if daughter(i) is a Phi or a Rho
+          if(gen->daughter(i)->pdgId() == 333 || gen->daughter(i)->pdgId() == 113){
+            if(gen->daughter(i)->numberOfDaughters() == 2){      
+              //for each Meson daughter
+              for(int j = 0; j < 2; j++){
+                //if daughter(j) is a K+
+                if(gen->daughter(i)->daughter(j)->pdgId() == 321){
+                  mu[1].SetPxPyPzE(gen->daughter(i)->daughter(j)->px(),gen->daughter(i)->daughter(j)->py(), gen->daughter(i)->daughter(j)->pz(),gen->daughter(i)->daughter(j)->energy());
+                  mu[0].SetPxPyPzE(gen->daughter(i)->px(),gen->daughter(i)->py(), gen->daughter(i)->pz(),gen->daughter(i)->energy());
+                  TVector3 trackBoost = mu[0].BoostVector();
+                  mu[1].Boost(- trackBoost);
+                  theta_pol = mu[0].Vect().Angle(mu[1].Vect());
+                }
+                //if daughter(j) is a pi+
+                if(gen->daughter(i)->daughter(j)->pdgId() == 211){
+                  mu[1].SetPxPyPzE(gen->daughter(i)->daughter(j)->px(),gen->daughter(i)->daughter(j)->py(), gen->daughter(i)->daughter(j)->pz(),gen->daughter(i)->daughter(j)->energy());
+                  mu[0].SetPxPyPzE(gen->daughter(i)->px(),gen->daughter(i)->py(), gen->daughter(i)->pz(),gen->daughter(i)->energy());
+                  TVector3 trackBoost = mu[0].BoostVector();
+                  mu[1].Boost(- trackBoost);
+                  theta_pol = mu[0].Vect().Angle(mu[1].Vect());
+                }
+              }
+            }
+          }
+      }
+    }
+  }    
+
+  theta_pol_tree = theta_pol;
+
   mytree->Fill();
+
 }
+
 
 //*************************************************************//
 //                                                             //
@@ -300,6 +348,9 @@ void ZMesonGammaGen::create_trees()
   mytree->Branch("genTrackplus_eta",&genTrackplus_eta_tree);
   mytree->Branch("genTrackplus_phi",&genTrackplus_phi_tree);
   mytree->Branch("genTrackplus_E",&genTrackplus_E_tree);
+
+  mytree->Branch("theta_pol",&theta_pol_tree);
+
     
 }
 
@@ -310,6 +361,5 @@ void ZMesonGammaGen::beginJob()
 void ZMesonGammaGen::endJob() 
 {
 }
-
 //define this as a plug-in
 DEFINE_FWK_MODULE(ZMesonGammaGen);
