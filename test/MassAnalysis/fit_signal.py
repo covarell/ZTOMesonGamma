@@ -62,7 +62,7 @@ else :
 fileInput.cd()
 tree = fileInput.Get("tree_output")
 
-#prepare a rebinned TH1 for Higgs mass ---------------------------------------------------------------
+#prepare a rebinned TH1 for Z mass ---------------------------------------------------------------
 xLowRange  = 75.
 xHighRange = 105.
 
@@ -169,7 +169,7 @@ mypdfs.add(sigPDF_voig)
 #multipdf = ROOT.RooMultiPdf("multipdf_"+CHANNEL+"_sig","All Pdfs",cat,mypdfs)
 '''
 #create Workspace ------------------------------------------------------------------------------------------------------------------------------
-norm = fileInput.Get("h_ZMass").Integral()  # get the normalization of ggH signal (area under ggH signal)
+norm = fileInput.Get("h_ZMass").Integral()  # get the normalization of MC signal (area under MC signal)
 print "norm = ", norm
 sig_norm = ROOT.RooRealVar(sigPDF_voig.GetName() + "_norm", sigPDF_voig.GetName() + "_norm", norm)
 

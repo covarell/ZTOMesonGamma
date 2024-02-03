@@ -77,9 +77,9 @@ myWF = Simplified_Workflow_Handler("Signal","Data",isBDT)
 #Normalization for MC dataset ################################################################################
 
 if isPhiAnalysis:
-    normalization_weight = (1./25000.) * (1928000./0.0336) * 0.49 
-else:
-    normalization_weight = (1./25000.) * (1928000./0.0336)
+    normalization_weight = (1./75250.) * (1928000./0.0336) * 0.49 
+elif isRhoAnalysis:
+    normalization_weight = (1./75250.) * (1928000./0.0336)
  
 
 #Combine luminosity
@@ -315,7 +315,7 @@ for jentry in xrange(nentries):
             polarizationWeight = 3.*math.cos(mytree.theta_polarization)*math.cos(mytree.theta_polarization)
         else: 
             polarizationWeight = 0.
-        eventWeight =  luminosity * normalization_weight * weight_sign * PUWeight*polarizationWeight
+        eventWeight =  luminosity * normalization_weight * weight_sign * PUWeight * polarizationWeight
     else:
         eventWeight = 1.
 
@@ -328,6 +328,7 @@ for jentry in xrange(nentries):
             print "mytree.MC_Weight       = ",mytree.MC_Weight, " (this is not considered)"
             print "weight sign            = ",weight_sign
             print "PUWeight               = ",PUWeight
+            print "polarization weight    = ",polarizationWeight
             print "Final eventWeight **** = ",_eventWeight
             print "ZMass                  = ",ZMass
 
@@ -364,7 +365,7 @@ for jentry in xrange(nentries):
     #if DATA -> Blind Analysis on Z inv mass plot
     if samplename == "Data":
         if isDataBlind:
-            if ZMass < 80. or ZMass > 100.:##########100 for phi_preselection
+            if ZMass < 80. or ZMass > 101.:##########100 for phi_preselection
                 histo_map["h_ZMass"].Fill(ZMass, eventWeight)
         else:
             histo_map["h_ZMass"].Fill(ZMass, eventWeight)

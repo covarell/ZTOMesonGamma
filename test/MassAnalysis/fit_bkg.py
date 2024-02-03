@@ -86,16 +86,45 @@ parList = ROOT.RooArgSet(land_add_mean, land_add_sigma, gaus_mean, gaus_sigma)
 
 #Input file and tree ---------------------------------------------------------------
 if isPhiGammaAnalysis:
-    fileInput = ROOT.TFile("histos/latest_productions/CR_Phi_BDT_Sidebands.root")
+    fileInput = ROOT.TFile("histos/latest_productions/CR_Phi_BDT_SidebandsNorm.root")###########################
 else :
-    fileInput = ROOT.TFile("histos/latest_productions/CR_Rho_BDT_Sidebands.root")
+    fileInput = ROOT.TFile("histos/latest_productions/CR_Rho_BDT_SidebandsNorm.root")###########################
 fileInput.cd()
 tree = fileInput.Get("tree_output")
 
+#prepare a rebinned TH1 for Z mass ---------------------------------------------------------------
+#xLowRange  = 75.
+#xHighRange = 105.
+
+if isPhiGammaAnalysis: h_mZ = ROOT.TH1F("h_mZ","h_mZ", 150, 50., 200.)
+else: h_mZ = ROOT.TH1F("h_mZ","h_mZ", 300, 50., 200.)
+
+nentries_sig = tree.GetEntriesFast()
+print "nEntries_sig = ",nentries_sig
+
+tot=0.
+for jentry in xrange(nentries_sig):
+    ientry = tree.LoadTree( jentry )
+    if ientry < 0:
+        print "break"
+        break
+    nb = tree.GetEntry(jentry)
+    if nb <= 0:
+        print "nb < 0"
+        continue
+    #tot+=tree.eventWeight
+    #print "eventWeight =", tree.eventWeight
+    #print "somma =", tot
+
+    h_mZ.Fill(tree.ZMass)
+
+
 #Retrieve observed_data from the tree, insert the variable also ---------------------------------------------------------------
 observed_data = ROOT.RooDataSet("observed_data","observed_data",ROOT.RooArgSet(mass),ROOT.RooFit.Import(tree))
+#observed_data = ROOT.RooDataHist("observed_data", "observed_data", ROOT.RooArgList(mass), h_mZ)############
 nEntries = observed_data.numEntries() 
 print "nEntries = ",nEntries
+
 
 
 #Do the fit ------------------------------------------------------------------------------------------------------------------------------
@@ -177,9 +206,10 @@ mypdfs.add(bkgPDF_landau)
 multipdf = ROOT.RooMultiPdf("multipdf_"+CHANNEL+"_bkg","All Pdfs",cat,mypdfs)
 
 #create Workspace ------------------------------------------------------------------------------------------------------------------------------
-norm     = nEntries #fileInput.Get("h_ZMass").Integral() #get the normalization of ggH signal (area under ggH signal)
-print "************************************** n. events = ",nEntries
-bkg_norm = ROOT.RooRealVar(multipdf.GetName()+ "_norm", multipdf.GetName()+ "_norm", norm,0.5*norm, 2*norm)
+#norm     = nEntries 
+norm = fileInput.Get("h_ZMass").Integral()################
+print "************************************** n. events = ",nEntries, "norm = ", norm
+bkg_norm = ROOT.RooRealVar(multipdf.GetName()+ "_norm", multipdf.GetName()+ "_norm", norm,0.5*norm, 2*norm)#########
 
 inputWS = ROOT.TFile("workspaces/workspace_"+CHANNEL+".root")  
 inputWS.cd()
@@ -188,7 +218,7 @@ getattr(workspace,'import')(cat)
 getattr(workspace,'import')(multipdf)
 getattr(workspace,'import')(observed_data)
 getattr(workspace,'import')(bkg_norm)
-print("integral BKG",bkg_norm.Print())
+#print "integral BKG :",bkg_norm.Print()##############
 
 fOut = ROOT.TFile("workspaces/workspace_"+CHANNEL+".root","UPDATE")
 fOut.cd()

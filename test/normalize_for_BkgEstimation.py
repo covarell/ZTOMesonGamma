@@ -1,5 +1,7 @@
 import ROOT
 import argparse
+import numpy as np
+
 
 p = argparse.ArgumentParser(description='Select rootfile to plot')
 p.add_argument('Category', help='Type the category') #flag for bkg estimation
@@ -72,5 +74,23 @@ for histo_name in list_histos:
 
     print "histo CR integral after the normalization = ", histoCR.Integral()
     print "###############"
+'''
+#Variables to go in the output tree ################################################################################
+_ZMass = np.zeros(1, dtype=float)
 
+tree_output = ROOT.TTree('tree_output','tree_output')
+tree_output.Branch('ZMass',_ZMass,'_ZMass/D') 
+
+#EVENTS LOOP ########################################################################################################
+for jentry in range(1,fOut.Get("h_ZMass").GetNbinsX()+1):
+    #Retrieve variables from the histo
+    ZMass  = fOut.Get("h_ZMass").GetBinCenter(jentry)
+    print ZMass
+    #FILL TREE ########################################################################################################
+    _ZMass[0] = ZMass
+    tree_output.Fill()
+
+#Tree writing ##########################################################################################################
+tree_output.Write()
+'''
 fOut.Close()
