@@ -131,7 +131,7 @@ else :
     SR_input = ROOT.TFile("histos/latest_productions/SR_Rho_BDT_Signal.root")
 
 h_mZ_SR = SR_input.Get("h_ZMass")
-True_data = ROOT.RooDataHist("observed_data", "observed_data", ROOT.RooArgList(mass), h_mZ_SR)
+True_data = ROOT.RooDataHist("True_data", "True_data", ROOT.RooArgList(mass), h_mZ_SR)
 
 
 #Do the fit ------------------------------------------------------------------------------------------------------------------------------
