@@ -126,9 +126,9 @@ print "nEntries = ",nEntries
 
 #recupero l'istogramma della SR
 if isPhiGammaAnalysis:
-    SR_input = ROOT.TFile("histos/latest_productions/SR_Phi_BDT_Signal.root")
+    SR_input = ROOT.TFile("histos/latest_productions/SR_Phi_BDT_Data.root")
 else :
-    SR_input = ROOT.TFile("histos/latest_productions/SR_Rho_BDT_Signal.root")
+    SR_input = ROOT.TFile("histos/latest_productions/SR_Rho_BDT_Data.root")
 
 h_mZ_SR = SR_input.Get("h_ZMass")
 True_data = ROOT.RooDataHist("True_data", "True_data", ROOT.RooArgList(mass), h_mZ_SR)
