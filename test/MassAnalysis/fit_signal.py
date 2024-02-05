@@ -169,24 +169,26 @@ mypdfs.add(sigPDF_voig)
 #multipdf = ROOT.RooMultiPdf("multipdf_"+CHANNEL+"_sig","All Pdfs",cat,mypdfs)
 '''
 #create Workspace ------------------------------------------------------------------------------------------------------------------------------
-norm = fileInput.Get("h_ZMass").Integral()  # get the normalization of MC signal (area under MC signal)
+#norm = fileInput.Get("h_ZMass").Integral()  # get the normalization of MC signal (area under MC signal)
+norm = h_mZ.Integral()
 print "norm = ", norm
 sig_norm = ROOT.RooRealVar(sigPDF_voig.GetName() + "_norm", sigPDF_voig.GetName() + "_norm", norm)
+
 
 workspace = ROOT.RooWorkspace("workspace_"+CHANNEL+"")
 getattr(workspace,'import')(sigPDF_voig)
 getattr(workspace,'import')(sig_norm)
 
-#fOut = ROOT.TFile("workspaces/workspace_bkg_"+CHANNEL+".root","RECREATE")
-#fOut.cd()
-#workspace.Write()
-#workspace.writeToFile("workspaces/workspace_bkg_"+CHANNEL+".root")
-fOutput = ROOT.TFile("workspaces/workspace_"+CHANNEL+".root","RECREATE")
-workspace.Write()
-fOutput.Write()
-fOutput.Close()
 print "-------------------------------------------"
 print "Final print to check the workspace update:"
 workspace.Print()
+
+
+fOutput = ROOT.TFile("workspaces/workspace_"+CHANNEL+".root","RECREATE")
+fOutput.cd()
+workspace.Write()
+#fOutput.Write()
+fOutput.Close()
+
 
 

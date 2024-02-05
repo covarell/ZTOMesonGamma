@@ -58,7 +58,7 @@ for histo_name in list_histos:
 
     if histo_name == "h_ZMass" or histo_name == "h_InvMass_TwoTrk_Photon_NoPhiMassCut":
         #print "CRIntegral =", histoCR.Integral()
-        CRintegral = histoCR.Integral() - histoCR.Integral(histoCR.GetXaxis().FindBin(80.),histoCR.GetXaxis().FindBin(100.)) #since in this plot there is the blind window for data in SR, this trick is to make the divide properly. Remember to bypass it for the unblinding
+        CRintegral = histoCR.Integral() - histoCR.Integral(histoCR.GetXaxis().FindBin(80.),histoCR.GetXaxis().FindBin(100.5)) #since in this plot there is the blind window for data in SR, this trick is to make the divide properly. Remember to bypass it for the unblinding
         #print "ZMass CR integral = ", CRintegral
     else:
         CRintegral = histoCR.Integral()
