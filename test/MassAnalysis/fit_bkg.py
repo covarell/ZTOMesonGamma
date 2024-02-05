@@ -124,6 +124,7 @@ observed_data = ROOT.RooDataHist("observed_data", "observed_data", ROOT.RooArgLi
 nEntries = observed_data.numEntries() 
 print "nEntries = ",nEntries
 
+#recupero l'istogramma della SR
 if isPhiGammaAnalysis:
     SR_input = ROOT.TFile("histos/latest_productions/SR_Phi_BDT_Signal.root")
 else :
@@ -202,16 +203,16 @@ multipdf = ROOT.RooMultiPdf("multipdf_"+CHANNEL+"_bkg","All Pdfs",cat,mypdfs)
 
 #create Workspace ------------------------------------------------------------------------------------------------------------------------------
 norm   = nEntries 
-norm1 = h_mZ.Integral()################
+norm1 = h_mZ.Integral()#ora uso questa
 print "************************************** n. events = ",nEntries, "norm = ", norm1
-bkg_norm = ROOT.RooRealVar(multipdf.GetName()+ "_norm", multipdf.GetName()+ "_norm", norm, 0.5*norm, 2*norm)#########
+bkg_norm = ROOT.RooRealVar(multipdf.GetName()+ "_norm", multipdf.GetName()+ "_norm", norm1, 0.5*norm1, 2*norm1)#########
 
 inputWS = ROOT.TFile("workspaces/workspace_"+CHANNEL+".root")  
 inputWS.cd()
 workspace = inputWS.Get("workspace_"+CHANNEL+"")
 getattr(workspace,'import')(cat)
 getattr(workspace,'import')(multipdf)
-getattr(workspace,'import')(True_data)
+getattr(workspace,'import')(True_data)#passo i dati della signal region
 getattr(workspace,'import')(bkg_norm)
 print "integral BKG :",bkg_norm.Print()
 

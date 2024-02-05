@@ -5,7 +5,7 @@ kmax * number of nuisance parameters
 -------------------------------------
 shapes	sig			BDT	workspaces/workspace_Phi.root  workspace_Phi:voigtian_signal
 shapes	bkg			BDT	workspaces/workspace_Phi.root  workspace_Phi:multipdf_Phi_bkg
-shapes	data_obs	BDT	workspaces/workspace_Phi.root  workspace_Phi:observed_data
+shapes	data_obs	BDT	workspaces/workspace_Phi.root  workspace_Phi:True_data
 
 -------------------------------------
 bin	         BDT
