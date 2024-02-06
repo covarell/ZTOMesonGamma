@@ -43,7 +43,7 @@ CMS_lumi.lumi_13TeV = "39.54 fb^{-1}"
 
 #Parameters of the PDF ---------------------------------------------------------------
 mass = ROOT.RooRealVar("ZMass","ZMass",75.,105.,"GeV")#70,110
-mass.setRange("full",70.,110.)
+mass.setRange("full",70.,105.)#110
 
 
 #Initialize a Voigtian pdf
@@ -170,7 +170,7 @@ mypdfs.add(sigPDF_voig)
 '''
 #create Workspace ------------------------------------------------------------------------------------------------------------------------------
 #norm = fileInput.Get("h_ZMass").Integral()  # get the normalization of MC signal (area under MC signal)
-norm = h_mZ.Integral()
+norm = h_mZ.Integral(h_mZ.FindBin(75.), h_mZ.FindBin(105.))
 print "norm = ", norm
 sig_norm = ROOT.RooRealVar(sigPDF_voig.GetName() + "_norm", sigPDF_voig.GetName() + "_norm", norm)
 

@@ -505,8 +505,8 @@ bin3content  = h_Events.GetBinContent(3)
 nEventsPhoton = bin3content
 bin4content  = h_Events.GetBinContent(4)
 bin5content  = h_Events.GetBinContent(5)
-if not samplename == "Data" :
-    bin6content  = h_Events.GetBinContent(6)##############
+#if not samplename == "Data" :
+bin6content  = h_Events.GetBinContent(6)##############
 nEventsMesonMassSR = nEventsRightSB + nEventsLeftSB
 
 
@@ -518,8 +518,8 @@ histo_map["h_efficiency"].Fill(1.5,bin2content*scale_factor)
 histo_map["h_efficiency"].Fill(2.5,bin3content*scale_factor)
 histo_map["h_efficiency"].Fill(3.5,bin4content*scale_factor)
 histo_map["h_efficiency"].Fill(4.5,bin5content*scale_factor)
-if not samplename == "Data" :
-    histo_map["h_efficiency"].Fill(5.5,bin6content*scale_factor)##########
+#if not samplename == "Data" :
+histo_map["h_efficiency"].Fill(5.5,bin6content*scale_factor)##########
 
 
 histo_map["h_efficiency"].GetXaxis().SetBinLabel(1,"Events processed")
@@ -527,8 +527,8 @@ histo_map["h_efficiency"].GetXaxis().SetBinLabel(2,"Events triggered")
 histo_map["h_efficiency"].GetXaxis().SetBinLabel(3,"Photon requested")
 histo_map["h_efficiency"].GetXaxis().SetBinLabel(5,"Best couple found")
 histo_map["h_efficiency"].GetXaxis().SetBinLabel(6,"trk-cand pT selection")
-if not samplename == "Data" :
-    histo_map["h_efficiency"].GetXaxis().SetBinLabel(4,"Iso selection")######################
+#if not samplename == "Data" :
+histo_map["h_efficiency"].GetXaxis().SetBinLabel(4,"Iso selection")######################
 
 
 c11 = ROOT.TCanvas()

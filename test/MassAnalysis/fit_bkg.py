@@ -126,12 +126,15 @@ print "nEntries = ",nEntries
 
 #recupero l'istogramma della SR
 if isPhiGammaAnalysis:
-    SR_input = ROOT.TFile("histos/latest_productions/SR_Phi_BDT_Data.root")
+    SR_input = ROOT.TFile("histos/latest_productions/SR_Phi_BDT_Data.root")############
 else :
     SR_input = ROOT.TFile("histos/latest_productions/SR_Rho_BDT_Data.root")
 
+#h_mZ_SR = SR_input.Get("tree_output")
 h_mZ_SR = SR_input.Get("h_ZMass")
+#True_data = ROOT.RooDataSet("True_data","True_data",ROOT.RooArgSet(mass),ROOT.RooFit.Import(h_mZ_SR))
 True_data = ROOT.RooDataHist("True_data", "True_data", ROOT.RooArgList(mass), h_mZ_SR)
+
 
 
 #Do the fit ------------------------------------------------------------------------------------------------------------------------------
@@ -194,24 +197,25 @@ else:
     canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Fit/fit_bkg.pdf")
     canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Fit/fit_bkg.png")
 
+'''
 # Multipdf ------------------------------------------------------------------------------------------------------------------------------
 cat = ROOT.RooCategory("pdf_index","Index of Pdf which is active")
 mypdfs = ROOT.RooArgList()
 mypdfs.add(bkgPDF_landau)
 
 multipdf = ROOT.RooMultiPdf("multipdf_"+CHANNEL+"_bkg","All Pdfs",cat,mypdfs)
-
+'''
 #create Workspace ------------------------------------------------------------------------------------------------------------------------------
 norm   = nEntries 
-norm1 = h_mZ.Integral()#ora uso questa
+norm1 = h_mZ_SR.Integral(h_mZ_SR.FindBin(70.), h_mZ_SR.FindBin(200.))#ora uso questa
 print "************************************** n. events = ",nEntries, "norm = ", norm1
-bkg_norm = ROOT.RooRealVar(multipdf.GetName()+ "_norm", multipdf.GetName()+ "_norm", norm1, 0.5*norm1, 2*norm1)#########
+bkg_norm = ROOT.RooRealVar(bkgPDF_landau.GetName()+ "_norm", bkgPDF_landau.GetName()+ "_norm", norm1, 0.5*norm1, 2*norm1)#########
 
 inputWS = ROOT.TFile("workspaces/workspace_"+CHANNEL+".root")  
 inputWS.cd()
 workspace = inputWS.Get("workspace_"+CHANNEL+"")
-getattr(workspace,'import')(cat)
-getattr(workspace,'import')(multipdf)
+#getattr(workspace,'import')(cat)
+getattr(workspace,'import')(bkgPDF_landau)
 getattr(workspace,'import')(True_data)#passo i dati della signal region
 getattr(workspace,'import')(bkg_norm)
 print "integral BKG :",bkg_norm.Print()
