@@ -8,7 +8,7 @@ from functions_smuggler import Simplified_Workflow_Handler
 
 #Following bools are given as input
 debug         = False
-verbose       = False
+verbose       = True
 isBDT         = False #BDT bool
 isDataBlind   = False #Bool for blind analysis
 isPhiAnalysis = False # for Z -> Phi Gamma
@@ -320,17 +320,8 @@ for jentry in xrange(nentries):
         eventWeight = 1.
 
 
-    if verbose:
-            print "EVENT WEIGHT"
-            print "--------------------------------------"
-            print "luminosity             = ",luminosity
-            print "normalization_weight   = ",normalization_weight
-            print "mytree.MC_Weight       = ",mytree.MC_Weight, " (this is not considered)"
-            print "weight sign            = ",weight_sign
-            print "PUWeight               = ",PUWeight
-            print "polarization weight    = ",polarizationWeight
-            print "Final eventWeight **** = ",_eventWeight
-            print "ZMass                  = ",ZMass
+    #if verbose:
+            
 
 
     #Lepton veto
@@ -435,8 +426,20 @@ for jentry in xrange(nentries):
     nEventsOverCuts += 1
 
     if not samplename == 'Data' :
-        weightSum += eventWeight
-        #print "Signal weight sum   = ",float(weightSum)
+        if verbose:
+            print "EVENT WEIGHT:"
+            #print "--------------------------------------"
+            print "luminosity             = ",luminosity
+            print "normalization_weight   = ",normalization_weight
+            print "mytree.MC_Weight       = ",mytree.MC_Weight, " (this is not considered)"
+            print "weight sign            = ",weight_sign
+            print "PUWeight               = ",PUWeight
+            print "polarization weight    = ",polarizationWeight
+            print "Final eventWeight **** = ",eventWeight
+            print "ZMass                  = ",ZMass
+            weightSum += eventWeight
+            print "Signal weight sum   = ",float(weightSum)
+            print "-----------------------------------------------------"
 
 #HISTO LABELS #########################################################################################################
 histo_map["h_ZMass"].GetXaxis().SetTitle("m_{trk^{+}trk^{-}#gamma} [GeV/c^2]")

@@ -232,6 +232,12 @@ for histo_name in list_histos:
 
         if histo_name == "h_theta_pol" :
             hstack[histo_name].GetXaxis().SetTitle("#theta [rad]")
+
+        if histo_name == "h_bigTrkPt" :
+            hstack[histo_name].GetXaxis().SetTitle("p_{T}^{1} [GeV]")
+
+        if histo_name == "h_smallTrkPt" :
+            hstack[histo_name].GetXaxis().SetTitle("p_{T}^{2} [GeV]")
            
         hstack[histo_name].Draw("SAME,histo")
 

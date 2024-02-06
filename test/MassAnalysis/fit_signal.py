@@ -42,8 +42,8 @@ CMS_lumi.cmsTextSize = 0.8
 CMS_lumi.lumi_13TeV = "39.54 fb^{-1}" 
 
 #Parameters of the PDF ---------------------------------------------------------------
-mass = ROOT.RooRealVar("ZMass","ZMass",75.,105.,"GeV")#70,110
-mass.setRange("full",70.,105.)#110
+mass = ROOT.RooRealVar("ZMass","ZMass",75.,105.,"GeV")
+mass.setRange("full",75.,105.)
 
 
 #Initialize a Voigtian pdf
@@ -71,7 +71,7 @@ h_mZ = ROOT.TH1F("h_mZ","h_mZ", int(xHighRange - xLowRange), xLowRange, xHighRan
 nentries_sig = tree.GetEntriesFast()
 print "nEntries_sig = ",nentries_sig
 
-tot=0.
+#tot=0.
 for jentry in xrange(nentries_sig):
     ientry = tree.LoadTree( jentry )
     if ientry < 0:
@@ -88,22 +88,13 @@ for jentry in xrange(nentries_sig):
     h_mZ.Fill(tree.ZMass, tree.eventWeight)
 
 #Retrieve observed_data from the tree, insert the variable also ---------------------------------------------------------------
-#observed_data = ROOT.RooDataSet("observed_data","observed_data",ROOT.RooArgSet(mass),ROOT.RooFit.Import(tree))
 observed_data = ROOT.RooDataHist("observed_data", "observed_data", ROOT.RooArgList(mass), h_mZ)
-nEntries = observed_data.numEntries() 
-print "nEntries = ",nEntries
+#nEntries = observed_data.numEntries() 
+#print "nEntries = ",nEntries
 
 
 #Do the fit ------------------------------------------------------------------------------------------------------------------------------
 fitResult_voig = sigPDF_voig.fitTo(observed_data,ROOT.RooFit.Save())
-#fitResult_landau = convolution_pdf.fitTo(observed_data,ROOT.RooFit.Save())
-#Do the F-test ------------------------------------------------------------------------------------------------------------------------------
-#print "################## F-TEST"
-#print "minNll = ", fitResult_bernstein.minNll()
-#print "2Delta_minNll = ", 2*(31446.9134091-fitResult_bernstein.minNll()) # If 2*(NLL(N)-NLL(N+1)) > 3.85 -> N+1 is significant improvement
-#print "##################"
-
-
 
 #Plot ------------------------------------------------------------------------------------------------------------------------
 canvas_voig = ROOT.TCanvas()
@@ -150,24 +141,13 @@ leg1.Draw()
 CMS_lumi.CMS_lumi(canvas_voig, iPeriod, iPos) #Print integrated lumi and energy information
 
 if isPhiGammaAnalysis:
-    #canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/Fit/fit_signal.pdf")
-    #canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/Fit/fit_signal.png")
     canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Fit/fit_signal.pdf")
     canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Fit/fit_signal.png")
 else:
-    #canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/Fit/fit_signal.pdf")
-    #canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/Fit/fit_signal.png")
     canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Fit/fit_signal.pdf")
     canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Fit/fit_signal.png")
 
-'''
-# Multipdf ------------------------------------------------------------------------------------------------------------------------------
-cat = ROOT.RooCategory("pdf_index","Index of Pdf which is active")
-mypdfs = ROOT.RooArgList()
-mypdfs.add(sigPDF_voig)
 
-#multipdf = ROOT.RooMultiPdf("multipdf_"+CHANNEL+"_sig","All Pdfs",cat,mypdfs)
-'''
 #create Workspace ------------------------------------------------------------------------------------------------------------------------------
 #norm = fileInput.Get("h_ZMass").Integral()  # get the normalization of MC signal (area under MC signal)
 norm = h_mZ.Integral(h_mZ.FindBin(75.), h_mZ.FindBin(105.))

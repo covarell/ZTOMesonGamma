@@ -28,7 +28,7 @@ mytree = fInput.Get("ZMesonGammaGen/mytree")
 
 #HISTOS ###########################################################################################################
 histo_map = dict()
-list_histos = ["h_ZMass", "h_MesonMass", "h_firstTrkPt", "h_secondTrkPt", "h_firstTrkEta", "h_secondTrkEta", "h_firstTrkPhi", "h_secondTrkPhi", "h_firstTrkEnergy", "h_secondTrkEnergy","h_mesonPt", "h_mesonEta", "h_mesonPhi", "h_mesonEnergy", "h_photonPt", "h_photonEta", "h_photonPhi","h_photonEnergy", "h_ZpT", "h_ZEta", "h_ZPhi", "h_ZEnergy", "h_theta_pol"] 
+list_histos = ["h_ZMass", "h_MesonMass", "h_firstTrkPt", "h_secondTrkPt", "h_firstTrkEta", "h_secondTrkEta", "h_firstTrkPhi", "h_secondTrkPhi", "h_firstTrkEnergy", "h_secondTrkEnergy","h_mesonPt", "h_mesonEta", "h_mesonPhi", "h_mesonEnergy", "h_photonPt", "h_photonEta", "h_photonPhi","h_photonEnergy", "h_ZpT", "h_ZEta", "h_ZPhi", "h_ZEnergy", "h_theta_pol", "h_bigTrkPt", "h_smallTrkPt"] 
 
 histo_map[list_histos[0]]  = ROOT.TH1F(list_histos[0],"M_{Z}", 300, 50., 200.) 
 if   isPhiAnalysis: histo_map[list_histos[1]]  = ROOT.TH1F(list_histos[1],"M_{meson}", 100, 1., 1.05) 
@@ -55,6 +55,9 @@ histo_map[list_histos[19]] = ROOT.TH1F(list_histos[19],"#eta_{Z}", 100, -2.5,2.5
 histo_map[list_histos[20]] = ROOT.TH1F(list_histos[20],"#phi_{Z}", 100, -math.pi, math.pi)
 histo_map[list_histos[21]] = ROOT.TH1F(list_histos[21],"E_{T} of Z", 100, 0., 250.)
 histo_map[list_histos[22]] = ROOT.TH1F(list_histos[22],"#theta_{pol}", 100, 0., 3.3)
+histo_map[list_histos[23]] = ROOT.TH1F(list_histos[23],"p_{T} of the bigger track", 100, 0., 70.)
+histo_map[list_histos[24]] = ROOT.TH1F(list_histos[24],"p_{T} of the smaller track", 100, 0., 70.)
+
 
 
 
@@ -130,6 +133,9 @@ for jentry in xrange(nentries):
     ZPhi           = mytree.genZ_phi
     ZEnergy        = mytree.genZ_E
     theta          = mytree.theta_pol
+    bigTrkPt       = mytree.genTrackBig_pT
+    smallTrkPt     = mytree.genTrackSmall_pT
+
 
 
     eventWeight = 1.
@@ -159,6 +165,9 @@ for jentry in xrange(nentries):
     histo_map["h_ZPhi"].Fill(ZPhi, eventWeight)
     histo_map["h_ZEnergy"].Fill(ZEnergy, eventWeight)
     histo_map["h_theta_pol"].Fill(theta, eventWeight)
+    histo_map["h_bigTrkPt"].Fill(bigTrkPt, eventWeight)
+    histo_map["h_smallTrkPt"].Fill(smallTrkPt, eventWeight)
+
 
 
 
@@ -226,7 +235,11 @@ histo_map["h_ZEnergy"].GetXaxis().SetTitle("E_{Z} [GeV]")
 histo_map["h_ZEnergy"].SetTitle("Energy of the Z")
 histo_map["h_theta_pol"].SetTitle("angle of polarization")
 histo_map["h_theta_pol"].GetXaxis().SetTitle("#theta [rad]")
-
+histo_map["h_theta_pol"].SetTitle("angle of polarization")
+histo_map["h_bigTrkPt"].GetXaxis().SetTitle("p_{T}^{1} [GeV]")
+histo_map["h_bigTrkPt"].SetTitle("p_{T} of the leading track")
+histo_map["h_smallTrkPt"].GetXaxis().SetTitle("p_{T}^{2} [GeV]")
+histo_map["h_smallTrkPt"].SetTitle("p_{T} of the subleading track")
 
 
 

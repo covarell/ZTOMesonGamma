@@ -54,6 +54,9 @@ class ZMesonGammaGen : public edm::EDAnalyzer {
   float genTrackplus_phi_tree;
   float genTrackplus_E_tree;
 
+  float genTrackBig_pT_tree;
+  float genTrackSmall_pT_tree;  
+
   float theta_pol; 
   float theta_pol_tree;
 

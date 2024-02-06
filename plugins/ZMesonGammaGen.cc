@@ -78,6 +78,9 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   float genTrackplus_phi = -999.;
   float genTrackplus_E   = -999.;
 
+  float genTrackBig_pT   = -999.;
+  float genTrackSmall_pT= -999.;
+
   genZ_ID_tree   = 0;
   genZ_pT_tree   = 0.;
   genZ_eta_tree  = 0.;
@@ -109,6 +112,9 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   genTrackplus_eta_tree = 0.;
   genTrackplus_phi_tree = 0.;
   genTrackplus_E_tree   = 0.;
+
+  genTrackBig_pT_tree   = 0;
+  genTrackSmall_pT_tree = 0.;  
 
   theta_pol     = -10.;
   TLorentzVector mu[2];
@@ -218,7 +224,17 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
               }
 
       
-            } //j-forloop end
+            }//j-forloop end
+
+            if (genTrackplus_pT < genTrackminus_pT){ 
+              genTrackBig_pT = genTrackminus_pT;
+              genTrackSmall_pT = genTrackplus_pT;
+            }
+            else if(genTrackplus_pT > genTrackminus_pT){
+              genTrackBig_pT = genTrackplus_pT;
+              genTrackSmall_pT = genTrackminus_pT;
+            }
+            cout << genTrackSmall_pT << endl;
             //cout << "pdgIDE" << endl;
             //cout<<genTrackplus_ID<<endl;
           }//"if Phi/Rho has two daughters" end   //quindi: il mesone è sempre un phi/rho, infatti pdgID è stampato sempre, mentre non sempre il mesone decade in due figlie,
@@ -261,6 +277,9 @@ void ZMesonGammaGen::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
   genTrackplus_eta_tree = genTrackplus_eta;
   genTrackplus_phi_tree = genTrackplus_phi;
   genTrackplus_E_tree   = genTrackplus_E;
+
+  genTrackBig_pT_tree   = genTrackBig_pT;
+  genTrackSmall_pT_tree = genTrackSmall_pT;
   
 
   //For the polarization reweighting
@@ -348,6 +367,9 @@ void ZMesonGammaGen::create_trees()
   mytree->Branch("genTrackplus_eta",&genTrackplus_eta_tree);
   mytree->Branch("genTrackplus_phi",&genTrackplus_phi_tree);
   mytree->Branch("genTrackplus_E",&genTrackplus_E_tree);
+
+  mytree->Branch("genTrackBig_pT",&genTrackBig_pT_tree);
+  mytree->Branch("genTrackSmall_pT",&genTrackSmall_pT_tree);
 
   mytree->Branch("theta_pol",&theta_pol_tree);
 
