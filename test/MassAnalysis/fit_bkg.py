@@ -84,7 +84,6 @@ for jentry in xrange(nentries):
     h_mZ.Fill(tree.ZMass)
 
 '''
-
 #Retrieve observed_data from the tree, insert the variable also ---------------------------------------------------------------
 observed_data = ROOT.RooDataSet("observed_data","observed_data",ROOT.RooArgSet(mass),ROOT.RooFit.Import(tree))
 #observed_data = ROOT.RooDataHist("observed_data", "observed_data", ROOT.RooArgList(mass), h_mZ)############
@@ -97,9 +96,9 @@ if isPhiGammaAnalysis:
 else :
     SR_input = ROOT.TFile("histos/latest_productions/SR_Rho_BDT_Data.root")
 
-h_mZ_SR = SR_input.Get("tree_output")
+mZ_SR = SR_input.Get("tree_output")
 #h_mZ_SR = SR_input.Get("h_ZMass")
-True_data = ROOT.RooDataSet("True_data","True_data",ROOT.RooArgSet(mass),ROOT.RooFit.Import(h_mZ_SR))
+True_data = ROOT.RooDataSet("True_data","True_data",ROOT.RooArgSet(mass),ROOT.RooFit.Import(mZ_SR))
 #True_data = ROOT.RooDataHist("True_data", "True_data", ROOT.RooArgList(mass), h_mZ_SR)
 
 
