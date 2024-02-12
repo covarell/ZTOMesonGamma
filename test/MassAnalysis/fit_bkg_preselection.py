@@ -42,7 +42,7 @@ CMS_lumi.cmsTextSize = 0.8
 CMS_lumi.lumi_13TeV = "39.54 fb^{-1}" 
 
 #Parameters of the PDF ---------------------------------------------------------------
-mass = ROOT.RooRealVar("ZMass","ZMass",70.,200.,"GeV")#70 200
+mass = ROOT.RooRealVar("ZMass","ZMass",70.,200.,"GeV")
 mass.setRange("full",70.,200.)
 
 #Initialize a Landau pdf
@@ -52,54 +52,34 @@ bkgPDF_landau = ROOT.RooLandau("landau_bkg", "bkgPDF", mass, land_mean, land_sig
 
 #Input file and tree ---------------------------------------------------------------
 if isPhiGammaAnalysis:
-    fileInput = ROOT.TFile("histos/latest_productions/CR_Phi_preselection_Sidebands.root")
+    fileInput = ROOT.TFile("histos/latest_productions/CR_Phi_preselection_SidebandsNorm.root")###background normalizzato alla signal region di mkk blindata
 else :
-    fileInput = ROOT.TFile("histos/latest_productions/CR_Rho_preselection_Sidebands.root")
+    fileInput = ROOT.TFile("histos/latest_productions/CR_Rho_preselection_SidebandsNorm.root")
 fileInput.cd()
-tree = fileInput.Get("tree_output")
+#tree = fileInput.Get("tree_output")
 
-#prepare a rebinned TH1 for Z mass ---------------------------------------------------------------
-#xLowRange  = 75.
-#xHighRange = 105.
-#h_mZ = fileInput.Get("h_ZMass")
-#if isPhiGammaAnalysis:
-#    h_mZ.Rebin(2)
-'''
-#if isPhiGammaAnalysis: h_mZ = ROOT.TH1F("h_mZ","h_mZ", 130, 70., 200.)
-#else: h_mZ =  ROOT.TH1F("h_mZ","h_mZ", 260, 70., 200.)
+h_mZ = fileInput.Get("h_ZMass")
+if isPhiGammaAnalysis:
+    h_mZ.Rebin(2)
 
-nentries = tree.GetEntriesFast()
-print "nEntries = ",nentries
-
-for jentry in xrange(nentries):
-    ientry = tree.LoadTree( jentry )
-    if ientry < 0:
-        print "break"
-        break
-    nb = tree.GetEntry(jentry)
-    if nb <= 0:
-        print "nb < 0"
-        continue
-    
-    h_mZ.Fill(tree.ZMass)
-
-'''
 #Retrieve observed_data from the tree, insert the variable also ---------------------------------------------------------------
-observed_data = ROOT.RooDataSet("observed_data","observed_data",ROOT.RooArgSet(mass),ROOT.RooFit.Import(tree))
-#observed_data = ROOT.RooDataHist("observed_data", "observed_data", ROOT.RooArgList(mass), h_mZ)############
-nEntries = observed_data.numEntries() 
+#observed_data = ROOT.RooDataSet("observed_data","observed_data",ROOT.RooArgSet(mass),ROOT.RooFit.Import(tree))
+observed_data = ROOT.RooDataHist("observed_data", "observed_data", ROOT.RooArgList(mass), h_mZ)############
+#nEntries = observed_data.numEntries()
+#nEntries =h_mZ.Integral(h_mZ.FindBin(70.), h_mZ.FindBin(200.))
+nEntries=observed_data.sumEntries() 
 print "nEntries in bkg distribution = ",nEntries
 
 #recupero l'istogramma della SR e della CR e il tree della SR
 if isPhiGammaAnalysis:
-    SR_input = ROOT.TFile("histos/latest_productions/SR_Phi_preselection_Data.root")############
+    SR_input = ROOT.TFile("histos/latest_productions/SR_Phi_preselection_Data.root")
 else :
     SR_input = ROOT.TFile("histos/latest_productions/SR_Rho_preselection_Data.root")
 
 h_mZ_SR = SR_input.Get("h_ZMass")# mi serve per calcolare l'integrale sulle sidebands di mkkg
 h_mZ_CR = fileInput.Get("h_ZMass")# mi serve per calcolare l'integrale sulle sidebands di mkkg
 mZ_SR_tree = SR_input.Get("tree_output")
-True_data = ROOT.RooDataSet("True_data","True_data",ROOT.RooArgSet(mass),ROOT.RooFit.Import(mZ_SR_tree))
+True_data = ROOT.RooDataSet("True_data","True_data",ROOT.RooArgSet(mass),ROOT.RooFit.Import(mZ_SR_tree))#Dati su cui fare il fit con Combine
 #True_data = ROOT.RooDataHist("True_data", "True_data", ROOT.RooArgList(mass), h_mZ_SR)
 
 
@@ -117,7 +97,6 @@ else:
     xframe_landau = mass.frame(120)
 
 observed_data.plotOn(xframe_landau)
-#bkgPDF_landau.plotOn(xframe_landau)
 bkgPDF_landau.plotOn(xframe_landau,ROOT.RooFit.NormRange("full"),ROOT.RooFit.Range("full"),ROOT.RooFit.Name("bkgPDF_landau"), ROOT.RooFit.LineColor(ROOT.kBlue))
 xframe_landau.SetTitle("#sqrt{s} = 13 TeV       lumi = 39.54/fb")
 xframe_landau.GetXaxis().SetTitle("m_{ditrk,#gamma} [GeV]")
@@ -158,7 +137,7 @@ else:
 
 
 #create Workspace ------------------------------------------------------------------------------------------------------------------------------
-norm  = nEntries*(h_mZ_SR.Integral(h_mZ_SR.FindBin(70.),h_mZ_SR.FindBin(200.)))/(h_mZ_CR.Integral(h_mZ_CR.FindBin(70.),h_mZ_CR.FindBin(200.))-h_mZ_CR.Integral(h_mZ_CR.FindBin(80.),h_mZ_CR.FindBin(100.)))
+norm  = nEntries#*(h_mZ_SR.Integral(h_mZ_SR.FindBin(70.),h_mZ_SR.FindBin(200.)))/(h_mZ_CR.Integral(h_mZ_CR.FindBin(70.),h_mZ_CR.FindBin(200.))-h_mZ_CR.Integral(h_mZ_CR.FindBin(80.),h_mZ_CR.FindBin(100.)))
 print "bkg normalization:", norm
 bkg_norm = ROOT.RooRealVar(bkgPDF_landau.GetName()+ "_norm", bkgPDF_landau.GetName()+ "_norm", norm, 0.5*norm, 2*norm)#########
 
@@ -166,7 +145,7 @@ inputWS = ROOT.TFile("workspaces/workspace_"+CHANNEL+"_preselection.root")
 inputWS.cd()
 workspace = inputWS.Get("workspace_"+CHANNEL+"_preselection")
 getattr(workspace,'import')(bkgPDF_landau)
-getattr(workspace,'import')(True_data)#passo i dati della signal region
+getattr(workspace,'import')(True_data)
 getattr(workspace,'import')(bkg_norm)
 print "integral BKG :",bkg_norm.Print()
 

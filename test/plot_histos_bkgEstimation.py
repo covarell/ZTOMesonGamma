@@ -235,7 +235,7 @@ for histo_name in list_histos:
         elif histo_name == "h_ZMass" and isTightSelection and not isPhi :
             hstack[histo_name].SetMaximum(2.* hdata[histo_name].GetMaximum())                  
         else:
-            hstack[histo_name].SetMaximum(2.1 * hdata[histo_name].GetMaximum())
+            hstack[histo_name].SetMaximum(1.2 * hdata[histo_name].GetMaximum())
 
 
         if histo_name == "h_ZMass":
@@ -364,9 +364,9 @@ for histo_name in list_histos:
     if signal_magnify != 1:
         hsignal[histo_name].Scale(signal_magnify)   
         if histo_name == "h_ZMass" and isPhi:
-            hsignal[histo_name].Scale(0.2) 
+            hsignal[histo_name].Scale(0.2) #0.2
         if histo_name == "h_ZMass" and not isPhi:
-            hsignal[histo_name].Scale(0.2)
+            hsignal[histo_name].Scale(0.2)#0.2
             #hsignalggH[histo_name].Rebin(1/5)#do this to have more granularity in the signal curve
 
     hdata[histo_name].Draw("SAME,E1,X0")

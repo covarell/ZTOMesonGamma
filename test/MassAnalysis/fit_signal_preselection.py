@@ -42,7 +42,7 @@ CMS_lumi.cmsTextSize = 0.8
 CMS_lumi.lumi_13TeV = "39.54 fb^{-1}" 
 
 #Parameters of the PDF ---------------------------------------------------------------
-mass = ROOT.RooRealVar("ZMass","ZMass",84.,100.,"GeV")
+mass = ROOT.RooRealVar("ZMass","ZMass",91.,84.,100.,"GeV")
 mass.setRange("full",84.,100.)
 
 
@@ -89,7 +89,8 @@ for jentry in xrange(nentries_sig):
 
 #Retrieve observed_data from the tree, insert the variable also ---------------------------------------------------------------
 observed_data = ROOT.RooDataHist("observed_data", "observed_data", ROOT.RooArgList(mass), h_mZ)
-#nEntries = observed_data.numEntries() 
+#nEntries = observed_data.sumEntries() 
+nEntries = h_mZ.Integral(h_mZ.FindBin(84.), h_mZ.FindBin(100.))
 #print "nEntries = ",nEntries
 
 
@@ -151,6 +152,7 @@ else:
 #create Workspace ------------------------------------------------------------------------------------------------------------------------------
 #norm = fileInput.Get("h_ZMass").Integral()  # get the normalization of MC signal (area under MC signal)
 norm = h_mZ.Integral(h_mZ.FindBin(84.), h_mZ.FindBin(100.))
+norm = nEntries
 print "norm = ", norm
 sig_norm = ROOT.RooRealVar(sigPDF_voig.GetName() + "_norm", sigPDF_voig.GetName() + "_norm", norm)
 

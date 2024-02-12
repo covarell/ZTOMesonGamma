@@ -42,8 +42,8 @@ CMS_lumi.cmsTextSize = 0.8
 CMS_lumi.lumi_13TeV = "39.54 fb^{-1}" 
 
 #Parameters of the PDF ---------------------------------------------------------------
-mass = ROOT.RooRealVar("ZMass","ZMass",75.,105.,"GeV")
-mass.setRange("full",75.,105.)
+mass = ROOT.RooRealVar("ZMass","ZMass",91.,84.,100.,"GeV")
+mass.setRange("full",84.,100.)
 
 
 #Initialize a Voigtian pdf
@@ -63,8 +63,8 @@ fileInput.cd()
 tree = fileInput.Get("tree_output")
 
 #prepare a rebinned TH1 for Z mass ---------------------------------------------------------------
-xLowRange  = 75.
-xHighRange = 105.
+xLowRange  = 84.
+xHighRange = 100.
 
 h_mZ = ROOT.TH1F("h_mZ","h_mZ", int(xHighRange - xLowRange), xLowRange, xHighRange)
 
@@ -150,7 +150,7 @@ else:
 
 #create Workspace ------------------------------------------------------------------------------------------------------------------------------
 #norm = fileInput.Get("h_ZMass").Integral()  # get the normalization of MC signal (area under MC signal)
-norm = h_mZ.Integral(h_mZ.FindBin(75.), h_mZ.FindBin(105.))
+norm = h_mZ.Integral(h_mZ.FindBin(84.), h_mZ.FindBin(100.))
 print "norm = ", norm
 sig_norm = ROOT.RooRealVar(sigPDF_voig.GetName() + "_norm", sigPDF_voig.GetName() + "_norm", norm)
 

@@ -72,6 +72,9 @@ for histo_name in list_histos:
         histoCR.Scale(SRintegral/CRintegral)
     histoCR.Write()
 
+    if histo_name == "h_ZMass":
+        print SRintegral/CRintegral
+
     print "histo CR integral after the normalization = ", histoCR.Integral()
     print "###############"
 '''

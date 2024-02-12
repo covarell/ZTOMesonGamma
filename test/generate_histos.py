@@ -8,7 +8,7 @@ from functions_smuggler import Simplified_Workflow_Handler
 
 #Following bools are given as input
 debug         = False
-verbose       = False
+verbose       = True
 isBDT         = False #BDT bool
 isDataBlind   = False #Bool for blind analysis
 isPhiAnalysis = False # for Z -> Phi Gamma
@@ -31,6 +31,7 @@ fInput = ROOT.TFile(args.rootfile_name)
 output_filename = args.outputfile_option
 mytree = fInput.Get("ZMesonGamma/mytree")
 h_Events = fInput.Get("ZMesonGamma/hEvents")
+
 
 #SPLIT: I can split a string of chars before and after a split code (that could be a string or a symbol)
 #then I can take the string standing before or after with [0] or [1], respectively. 
@@ -70,17 +71,16 @@ if (args.isBDT_option == "BDT"):
 print "Category = ", args.isBDT_option
 print "-----------------------------------------------"
 
+if isPhiAnalysis:
+    effInput = ROOT.TFile("rootfiles/latest_productions/Efficiency_Signal_Phi.root")
+    effTree = effInput.Get("Efficiency/mytree")
+else :
+    effInput = ROOT.TFile("rootfiles/latest_productions/Efficiency_Signal_Rho.root")
+    effTree = effInput.Get("Efficiency/mytree")
+
+
 ################################################################################################################
 myWF = Simplified_Workflow_Handler("Signal","Data",isBDT)
-
-
-#Normalization for MC dataset ################################################################################
-
-if isPhiAnalysis:
-    normalization_weight = (1./75250.) * (1928000./0.0336) * 0.49 
-elif isRhoAnalysis:
-    normalization_weight = (1./75250.) * (1928000./0.0336)
- 
 
 #Combine luminosity
 #luminosity2018A = 14.00 #fb^-1
@@ -89,9 +89,57 @@ elif isRhoAnalysis:
 #luminosity2018D = 31.93 #fb^-1
 luminosity = 39.54 #total lumi delivered during the trigger activity: 39.54 #fb^-1
 
+if isPhiAnalysis:
+    normalization_weight_eff = (1./1.) * (1928000./0.0336) * 0.49 
+elif isRhoAnalysis:
+    normalization_weight_eff = (1./1.) * (1928000./0.0336)
+
+
+if not samplename == "Data":
+    weightSum_eff = 0.
+    polWeightSum_eff = 0.
+
+#Normalization for MC dataset ################################################################################
+#EVENTS LOOP ########################################################################################################
+nEntries = effTree.GetEntriesFast()
+for jentry in xrange(nEntries):
+    ientry = effTree.LoadTree( jentry )
+    if ientry < 0:
+        break
+    nb = effTree.GetEntry(jentry)
+    if nb <= 0:
+        print "nb < 0"
+        continue
+
+    if debug: 
+        print "Processing EVENT n.",jentry+1," ..."
+
+    if not samplename == "Data" :
+        PUWeight_eff    = effTree.PU_Weight
+        weight_sign_eff = effTree.MC_Weight/abs(effTree.MC_Weight) #just take the sign of the MC gen weight
+
+        if not effTree.theta_polarization == -10. :
+            polarizationWeight_eff = 3.*math.cos(effTree.theta_polarization)*math.cos(effTree.theta_polarization)
+        else: 
+            polarizationWeight_eff = 0.
+
+        eventWeight_eff =  luminosity * normalization_weight_eff * weight_sign_eff * PUWeight_eff * polarizationWeight_eff  
+
+    else:
+        eventWeight_eff = 1.
+
+    weightSum_eff+=eventWeight_eff
+
+if isPhiAnalysis:
+    normalization_weight = (1./1.) * (1928000./0.0336) * 0.49 
+elif isRhoAnalysis:
+    normalization_weight = (1./1.) * (1928000./0.0336)
+ 
+
 if not samplename == "Data":
     weightSum = 0.
-else: weightSum = 1.
+    polWeightSum = 0.
+#else: weightSum = 1.
 
 #HISTOS #########################################################################################################
 histo_map = dict()
@@ -126,9 +174,7 @@ histo_map[list_histos[21]] = ROOT.TH1F(list_histos[21],"n. of jets over pre-filt
 histo_map[list_histos[22]] = ROOT.TH1F(list_histos[22],"n. of muons", 6, -0.5, 5.5)
 histo_map[list_histos[23]] = ROOT.TH1F(list_histos[23],"n. of electrons", 5, -0.5, 5.5)
 histo_map[list_histos[24]] = ROOT.TH1F(list_histos[24],"Iso_neutral of the meson", 100, 0.,1.)
-if not samplename == "Data" :
-    histo_map[list_histos[25]] = ROOT.TH1F(list_histos[25],"Efficiency steps", 6, 0.,6.)###############################################
-else : histo_map[list_histos[25]] = ROOT.TH1F(list_histos[25],"Efficiency steps", 5, 0.,5.)
+histo_map[list_histos[25]] = ROOT.TH1F(list_histos[25],"Efficiency steps", 6, 0.,6.)###############################################
 histo_map[list_histos[26]] = ROOT.TH1F(list_histos[26],"#Delta#phi between meson and photon", 100, -math.pi, math.pi)
 
 
@@ -184,7 +230,7 @@ tree_output.Branch('firstTrkIsoCh',_firstTrkIsoCh,'_firstTrkIsoCh/D')
 tree_output.Branch('secondTrkIso',_secondTrkIso,'_secondTrkIso/D')
 tree_output.Branch('secondTrkIsoCh',_secondTrkIsoCh,'_secondTrkIsoCh/D')
 tree_output.Branch('bestPairDeltaR',_bestPairDeltaR,'_bestPairDeltaR/D')
-tree_output.Branch('eventWeight',_eventWeight,'_eventWeight/D')############
+tree_output.Branch('eventWeight',_eventWeight,'_eventWeight/D')
 tree_output.Branch('nJets',_nJets,'_nJets/D')
 tree_output.Branch('MesonGammaDeltaPhi',_MesonGammaDeltaPhi,'_MesonGammaDeltaPhi/D')
 
@@ -311,13 +357,18 @@ for jentry in xrange(nentries):
     if not samplename == "Data" :
         PUWeight    = mytree.PU_Weight
         weight_sign = mytree.MC_Weight/abs(mytree.MC_Weight) #just take the sign of the MC gen weight
+
         if not mytree.theta_polarization == -10. :
             polarizationWeight = 3.*math.cos(mytree.theta_polarization)*math.cos(mytree.theta_polarization)
         else: 
             polarizationWeight = 0.
-        eventWeight =  luminosity * normalization_weight * weight_sign * PUWeight * polarizationWeight
+
+        eventWeight =  luminosity * normalization_weight * weight_sign * PUWeight * polarizationWeight   
+
     else:
         eventWeight = 1.
+
+
 
 
     #if verbose:
@@ -350,13 +401,24 @@ for jentry in xrange(nentries):
     if samplename == 'Data':
          if (CRflag == 0 and ZMass > 50. and ZMass < 80.) : nEventsLeftSB  += 1
          if (CRflag == 0 and ZMass > 101. and ZMass < 200.) : nEventsRightSB += 1
+
+
+
+    weightSum += eventWeight
+    polWeightSum += polarizationWeight
+    if not samplename == "Data":
+        if isPhiAnalysis:
+            eventWeight = eventWeight/(weightSum_eff)*(1928000/0.0336)*0.49*luminosity
+        else: 
+            eventWeight = eventWeight/(weightSum_eff)*(1928000/0.0336)*luminosity
+
     
 
     #FILL HISTOS #####################################################################################################
     #if DATA -> Blind Analysis on Z inv mass plot
     if samplename == "Data":
         if isDataBlind:
-            if ZMass < 80. or ZMass > 100.5:##########100 for phi_preselection
+            if ZMass < 80. or ZMass > 100:##########100 for phi_preselection
                 histo_map["h_ZMass"].Fill(ZMass, eventWeight)
         else:
             histo_map["h_ZMass"].Fill(ZMass, eventWeight)
@@ -425,6 +487,8 @@ for jentry in xrange(nentries):
     #counters
     nEventsOverCuts += 1
 
+    
+    
     if not samplename == 'Data' :
         if verbose:
             print "EVENT WEIGHT:"
@@ -436,9 +500,9 @@ for jentry in xrange(nentries):
             print "PUWeight               = ",PUWeight
             print "polarization weight    = ",polarizationWeight
             print "Final eventWeight **** = ",eventWeight
-            print "ZMass                  = ",ZMass
-            weightSum += eventWeight
-            print "Signal weight sum   = ",float(weightSum)
+            print "ZMass                  = ",ZMass  
+            print "polarization sumweight = ",float(polWeightSum)          
+            print "Signal weight sum      = ",float(weightSum)
             print "-----------------------------------------------------"
 
 #HISTO LABELS #########################################################################################################
@@ -508,8 +572,7 @@ bin3content  = h_Events.GetBinContent(3)
 nEventsPhoton = bin3content
 bin4content  = h_Events.GetBinContent(4)
 bin5content  = h_Events.GetBinContent(5)
-#if not samplename == "Data" :
-bin6content  = h_Events.GetBinContent(6)##############
+bin6content  = h_Events.GetBinContent(6)
 nEventsMesonMassSR = nEventsRightSB + nEventsLeftSB
 
 
@@ -521,17 +584,16 @@ histo_map["h_efficiency"].Fill(1.5,bin2content*scale_factor)
 histo_map["h_efficiency"].Fill(2.5,bin3content*scale_factor)
 histo_map["h_efficiency"].Fill(3.5,bin4content*scale_factor)
 histo_map["h_efficiency"].Fill(4.5,bin5content*scale_factor)
-#if not samplename == "Data" :
-histo_map["h_efficiency"].Fill(5.5,bin6content*scale_factor)##########
+histo_map["h_efficiency"].Fill(5.5,bin6content*scale_factor)
 
 
 histo_map["h_efficiency"].GetXaxis().SetBinLabel(1,"Events processed")
 histo_map["h_efficiency"].GetXaxis().SetBinLabel(2,"Events triggered")
 histo_map["h_efficiency"].GetXaxis().SetBinLabel(3,"Photon requested")
+histo_map["h_efficiency"].GetXaxis().SetBinLabel(4,"Iso selection")
 histo_map["h_efficiency"].GetXaxis().SetBinLabel(5,"Best couple found")
 histo_map["h_efficiency"].GetXaxis().SetBinLabel(6,"trk-cand pT selection")
-#if not samplename == "Data" :
-histo_map["h_efficiency"].GetXaxis().SetBinLabel(4,"Iso selection")######################
+
 
 
 c11 = ROOT.TCanvas()
@@ -546,35 +608,23 @@ histo_map["h_efficiency"].GetXaxis().SetRangeUser(0.,7.1)
 #histo_map["h_efficiency"].SetMaximum(max(histo_map["h_efficiency"].GetHistogram().GetMaximum(),30.))
 histo_map["h_efficiency"].Draw("HIST TEXT0")
 if not samplename == "Data" and isPhiAnalysis:
-    #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Phi/h_efficiency.pdf")
-    #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Phi/h_efficiency.png")
     c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Signal/h_efficiency.pdf")
     c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Signal/h_efficiency.png")
 elif not samplename == "Data" and isRhoAnalysis:
-    #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Rho/h_efficiency.pdf")
-    #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Signal/SR/Rho/h_efficiency.png")
     c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Signal/h_efficiency.pdf")
     c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Signal/h_efficiency.png")
 
 else:
     if isPhiAnalysis and CRflag == 0:
-        #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/SR/h_efficiency.pdf")
-        #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/SR/h_efficiency.png")
         c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Data/SR/h_efficiency.pdf")
         c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Data/SR/h_efficiency.png")
     elif isPhiAnalysis and CRflag == 1:
-        #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/CR/h_efficiency.pdf")
-        #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Phi/CR/h_efficiency.png")
         c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Data/CR/h_efficiency.pdf")
         c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Data/CR/h_efficiency.png")
     elif isRhoAnalysis and CRflag == 0:
-        #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/SR/h_efficiency.pdf")
-        #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/SR/h_efficiency.png")
         c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Data/SR/h_efficiency.pdf")
         c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Data/SR/h_efficiency.png")
     elif isRhoAnalysis and CRflag == 1: 
-        #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/CR/h_efficiency.pdf")
-        #c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Data/Rho/CR/h_efficiency.png")
         c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Data/CR/h_efficiency.pdf")
         c11.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Data/CR/h_efficiency.png")
 
@@ -615,9 +665,12 @@ if samplename == 'Data' and CRflag == 0:
 
 if not samplename == "Data":
     print "Signal weight sum   = ",float(weightSum)
-    print "Signal integral     = ",histo_map["h_ZMass"].Integral()
+    if isPhiAnalysis: print "Signal integral     = ",histo_map["h_ZMass"].Integral()
+    else : print "Signal integral     = ",histo_map["h_ZMass"].Integral()#/(weightSum_eff)*(1928000/0.0336)*luminosity
+    print "Total signal weight = ",weightSum_eff
     print "Total signal events = ",bin1content
     print "Signal efficiency   = ",nEventsOverCuts/bin1content
+    print "new eff             = ",weightSum/weightSum_eff
     
 print "-------------------------------------------"
 print ""

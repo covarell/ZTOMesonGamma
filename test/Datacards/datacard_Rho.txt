@@ -4,8 +4,8 @@ jmax 1 number of background minus 1
 kmax * number of nuisance parameters
 -------------------------------------
 shapes	sig			BDT	workspaces/workspace_Rho.root  workspace_Rho:voigtian_signal
-shapes	bkg			BDT	workspaces/workspace_Rho.root  workspace_Rho:multipdf_Rho_bkg
-shapes	data_obs	BDT	workspaces/workspace_Rho.root  workspace_Rho:observed_data
+shapes	bkg			BDT	workspaces/workspace_Rho.root  workspace_Rho:landau_bkg
+shapes	data_obs	BDT	workspaces/workspace_Rho.root  workspace_Rho:True_data
 
 -------------------------------------
 bin	         BDT
@@ -14,8 +14,7 @@ observation	 -1
 bin		BDT		 BDT
 process	sig		 bkg
 process	0	 	 1
-rate	0.0001   1
+rate	0.00001  1
 -------------------------------------
-lumi_13TeV_2018     lnN     1.025	      1.025	    -
+lumi_13TeV_2018     lnN     1.025	-
 -------------------------------------
-pdf_index discrete

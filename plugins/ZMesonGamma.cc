@@ -1523,15 +1523,17 @@ void ZMesonGamma::endJob() {
   hEvents->Fill(0.5,nEventsProcessed);
   hEvents->Fill(1.5,nEventsTriggered);
   hEvents->Fill(2.5,nEventsIsPhoton);
+  hEvents->Fill(3.5,nEventsPairIsolationFilter);
   hEvents->Fill(4.5,nEventsBestPairFound);  
   hEvents->Fill(5.5,nEventsTrkPtFilter);  
-  hEvents->Fill(3.5,nEventsPairIsolationFilter);
+  
   hEvents->GetXaxis()->SetBinLabel(1,"processed");
   hEvents->GetXaxis()->SetBinLabel(2,"triggered");
   hEvents->GetXaxis()->SetBinLabel(3,"best photon");
+  hEvents->GetXaxis()->SetBinLabel(4,"trks iso");
   hEvents->GetXaxis()->SetBinLabel(5,"best pair");
   hEvents->GetXaxis()->SetBinLabel(6,"trks pT");
-  hEvents->GetXaxis()->SetBinLabel(4,"trks iso");
+  
 }
 
 //define this as a plug-in
