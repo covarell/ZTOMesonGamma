@@ -52,7 +52,7 @@ bkgPDF_landau = ROOT.RooLandau("landau_bkg", "bkgPDF", mass, land_mean, land_sig
 
 #Input file and tree ---------------------------------------------------------------
 if isPhiGammaAnalysis:
-    fileInput = ROOT.TFile("histos/latest_productions/CR_Phi_BDT_SidebandsNorm.root")###background normalizzato alla signal region di mkk blindata
+    fileInput = ROOT.TFile("histos/latest_productions/CR_Phi_BDT_SidebandsNorm.root")###background normalizzato alla signal region di m_KK blinded (vedi normalize_for_Bkg_Estimation.py)
 else :
     fileInput = ROOT.TFile("histos/latest_productions/CR_Rho_BDT_SidebandsNorm.root")
 fileInput.cd()
@@ -77,8 +77,8 @@ if isPhiGammaAnalysis:
 else :
     SR_input = ROOT.TFile("histos/latest_productions/SR_Rho_BDT_Data.root")
 
-h_mZ_SR = SR_input.Get("h_ZMass")# mi serve per calcolare l'integrale sulle sidebands di mkkg
-h_mZ_CR = fileInput.Get("h_ZMass")# mi serve per calcolare l'integrale sulle sidebands di mkkg
+#h_mZ_SR = SR_input.Get("h_ZMass")# mi serve per calcolare l'integrale sulle sidebands di mkkg
+#h_mZ_CR = fileInput.Get("h_ZMass")# mi serve per calcolare l'integrale sulle sidebands di mkkg
 mZ_SR_tree = SR_input.Get("tree_output")
 True_data = ROOT.RooDataSet("True_data","True_data",ROOT.RooArgSet(mass),ROOT.RooFit.Import(mZ_SR_tree))#Dati su cui fare il fit con Combine
 #True_data = ROOT.RooDataHist("True_data", "True_data", ROOT.RooArgList(mass), h_mZ_SR)
@@ -140,7 +140,7 @@ else:
 #create Workspace ------------------------------------------------------------------------------------------------------------------------------
 norm  = nEntries#*(h_mZ_SR.Integral(h_mZ_SR.FindBin(70.),h_mZ_SR.FindBin(200.)))/(h_mZ_CR.Integral(h_mZ_CR.FindBin(70.),h_mZ_CR.FindBin(200.))-h_mZ_CR.Integral(h_mZ_CR.FindBin(80.),h_mZ_CR.FindBin(100.)))
 print "bkg normalization:", norm
-bkg_norm = ROOT.RooRealVar(bkgPDF_landau.GetName()+ "_norm", bkgPDF_landau.GetName()+ "_norm", norm, 0.5*norm, 2*norm)#########
+bkg_norm = ROOT.RooRealVar(bkgPDF_landau.GetName()+ "_norm", bkgPDF_landau.GetName()+ "_norm", norm, 0.5*norm, 2*norm)
 
 inputWS = ROOT.TFile("workspaces/workspace_"+CHANNEL+".root")  
 inputWS.cd()
