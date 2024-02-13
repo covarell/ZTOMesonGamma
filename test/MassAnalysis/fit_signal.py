@@ -69,7 +69,7 @@ xHighRange = 100.
 h_mZ = ROOT.TH1F("h_mZ","h_mZ", int(xHighRange - xLowRange), xLowRange, xHighRange)
 
 nentries_sig = tree.GetEntriesFast()
-print "nEntries_sig = ",nentries_sig
+#print "nEntries_sig = ",nentries_sig
 
 tot=0.
 for jentry in xrange(nentries_sig):
