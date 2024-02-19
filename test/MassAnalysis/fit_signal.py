@@ -154,6 +154,11 @@ norm = h_mZ.Integral(h_mZ.FindBin(84.), h_mZ.FindBin(100.))
 print "norm = ", norm
 sig_norm = ROOT.RooRealVar(sigPDF_voig.GetName() + "_norm", sigPDF_voig.GetName() + "_norm", norm)
 
+mean.setConstant(1)
+width.setConstant(1)
+sigma.setConstant(1)
+sig_norm.setConstant(1)
+
 
 workspace = ROOT.RooWorkspace("workspace_"+CHANNEL+"")
 getattr(workspace,'import')(sigPDF_voig)

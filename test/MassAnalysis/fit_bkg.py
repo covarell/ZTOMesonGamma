@@ -142,6 +142,10 @@ norm  = nEntries#*(h_mZ_SR.Integral(h_mZ_SR.FindBin(70.),h_mZ_SR.FindBin(200.)))
 print "bkg normalization:", norm
 bkg_norm = ROOT.RooRealVar(bkgPDF_landau.GetName()+ "_norm", bkgPDF_landau.GetName()+ "_norm", norm, 0.5*norm, 2*norm)
 
+land_mean.setConstant(1)
+land_sigma.setConstant(1)
+bkg_norm.setConstant(1)
+
 inputWS = ROOT.TFile("workspaces/workspace_"+CHANNEL+".root")  
 inputWS.cd()
 workspace = inputWS.Get("workspace_"+CHANNEL+"")

@@ -8,7 +8,7 @@ from functions_smuggler import Simplified_Workflow_Handler
 
 #Following bools are given as input
 debug         = False
-verbose       = True
+verbose       = False
 isBDT         = False #BDT bool
 isDataBlind   = False #Bool for blind analysis
 isPhiAnalysis = False # for Z -> Phi Gamma
