@@ -14,7 +14,7 @@ isRhoGammaAnalysis = False
 #Input
 p = argparse.ArgumentParser(description='Select rootfile to plot')
 p.add_argument('Decay_channel_option', help='Type <<Phi>> for Phi, <<Rho>> for Rho') #flag for bkg estimation
-p.add_argument('CAT_option', help='Type the category') #flag for bkg estimation
+p.add_argument('CAT_option', help='Type <<BDT>>') #flag for bkg estimation
 
 args = p.parse_args()
 
