@@ -81,10 +81,7 @@ for jentry in xrange(nentries_sig):
     if nb <= 0:
         print "nb < 0"
         continue
-    #tot+=tree.eventWeight
-    #print "eventWeight =", tree.eventWeight
-    #print "somma =", tot
-
+    
     h_mZ.Fill(tree.ZMass, tree.eventWeight)
 
 #Retrieve observed_data from the tree, insert the variable also ---------------------------------------------------------------
@@ -156,6 +153,10 @@ norm = nEntries
 print "norm = ", norm
 sig_norm = ROOT.RooRealVar(sigPDF_voig.GetName() + "_norm", sigPDF_voig.GetName() + "_norm", norm)
 
+mean.setConstant(1)
+width.setConstant(1)
+sigma.setConstant(1)
+sig_norm.setConstant(1)
 
 workspace = ROOT.RooWorkspace("workspace_"+CHANNEL+"_preselection")
 getattr(workspace,'import')(sigPDF_voig)

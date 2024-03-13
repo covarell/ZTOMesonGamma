@@ -81,9 +81,9 @@ for jentry in xrange(nentries_sig):
     if nb <= 0:
         print "nb < 0"
         continue
-    tot+=tree.eventWeight
-    print "eventWeight =", tree.eventWeight
-    print "somma =", tot
+    #tot+=tree.eventWeight
+    #print "eventWeight =", tree.eventWeight
+    #print "somma =", tot
 
     h_mZ.Fill(tree.ZMass, tree.eventWeight)
 
@@ -174,6 +174,5 @@ fOutput.cd()
 workspace.Write()
 #fOutput.Write()
 fOutput.Close()
-
 
 

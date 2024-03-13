@@ -128,7 +128,8 @@ for jentry in xrange(nEntries):
     else:
         eventWeight_eff = 1.
 
-    weightSum_eff+=eventWeight_eff
+    if not samplename == "Data" :
+        weightSum_eff+=eventWeight_eff
 
 if isPhiAnalysis:
     normalization_weight = (1./1.) * (1928000./0.0336) * 0.49 
@@ -174,7 +175,10 @@ histo_map[list_histos[21]] = ROOT.TH1F(list_histos[21],"n. of jets over pre-filt
 histo_map[list_histos[22]] = ROOT.TH1F(list_histos[22],"n. of muons", 6, -0.5, 5.5)
 histo_map[list_histos[23]] = ROOT.TH1F(list_histos[23],"n. of electrons", 5, -0.5, 5.5)
 histo_map[list_histos[24]] = ROOT.TH1F(list_histos[24],"Iso_neutral of the meson", 100, 0.,1.)
-histo_map[list_histos[25]] = ROOT.TH1F(list_histos[25],"Efficiency steps", 6, 0.,6.)###############################################
+if not isBDT:
+    histo_map[list_histos[25]] = ROOT.TH1F(list_histos[25],"Efficiency steps", 6, 0.,6.)###############################################
+else :
+    histo_map[list_histos[25]] = ROOT.TH1F(list_histos[25],"Efficiency steps", 7, 0.,7.)
 histo_map[list_histos[26]] = ROOT.TH1F(list_histos[26],"#Delta#phi between meson and photon", 100, -math.pi, math.pi)
 
 
@@ -247,6 +251,7 @@ nEventsLeftSB             = 0
 nEventsRightSB            = 0
 nHmatched                 = 0
 nMesonMatched             = 0
+nTightSelection           = 0
 
 
 #EVENTS LOOP ########################################################################################################
@@ -396,16 +401,16 @@ for jentry in xrange(nentries):
                 if debug: print "BDT cut NOT passed"
                 continue
 
-
+        nTightSelection+=1
     
     if samplename == 'Data':
          if (CRflag == 0 and ZMass > 50. and ZMass < 80.) : nEventsLeftSB  += 1
          if (CRflag == 0 and ZMass > 101. and ZMass < 200.) : nEventsRightSB += 1
 
 
-
-    weightSum += eventWeight
-    polWeightSum += polarizationWeight
+    if not samplename == "Data" :
+        weightSum += eventWeight
+        polWeightSum += polarizationWeight
     if not samplename == "Data":
         if isPhiAnalysis:
             eventWeight = eventWeight/(weightSum_eff)*(1928000/0.0336)*0.49*luminosity
@@ -574,6 +579,8 @@ bin4content  = h_Events.GetBinContent(4)
 bin5content  = h_Events.GetBinContent(5)
 bin6content  = h_Events.GetBinContent(6)
 nEventsMesonMassSR = nEventsRightSB + nEventsLeftSB
+if isBDT:
+    bin7content = nTightSelection
 
 
 nSignal      = bin1content
@@ -585,6 +592,8 @@ histo_map["h_efficiency"].Fill(2.5,bin3content*scale_factor)
 histo_map["h_efficiency"].Fill(3.5,bin4content*scale_factor)
 histo_map["h_efficiency"].Fill(4.5,bin5content*scale_factor)
 histo_map["h_efficiency"].Fill(5.5,bin6content*scale_factor)
+if isBDT:
+    histo_map["h_efficiency"].Fill(6.5,bin7content*scale_factor)    
 
 
 histo_map["h_efficiency"].GetXaxis().SetBinLabel(1,"Events processed")
@@ -593,6 +602,8 @@ histo_map["h_efficiency"].GetXaxis().SetBinLabel(3,"Photon requested")
 histo_map["h_efficiency"].GetXaxis().SetBinLabel(4,"Iso selection")
 histo_map["h_efficiency"].GetXaxis().SetBinLabel(5,"Best couple found")
 histo_map["h_efficiency"].GetXaxis().SetBinLabel(6,"trk-cand pT selection")
+if isBDT:
+    histo_map["h_efficiency"].GetXaxis().SetBinLabel(7,"Tight selection")
 
 
 
