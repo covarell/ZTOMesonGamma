@@ -42,8 +42,8 @@ CMS_lumi.cmsTextSize = 0.8
 CMS_lumi.lumi_13TeV = "39.54 fb^{-1}" 
 
 #Parameters of the PDF ---------------------------------------------------------------
-mass = ROOT.RooRealVar("ZMass","ZMass",91.,84.,100.,"GeV")
-mass.setRange("full",84.,100.)
+mass = ROOT.RooRealVar("ZMass","ZMass",91.,75.,130.,"GeV")
+mass.setRange("full",75.,130.)
 
 
 #Initialize a Voigtian pdf
@@ -51,7 +51,7 @@ mean  = ROOT.RooRealVar('mean', 'mean', 90., 80., 110.)
 width = ROOT.RooRealVar('width', 'width', 5., 0., 10.)
 sigma = ROOT.RooRealVar('sigma', 'sigma', 5., 0., 10.) 
 
-sigPDF_voig = ROOT.RooVoigtian("voigtian_signal", "signalPDF", mass, mean, width, sigma)
+sigPDF_voig = ROOT.RooVoigtian("sigPDF_voig", "sigPDF_voig", mass, mean, width, sigma)
 
 
 #Input file and tree ---------------------------------------------------------------
@@ -63,8 +63,8 @@ fileInput.cd()
 tree = fileInput.Get("tree_output")
 
 #prepare a rebinned TH1 for Z mass ---------------------------------------------------------------
-xLowRange  = 84.
-xHighRange = 100.
+xLowRange  = 75.
+xHighRange = 130.
 
 h_mZ = ROOT.TH1F("h_mZ","h_mZ", int(xHighRange - xLowRange), xLowRange, xHighRange)
 
@@ -141,11 +141,11 @@ leg1.Draw()
 CMS_lumi.CMS_lumi(canvas_voig, iPeriod, iPos) #Print integrated lumi and energy information
 
 if isPhiGammaAnalysis:
-    canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Fit/fit_signal.pdf")
-    canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Fit/fit_signal.png")
+    #canvas_voig.SaveAs("/afs/cern.ch/user/c/covarell/www/zphigamma/fit_signal.pdf")
+    canvas_voig.SaveAs("/afs/cern.ch/user/c/covarell/www/zphigamma/fit_signal_phi.png")
 else:
-    canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Fit/fit_signal.pdf")
-    canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Fit/fit_signal.png")
+    #canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Fit/fit_signal.pdf")
+    canvas_voig.SaveAs("/afs/cern.ch/user/c/covarell/www/zphigamma/fit_signal_rho.png")
 
 
 #create Workspace ------------------------------------------------------------------------------------------------------------------------------

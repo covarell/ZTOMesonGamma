@@ -42,13 +42,13 @@ CMS_lumi.cmsTextSize = 0.8
 CMS_lumi.lumi_13TeV = "39.54 fb^{-1}" 
 
 #Parameters of the PDF ---------------------------------------------------------------
-mass = ROOT.RooRealVar("ZMass","ZMass",75.,200.,"GeV")#######84-200
-mass.setRange("full",75.,200.)#####84-200
+mass = ROOT.RooRealVar("ZMass","ZMass",75.,130.,"GeV")#######84-200
+mass.setRange("full",75.,130.)#####84-200
 
 #Initialize a Landau pdf
 land_mean = ROOT.RooRealVar('land_mean', 'land_mean', 103., 95.,110.) 
 land_sigma = ROOT.RooRealVar('land_sigma', 'land_sigma', 13., 10., 20.) 
-bkgPDF_landau = ROOT.RooLandau("landau_bkg", "bkgPDF", mass, land_mean, land_sigma)
+landau_pdf = ROOT.RooLandau("landau_pdf", "landau_pdf", mass, land_mean, land_sigma)
 '''
 #Initialize a CrystallBall
 gaus_mean = ROOT.RooRealVar('gaus_mean', 'gaus_mean', 103., 95.,105.)
@@ -64,9 +64,9 @@ c_bkg = ROOT.RooRealVar("c_bkg","c_bkg",0.01,-5.,1)
 d_bkg = ROOT.RooRealVar("d_bkg","d_bkg",-0.05,-0.5,0.)
 #e_bkg = ROOT.RooRealVar("e_bkg_","e_bkg",-0.05,-0.1,0.)
 
-convolution_pdf = ROOT.RooChebychev("chebychev","bkgPDF",mass,ROOT.RooArgList(a_bkg,b_bkg,c_bkg,d_bkg))
+chebychev_pdf = ROOT.RooChebychev("chebychev_pdf","chebychev_pdf",mass,ROOT.RooArgList(a_bkg,b_bkg,c_bkg,d_bkg))
 
-#bkgPDF_landau=convolution_pdf################
+#landau_pdf=chebychev_pdf################
 
 #Input file and tree ---------------------------------------------------------------
 if isPhiGammaAnalysis:
@@ -85,7 +85,7 @@ h_mZ = fileInput.Get("h_ZMass")
 observed_data = ROOT.RooDataSet("observed_data","observed_data",ROOT.RooArgSet(mass),ROOT.RooFit.Import(tree))
 #observed_data = ROOT.RooDataHist("observed_data", "observed_data", ROOT.RooArgList(mass), h_mZ)############
 nEntries = observed_data.numEntries()
-#nEntries =h_mZ.Integral(h_mZ.FindBin(70.), h_mZ.FindBin(200.))
+#nEntries =h_mZ.Integral(h_mZ.FindBin(70.), h_mZ.FindBin(130.))
 #nEntries=observed_data.sumEntries() 
 print "nEntries in bkg distribution = ",nEntries
 
@@ -103,8 +103,8 @@ True_data = ROOT.RooDataSet("True_data","True_data",ROOT.RooArgSet(mass),ROOT.Ro
 
 
 #Do the fit ------------------------------------------------------------------------------------------------------------------
-fitResult_landau = bkgPDF_landau.fitTo(observed_data,ROOT.RooFit.Save())
-fitResult_cheby = convolution_pdf.fitTo(observed_data,ROOT.RooFit.Save())
+fitResult_landau = landau_pdf.fitTo(observed_data,ROOT.RooFit.Save())
+fitResult_cheby = chebychev_pdf.fitTo(observed_data,ROOT.RooFit.Save())
 
 #Plot ------------------------------------------------------------------------------------------------------------------------
 canvas_landau = ROOT.TCanvas()
@@ -117,11 +117,11 @@ else:
     xframe_landau = mass.frame(120)
 
 observed_data.plotOn(xframe_landau)
-bkgPDF_landau.plotOn(xframe_landau,ROOT.RooFit.NormRange("full"),ROOT.RooFit.Range("full"),ROOT.RooFit.Name("bkgPDF_landau"), ROOT.RooFit.LineColor(ROOT.kBlue))
+landau_pdf.plotOn(xframe_landau,ROOT.RooFit.NormRange("full"),ROOT.RooFit.Range("full"),ROOT.RooFit.Name("landau_pdf"), ROOT.RooFit.LineColor(ROOT.kBlue))
 xframe_landau.SetTitle("#sqrt{s} = 13 TeV       lumi = 39.54/fb")
 xframe_landau.GetXaxis().SetTitle("m_{ditrk,#gamma} [GeV]")
 xframe_landau.SetMaximum(1.3*xframe_landau.GetMaximum())
-bkgPDF_landau.paramOn(xframe_landau, ROOT.RooFit.Layout(0.65,0.94,0.91),ROOT.RooFit.Format("NEU",ROOT.RooFit.AutoPrecision(1))) #,ROOT.RooFit.Layout(0.65,0.90,0.90)
+landau_pdf.paramOn(xframe_landau, ROOT.RooFit.Layout(0.65,0.94,0.91),ROOT.RooFit.Format("NEU",ROOT.RooFit.AutoPrecision(1))) #,ROOT.RooFit.Layout(0.65,0.90,0.90)
 xframe_landau.getAttText().SetTextSize(0.02)
 xframe_landau.Draw() #remember to draw the frame before the legend initialization to fill the latter correctly
 
@@ -129,8 +129,8 @@ xframe_landau.Draw() #remember to draw the frame before the legend initializatio
 nParam_landau = fitResult_landau.floatParsFinal().getSize()
 chi2_landau = xframe_landau.chiSquare()#Returns chi2. Remember to remove the option XErrorSize(0) from data.PlotOn
 cut_chi2_landau = "{:.2f}".format(chi2_landau) #Crop the chi2 to 2 decimal digits
-print "Chi square convolution = ",chi2_landau
-print "n param convolution = ",nParam_landau
+print "Chi square chebychev = ",chi2_landau
+print "n param chebychev = ",nParam_landau
 print ""
 
 leg1 = ROOT.TLegend(0.5,0.52,0.72,0.90) #right positioning
@@ -149,11 +149,11 @@ leg1.Draw()
 CMS_lumi.CMS_lumi(canvas_landau, iPeriod, iPos) #Print integrated lumi and energy information
 
 if isPhiGammaAnalysis:
-    canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Fit/fit_bkg_BDT.pdf")
-    canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Fit/fit_bkg_BDT.png")
+#    canvas_landau.SaveAs("/afs/cern.ch/user/c/covarell/www/zphigamma/fit_bkg_BDT.pdf")
+   canvas_landau.SaveAs("/afs/cern.ch/user/c/covarell/www/zphigamma/fit_bkg_BDT_phi.png")
 else:
-    canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Fit/fit_bkg_BDT.pdf")
-    canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Fit/fit_bkg_BDT.png")
+ #   canvas_landau.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Fit/fit_bkg_BDT.pdf")
+    canvas_landau.SaveAs("/afs/cern.ch/user/c/covarell/www/zphigamma/fit_bkg_BDT_rho.png")
 
 
 canvas_cheby = ROOT.TCanvas()
@@ -166,11 +166,11 @@ else:
     xframe_cheby = mass.frame(120)
 
 observed_data.plotOn(xframe_cheby)
-convolution_pdf.plotOn(xframe_cheby,ROOT.RooFit.NormRange("full"),ROOT.RooFit.Range("full"),ROOT.RooFit.Name("convolution_pdf"), ROOT.RooFit.LineColor(ROOT.kBlue))
+chebychev_pdf.plotOn(xframe_cheby,ROOT.RooFit.NormRange("full"),ROOT.RooFit.Range("full"),ROOT.RooFit.Name("chebychev_pdf"), ROOT.RooFit.LineColor(ROOT.kBlue))
 xframe_cheby.SetTitle("#sqrt{s} = 13 TeV       lumi = 39.54/fb")
 xframe_cheby.GetXaxis().SetTitle("m_{ditrk,#gamma} [GeV]")
 xframe_cheby.SetMaximum(1.3*xframe_cheby.GetMaximum())
-convolution_pdf.paramOn(xframe_cheby, ROOT.RooFit.Layout(0.65,0.94,0.91),ROOT.RooFit.Format("NEU",ROOT.RooFit.AutoPrecision(1))) #,ROOT.RooFit.Layout(0.65,0.90,0.90)
+chebychev_pdf.paramOn(xframe_cheby, ROOT.RooFit.Layout(0.65,0.94,0.91),ROOT.RooFit.Format("NEU",ROOT.RooFit.AutoPrecision(1))) #,ROOT.RooFit.Layout(0.65,0.90,0.90)
 xframe_cheby.getAttText().SetTextSize(0.02)
 xframe_cheby.Draw() #remember to draw the frame before the legend initialization to fill the latter correctly
 
@@ -178,8 +178,8 @@ xframe_cheby.Draw() #remember to draw the frame before the legend initialization
 nParam_cheby = fitResult_cheby.floatParsFinal().getSize()
 chi2_cheby = xframe_cheby.chiSquare()#Returns chi2. Remember to remove the option XErrorSize(0) from data.PlotOn
 cut_chi2_cheby = "{:.2f}".format(chi2_cheby) #Crop the chi2 to 2 decimal digits
-print "Chi square convolution = ",chi2_cheby
-print "n param convolution = ",nParam_cheby
+print "Chi square chebychev = ",chi2_cheby
+print "n param chebychev = ",nParam_cheby
 print ""
 
 leg2 = ROOT.TLegend(0.5,0.52,0.72,0.90) #right positioning
@@ -198,18 +198,18 @@ leg2.Draw()
 CMS_lumi.CMS_lumi(canvas_landau, iPeriod, iPos) #Print integrated lumi and energy information
 
 if isPhiGammaAnalysis:
-    canvas_cheby.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Fit/fit_bkg_BDT_2.pdf")
-    canvas_cheby.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Fit/fit_bkg_BDT_2.png")
+    #canvas_cheby.SaveAs("/fit_bkg_BDT_2.pdf")
+    canvas_cheby.SaveAs("/afs/cern.ch/user/c/covarell/www/zphigamma/fit_bkg_BDT_2_phi.png")
 else:
-    canvas_cheby.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Fit/fit_bkg_BDT_2.pdf")
-    canvas_cheby.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Fit/fit_bkg_BDT_2.png")
+    #canvas_cheby.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Fit/fit_bkg_BDT_2.pdf")
+    canvas_cheby.SaveAs("/afs/cern.ch/user/c/covarell/www/zphigamma/fit_bkg_BDT_2_rho.png")
 
 
 # Multipdf ------------------------------------------------------------------------------------------------------------------------------
 cat = ROOT.RooCategory("pdf_index","Index of Pdf which is active")
 mypdfs = ROOT.RooArgList()
-mypdfs.add(bkgPDF_landau)
-mypdfs.add(convolution_pdf)
+mypdfs.add(landau_pdf)
+mypdfs.add(chebychev_pdf)
 
 
 multipdf = ROOT.RooMultiPdf("multipdf","All Pdfs",cat,mypdfs)
@@ -218,9 +218,9 @@ multipdf = ROOT.RooMultiPdf("multipdf","All Pdfs",cat,mypdfs)
 
 
 #create Workspace ------------------------------------------------------------------------------------------------------------------------------
-norm  = nEntries*(h_mZ_SR.Integral(h_mZ_SR.FindBin(75.),h_mZ_SR.FindBin(200.))-h_mZ_CR.Integral(h_mZ_SR.FindBin(80.),h_mZ_SR.FindBin(100.)))/(h_mZ_CR.Integral(h_mZ_CR.FindBin(75.),h_mZ_CR.FindBin(200.))-h_mZ_CR.Integral(h_mZ_CR.FindBin(80.),h_mZ_CR.FindBin(100.)))
+norm  = nEntries*(h_mZ_SR.Integral(h_mZ_SR.FindBin(75.),h_mZ_SR.FindBin(130.))-h_mZ_CR.Integral(h_mZ_SR.FindBin(80.),h_mZ_SR.FindBin(100.)))/(h_mZ_CR.Integral(h_mZ_CR.FindBin(75.),h_mZ_CR.FindBin(130.))-h_mZ_CR.Integral(h_mZ_CR.FindBin(80.),h_mZ_CR.FindBin(100.)))
 print "bkg normalization:", norm
-#bkg_norm = ROOT.RooRealVar(bkgPDF_landau.GetName()+ "_norm", bkgPDF_landau.GetName()+ "_norm", norm, 0.5*norm, 2*norm)
+#bkg_norm = ROOT.RooRealVar(landau_pdf.GetName()+ "_norm", landau_pdf.GetName()+ "_norm", norm, 0.5*norm, 2*norm)
 bkg_norm = ROOT.RooRealVar(multipdf.GetName()+ "_norm", multipdf.GetName()+ "_norm", norm,0.5*norm, 2*norm)
 
 #land_mean.setConstant(1)
@@ -234,10 +234,11 @@ bkg_norm = ROOT.RooRealVar(multipdf.GetName()+ "_norm", multipdf.GetName()+ "_no
 inputWS = ROOT.TFile("workspaces/workspace_"+CHANNEL+".root")  
 inputWS.cd()
 workspace = inputWS.Get("workspace_"+CHANNEL+"")
-#getattr(workspace,'import')(bkgPDF_landau)
+getattr(workspace,'import')(landau_pdf)
+getattr(workspace,'import')(chebychev_pdf)
 getattr(workspace,'import')(True_data)
 getattr(workspace,'import')(cat)
-getattr(workspace,'import')(multipdf)
+#getattr(workspace,'import')(multipdf)
 getattr(workspace,'import')(bkg_norm)
 print "integral BKG :",bkg_norm.Print()
 

@@ -1,3 +1,4 @@
+
 import ROOT
 import argparse
 import tdrstyle, CMS_lumi
@@ -46,7 +47,7 @@ ROOT.gROOT.SetBatch(True) #Supress the opening of many Canvas's
 
 
 #Define the observable --------------------------
-mass = ROOT.RooRealVar("ZMass","ZMass",75.,200.,"GeV")###########same range of the workspace (75 or 84)
+mass = ROOT.RooRealVar("ZMass","ZMass",75.,130.,"GeV")###########same range of the workspace (75 or 84)
 
 #Signal input -------------------------------------------------------------
 if CATEGORY == "BDT" and isPhiGammaAnalysis: fileInputSignal = ROOT.TFile("histos/latest_productions/SR_Phi_BDT_Signal.root")
@@ -65,13 +66,21 @@ inputWS = ROOT.TFile("workspaces/workspace_"+CHANNEL+".root")
 inputWS.cd()
 workspace = inputWS.Get("workspace_"+CHANNEL+"")
 
-signalPDF = workspace.pdf("voigtian_signal") #SIGNAL PDF from the workspace
-#workspace.var("mean").setConstant(1) 
-#workspace.var("width").setConstant(1)
-#workspace.var("sigma").setConstant(1)
+signalPDF = workspace.pdf("sigPDF_voig") #SIGNAL PDF from the workspace
+print ("mean =", workspace.var("mean").getVal()) 
+print ("sigma =", workspace.var("sigma").getVal()) 
+print ("width =", workspace.var("width").getVal()) 
 
+bkgPDF = workspace.pdf("landau_pdf") #BKG PDF from the workspace
+#bkgPDF = workspace.pdf("chebychev_pdf") #BKG PDF from the workspace
+workspace.var("a_bkg").setRange(workspace.var("a_bkg").getVal()*0.9,workspace.var("a_bkg").getVal()*1.1);
+workspace.var("b_bkg").setRange(workspace.var("b_bkg").getVal()*1.1,workspace.var("b_bkg").getVal()*0.9);
+workspace.var("c_bkg").setRange(workspace.var("c_bkg").getVal()*0.9,workspace.var("c_bkg").getVal()*1.1);
+workspace.var("d_bkg").setRange(workspace.var("d_bkg").getVal()*1.1,workspace.var("d_bkg").getVal()*0.9);
 
-bkgPDF = workspace.pdf("landau_bkg") #BKG PDF from the workspace
+#print ("land_mean =", workspace.var("land_mean").getVal(), [workspace.var("land_mean").getMin(), workspace.var("land_mean").getMax() ]) 
+#print ("land_sigma =", workspace.var("land_sigma").getVal(), [workspace.var("land_sigma").getMin(), workspace.var("land_sigma").getMax() ]) 
+
 #workspace.var("land_mean").setConstant(1)
 #workspace.var("land_sigma").setConstant(1)
 
@@ -86,11 +95,11 @@ bkgPDF = ROOT.RooLandau("landau_bkg", "bkgPDF", mass, land_mean, land_sigma)
 B_R_ = ROOT.RooRealVar("B_R_","branching_ratio",0.000001,-0.001,0.001) #parameter of interest
 
 #Number of events in m_KKg
-fInput_sig = ROOT.TFile("rootfiles/latest_productions/ZMesonGamma"+CHANNEL+"_Signal.root")
+#fInput_sig = ROOT.TFile("rootfiles/latest_productions/ZMesonGamma"+CHANNEL+"_Signal.root")
 #mytree_sig     = fInput_sig.Get("ZMesonGamma/mytree")
-h_Events       = fInput_sig.Get("ZMesonGamma/hEvents")
-NsigPassed     = mytreeSignal.GetEntriesFast()
-totalSigEvents = h_Events.GetBinContent(1)
+#h_Events       = fInput_sig.Get("ZMesonGamma/hEvents")
+#NsigPassed     = mytreeSignal.GetEntriesFast()
+#totalSigEvents = h_Events.GetBinContent(1)
 #sigEfficiency  = float(NsigPassed/totalSigEvents)
 if isPhiGammaAnalysis: sigEfficiency = 0.0272
 else : sigEfficiency = 0.0197
@@ -111,36 +120,33 @@ eff  = ROOT.RooRealVar("eff","efficiency ",sigEfficiency)
 if CHANNEL == "Phi": B_R_meson = ROOT.RooRealVar("B_R_meson","b_r_meson",0.489) # = BR(phi -> K+K-)
 if CHANNEL == "Rho": B_R_meson = ROOT.RooRealVar("B_R_meson","b_r_meson",1.) # = BR(rho -> PiPi)
 #Nsig = ROOT.RooFormulaVar("Nsig","@0*@1*@2*@3*@4",ROOT.RooArgList(lumi,cross_sig,eff,B_R_meson,B_R_))
-Nsig = ROOT.RooRealVar("Nsig", "Nsig", 50., 0., 1500.)
+Nsig = ROOT.RooRealVar("Nsig", "Nsig", 50., -50., 500.)
 
 #ADD PDFs --------------------------------------------------------------------------------------------------
 argListN = ROOT.RooArgList(Nsig,Nbkg)
 print "arg list N size = ",argListN.getSize()
 
-
-totPDF_landau = ROOT.RooAddPdf("totPDF_landau","Land",ROOT.RooArgList(signalPDF,bkgPDF), argListN)
+totPDF_landau = ROOT.RooAddPdf("totPDF_landau","totPDF_landau",ROOT.RooArgList(signalPDF,bkgPDF), ROOT.RooArgList(Nsig,Nbkg))
 #totPDF_landau=bkgPDF
 
-
 print "PDFs added!"
-
 
 #Final useful information for debugging
 print ""
 print "######################################################"
 print "Ndata          = ",Ndata
-print "totalSigEvents = ",totalSigEvents
-print "NsigPassed     = ",NsigPassed
+#print "totalSigEvents = ",totalSigEvents
+#print "NsigPassed     = ",NsigPassed
 print "######################################################"
 print ""
 
 #prepare a rebinned TH1 for Z mass ---------------------------------------------------------------
 xLowRange  = 75.#84
-xHighRange = 200.
+xHighRange = 130.
 if isPhiGammaAnalysis:
-    h_mZ = ROOT.TH1F("h_mZ","h_mZ", int((xHighRange - xLowRange)/2), xLowRange, xHighRange)
+    h_mZ = ROOT.TH1F("h_mZ","h_mZ", int((xHighRange - xLowRange)/0.5), xLowRange, xHighRange)
 else:
-    h_mZ = ROOT.TH1F("h_mZ","h_mZ", int((xHighRange - xLowRange)/2), xLowRange, xHighRange)
+    h_mZ = ROOT.TH1F("h_mZ","h_mZ", int((xHighRange - xLowRange)/0.5), xLowRange, xHighRange)
 
 nentries = tree_fit.GetEntriesFast()
 #print "nEntries_sig = ",nentries_sig
@@ -166,6 +172,7 @@ observed_data = ROOT.RooDataHist("observed_data", "observed_data", ROOT.RooArgLi
 
 #Do the fit ------------------------------------------------------------------------------------------------------------------------------
 fitResult_voig = totPDF_landau.fitTo(observed_data,ROOT.RooFit.Save())
+#fitResult_voig = bkgPDF.fitTo(observed_data,ROOT.RooFit.Save()) 
 
 #Plot ------------------------------------------------------------------------------------------------------------------------
 canvas_voig = ROOT.TCanvas()
@@ -178,7 +185,8 @@ else:
     xframe_voig = mass.frame(120)
 
 observed_data.plotOn(xframe_voig)
-totPDF_landau.plotOn(xframe_voig,ROOT.RooFit.NormRange("full"),ROOT.RooFit.Range("full"),ROOT.RooFit.Name("signal_pdf"), ROOT.RooFit.LineColor(ROOT.kBlue))
+totPDF_landau.plotOn(xframe_voig,ROOT.RooFit.LineColor(ROOT.kBlue))
+#bkgPDF.plotOn(xframe_voig,ROOT.RooFit.LineColor(ROOT.kBlue))
 xframe_voig.SetTitle("#sqrt{s} = 13 TeV       lumi = 39.54/fb")
 xframe_voig.GetXaxis().SetTitle("m_{ditrk,#gamma} [GeV]")
 xframe_voig.SetMaximum(1.3*xframe_voig.GetMaximum())
@@ -186,7 +194,6 @@ Set_par = ROOT.RooArgSet(Nsig,Nbkg)
 totPDF_landau.paramOn(xframe_voig,ROOT.RooFit.Layout(0.65,0.94,0.91),ROOT.RooFit.Format("NEU",ROOT.RooFit.AutoPrecision(1)))
 xframe_voig.getAttText().SetTextSize(0.02)
 xframe_voig.Draw() #remember to draw the frame before the legend initialization to fill the latter correctly
-
 
 #Calculate Chi square and parameters 
 nParam_voig = fitResult_voig.floatParsFinal().getSize()
@@ -214,11 +221,11 @@ leg1.Draw()
 CMS_lumi.CMS_lumi(canvas_voig, iPeriod, iPos) #Print integrated lumi and energy information
 
 if isPhiGammaAnalysis:
-    canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Fit/fit_unblind.pdf")
-    canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Phi/Fit/fit_unblind.png")
+   # canvas_voig.SaveAs("./fit_unblind_phi.pdf")
+    canvas_voig.SaveAs("/afs/cern.ch/user/c/covarell/www/zphigamma/fit_unblind_phi.png")
 else:
-    canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Fit/fit_unblind.pdf")
-    canvas_voig.SaveAs("/eos/user/e/eferrand/ZMesonGamma/CMSSW_10_6_27/src/ZMesonGammaAnalysis/ZTOMesonGamma/plots/Rho/Fit/fit_unblind.png")
+   # canvas_voig.SaveAs("./fit_unblind_rho.pdf")
+    canvas_voig.SaveAs("/afs/cern.ch/user/c/covarell/www/zphigamma/fit_unblind_rho.png")
 
 '''
 #Now save the data and the PDF into a Workspace, for later use for statistical analysis
@@ -238,8 +245,7 @@ fInput = ROOT.TFile("unblinded_fit")
 fInput.cd()
 w = fInput.Get("w")
 
-w.var("land_mean").setConstant(1)
-w.var("land_sigma").setConstant(1)
+
 w.var("mean").setConstant(1)
 w.var("width").setConstant(1)
 w.var("sigma").setConstant(1)
